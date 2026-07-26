@@ -6,6 +6,11 @@ owner = "proxlavee"
 repo = "yomika"
 
 [changelog]
+# A title for the generated changelog file. Release notes strip this header.
+header = """
+# Changelog
+
+"""
 # A Tera template to be rendered for each release in the changelog.
 # See https://keats.github.io/tera/docs/#introduction
 body = """
@@ -49,10 +54,12 @@ body = """
   ## New Contributors ❤️
 {% endif %}\
 {% for contributor in github.contributors | filter(attribute="is_first_time", value=true) %}
+  {%- if contributor.username %}
   * @{{ contributor.username }} made their first contribution
     {%- if contributor.pr_number %} in \
       [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
     {%- endif %}
+  {%- endif %}
 {%- endfor -%}
 {%- endif %}
 
