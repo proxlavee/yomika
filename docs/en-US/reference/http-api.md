@@ -19,7 +19,7 @@ Important current behavior:
 - the API is served by the same process as the GUI or headless runtime
 - the server binds to `127.0.0.1` by default; use `--host` to bind elsewhere
 - the API and MCP server share the same loaded project, models, and pipeline state
-- when no `--port` is provided, Yomika chooses a random local port
+- without `--port`, release builds start at `4000` and advance to the next available port; debug builds bind exactly to `4000`
 - everything except `/api/v1/downloads`, `/api/v1/operations`, and `/api/v1/events` returns `503 Service Unavailable` until the app finishes bootstrapping
 
 ## Resource model

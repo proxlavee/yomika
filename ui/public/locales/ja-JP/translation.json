@@ -329,7 +329,7 @@
     "deviceDescription": "ハードウェアアクセラレーション情報",
     "deviceMl": "ML 演算",
     "apiKeys": "API キー",
-    "apiKeysDescription": "異なるプロバイダーの API キーを管理します。キーはデバイスのキーチェーンに安全に保存され、他人と共有されることはありません。",
+    "apiKeysDescription": "外部プロバイダーの API キーを管理します。キーはシステムのキーチェーンに安全に保存され、Yomika がリクエストを送信するときに、設定したプロバイダーにのみ送られます。",
     "freeTier": "無料プラン",
     "localLlm": "ローカル LLM",
     "localLlmTitle": "ローカル LLM",

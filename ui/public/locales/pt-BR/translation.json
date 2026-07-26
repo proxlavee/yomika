@@ -330,7 +330,7 @@
     "deviceDescription": "Informações sobre aceleração por hardware.",
     "deviceMl": "Computação ML",
     "apiKeys": "Chaves de API",
-    "apiKeysDescription": "Gerencie suas chaves de API para diferentes provedores. Suas chaves são armazenadas com segurança no chaveiro do seu dispositivo e nunca são compartilhadas.",
+    "apiKeysDescription": "Gerencie chaves de API de provedores externos. Elas são armazenadas com segurança no chaveiro do sistema e enviadas apenas ao provedor configurado quando o Yomika faz uma solicitação.",
     "freeTier": "Nível gratuito",
     "localLlm": "LLM local",
     "localLlmTitle": "LLM local",

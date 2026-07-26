@@ -1,6 +1,7 @@
 [project]
 site_name = "Yomika"
-site_description = "Yomika 是一款用 Rust 编写的本地优先漫画翻译工具。"
+site_url = "https://proxlavee.github.io/yomika/zh-CN/"
+site_description = "本地优先的漫画翻译工具，支持 OCR、图像修复、本地与远程 LLM 以及 MCP 自动化。"
 site_author = "Yomika contributors"
 repo_url = "https://github.com/proxlavee/yomika"
 repo_name = "proxlavee/yomika"
@@ -55,22 +56,22 @@ twitter_card = "summary_large_image"
 
 [[project.extra.alternate]]
 name = "English"
-link = "/"
+link = "https://proxlavee.github.io/yomika/"
 lang = "en"
 
 [[project.extra.alternate]]
 name = "日本語"
-link = "/ja-JP/"
+link = "https://proxlavee.github.io/yomika/ja-JP/"
 lang = "ja-JP"
 
 [[project.extra.alternate]]
 name = "简体中文"
-link = "/zh-CN/"
+link = "https://proxlavee.github.io/yomika/zh-CN/"
 lang = "zh-CN"
 
 [[project.extra.alternate]]
 name = "Português (Brasil)"
-link = "/pt-BR/"
+link = "https://proxlavee.github.io/yomika/pt-BR/"
 lang = "pt-BR"
 
 [[project.extra.social]]

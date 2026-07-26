@@ -50,7 +50,7 @@ O modo headless fica em primeiro plano até você parar, normalmente com `Ctrl+C
 
 ## Executar com uma porta fixa
 
-Por padrão, o Yomika usa uma porta local aleatória. Use `--port` quando precisar de um endereço estável para bookmarks, scripts, reverse proxies ou clientes MCP.
+Sem `--port`, builds de release começam em `4000` e avançam até a próxima porta local disponível quando necessário; builds de debug vinculam exatamente a `4000`. Use `--port` quando precisar de um endereço estável para bookmarks, scripts, reverse proxies ou clientes MCP.
 
 ```bash
 # macOS / Linux
@@ -60,7 +60,7 @@ yomika --port 9999
 yomika.exe --port 9999
 ```
 
-Se você não especificar `--port`, o Yomika ainda inicia o servidor, mas a porta escolhida é dinâmica.
+Ao especificar `--port`, o Yomika usa exatamente essa porta e informa um erro se ela não estiver disponível.
 
 ## Vincular a um endereço fora do loopback
 

@@ -42,14 +42,14 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev libclang-dev librsvg2-dev patchelf
 
       - name: Install CUDA Toolkit (ubuntu only)
-        uses: Jimver/cuda-toolkit@master
+        uses: Jimver/cuda-toolkit@v0.2.35
         if: startsWith(matrix.platform, 'ubuntu')
         with:
           cuda: '13.0.0'
           log-file-suffix: '${{ matrix.platform }}.txt'
 
       - name: Install CUDA Toolkit (windows only)
-        uses: Jimver/cuda-toolkit@master
+        uses: Jimver/cuda-toolkit@v0.2.35
         if: startsWith(matrix.platform, 'windows')
         with:
           cuda: '13.0.0'

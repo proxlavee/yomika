@@ -473,10 +473,11 @@ hide:
       </div>
 
       <div class="ym-hero__copy">
-        <h1>Translate manga locally, privately, and with a real production pipeline.</h1>
+        <h1>Translate and typeset manga with a local-first production pipeline.</h1>
         <p class="ym-hero__lede">
-          Yomika is a Rust desktop application for manga translation. It handles OCR,
-          cleanup, translation, review, and export on Windows, macOS, and Linux.
+          Yomika handles OCR, cleanup, translation, review, and export on Windows,
+          macOS, and Linux. Run the built-in vision pipeline and downloaded LLMs
+          on-device, or opt into a hosted translation provider.
         </p>
         <div class="ym-hero__model-row">
           <div class="ym-hero__model-label">Local models include</div>
@@ -510,7 +511,7 @@ hide:
   <section class="ym-section">
     <div class="ym-shell">
       <div class="ym-section__header">
-        <div class="ym-kicker">No-GUI Deployment</div>
+        <div class="ym-kicker">Headless deployment</div>
         <h2>Run Yomika without the desktop window when you need a local Web UI or a scriptable translation runtime.</h2>
         <p>
           The desktop app is the primary interface, but the same runtime can also run
@@ -553,7 +554,7 @@ yomika.exe --port 4000 --headless</code></pre>
     <div class="ym-shell">
       <div class="ym-section__header">
         <div class="ym-kicker">MCP Integration</div>
-        <h2>Let agents drive Yomika while models and page data stay on the local machine.</h2>
+        <h2>Let agents drive the same local Yomika runtime through MCP.</h2>
         <p>
           Yomika includes MCP support so the desktop UI, headless mode, and agent
           workflows all talk to the same local translation runtime instead of drifting
@@ -584,7 +585,7 @@ yomika.exe --port 4000 --headless</code></pre>
     <div class="ym-shell">
       <div class="ym-dev__lead">
         <img src="assets/Yomika_Logo.png" alt="Yomika logo" />
-        <div class="ym-kicker">Developer Friendly</div>
+        <div class="ym-kicker">Developer-friendly</div>
         <h2>Build from source and reuse the same runtime in your own tooling.</h2>
         <p>
           Yomika is designed to be practical to build and practical to integrate. Use

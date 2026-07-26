@@ -4,7 +4,7 @@ title: Introdução
 
 # Contribuindo com o Yomika
 
-Obrigado pelo seu interesse em contribuir com o Yomika. Estamos construindo um tradutor de mangá local-first, movido a ML e escrito em Rust — e adoraríamos a sua ajuda.
+Obrigado pelo seu interesse em contribuir com o Yomika. Estamos construindo um tradutor de mangá local-first, movido a ML, com backend em Rust e interface Tauri/Next.js — e adoraríamos a sua ajuda.
 
 ## Início Rápido
 
@@ -84,8 +84,7 @@ Ao usar ferramentas de IA (LLMs como ChatGPT, Claude, Copilot, etc.) para contri
 
 - **Por favor, informe o uso de IA** para reduzir a fadiga dos mantenedores
 - **Você é responsável** por todas as issues ou PRs gerados com IA que enviar
-- **Conteúdo de IA sem revisão ou de baixa qualidade será fechado imediatamente**
-- **Envios de baixa qualidade ou sem revisão podem ser fechados.** Cada pessoa é responsável por entender e validar todas as mudanças que envia.
+- **Envios de baixa qualidade ou sem revisão podem ser fechados imediatamente.** Cada pessoa é responsável por entender e validar todas as mudanças que envia.
 
 Incentivamos o uso de IA como apoio, mas toda contribuição precisa ser revisada e testada pelo contribuidor antes de ser enviada. Código gerado por IA deve ser compreendido, validado e adaptado ao padrão do Yomika.
 

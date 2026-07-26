@@ -2,27 +2,31 @@
 
 <h1 align="center">Yomika</h1>
 
-<p align="center">ML-powered manga translator, written in <b>Rust</b>.</p>
+<p align="center">Local-first manga translation, from OCR and inpainting to typesetting and export.</p>
 
 <p align="center">
-<a href="https://github.com/proxlavee/yomika/releases" target="_blank"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/proxlavee/yomika/total?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fproxlavee%2Fyomika%2Freleases"></a>
+<a href="https://github.com/proxlavee/yomika/actions/workflows/build.yml"><img alt="Build" src="https://github.com/proxlavee/yomika/actions/workflows/build.yml/badge.svg?branch=main"></a>
+<a href="https://github.com/proxlavee/yomika/actions/workflows/test.yml"><img alt="Test" src="https://github.com/proxlavee/yomika/actions/workflows/test.yml/badge.svg?branch=main"></a>
+<a href="https://github.com/proxlavee/yomika/actions/workflows/lint.yml"><img alt="Lint" src="https://github.com/proxlavee/yomika/actions/workflows/lint.yml/badge.svg?branch=main"></a>
+<a href="https://github.com/proxlavee/yomika/actions/workflows/docs.yml"><img alt="Documentation" src="https://github.com/proxlavee/yomika/actions/workflows/docs.yml/badge.svg?branch=main"></a>
+<a href="LICENSE"><img alt="GPL-3.0 license" src="https://img.shields.io/github/license/proxlavee/yomika"></a>
+<a href="https://github.com/proxlavee/yomika/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/proxlavee/yomika/total"></a>
 </p>
-
 
 <p align="center">
-<a href="docs/en-US/how-to/install-yomika.md">Getting Started</a> · <a href="docs/en-US/how-to/index.md">Docs</a> · <a href="https://github.com/proxlavee/yomika/issues">Bug reports</a> · <a href="https://github.com/proxlavee/yomika/discussions">Discussions</a>
+<a href="https://proxlavee.github.io/yomika/how-to/install-yomika/">Getting Started</a> · <a href="https://proxlavee.github.io/yomika/">Documentation</a> · <a href="https://github.com/proxlavee/yomika/issues">Bug reports</a> · <a href="https://github.com/proxlavee/yomika/discussions">Discussions</a>
 </p>
 
 <p align="center">
-<a href="docs/ja-JP/index.md" target="_blank">日本語</a> | <a href="docs/zh-CN/index.md" target="_blank">简体中文</a>
+<a href="https://proxlavee.github.io/yomika/">English</a> | <a href="https://proxlavee.github.io/yomika/ja-JP/">日本語</a> | <a href="https://proxlavee.github.io/yomika/zh-CN/">简体中文</a> | <a href="https://proxlavee.github.io/yomika/pt-BR/">Português (Brasil)</a>
 </p>
 
-Yomika introduces a local-first workflow for manga translation, utilizing the power of ML to automate the process. It combines the capabilities of object detection, OCR, inpainting, and LLMs to create a seamless translation experience.
+Yomika is a local-first desktop app for translating and typesetting manga. Its page-aware pipeline combines text and speech-bubble detection, OCR, inpainting, local or hosted translation, review, rendering, and export in one workspace.
 
-Under the hood, Yomika uses [candle](https://github.com/huggingface/candle) and [llama.cpp](https://github.com/ggml-org/llama.cpp) for high-performance inference, with [Tauri](https://github.com/tauri-apps/tauri) for the desktop app. All components are written in Rust, ensuring safety and speed.
+The Rust workspace uses [candle](https://github.com/huggingface/candle) for vision inference and [llama.cpp](https://github.com/ggml-org/llama.cpp) for local language models. A [Next.js](https://nextjs.org/) interface runs inside the [Tauri](https://github.com/tauri-apps/tauri) desktop shell, while the local HTTP API and MCP server make the same pipeline available to other tools.
 
 > [!NOTE]
-> Yomika runs its vision models and LLMs **locally** on your machine to keep your data private and secure.
+> The built-in vision pipeline and downloaded local LLMs run on your device. Remote providers and Codex are opt-in; when configured, the relevant OCR text or source image is sent to that service.
 
 ---
 
@@ -41,7 +45,7 @@ Under the hood, Yomika uses [candle](https://github.com/huggingface/candle) and 
 - Layered PSD export with editable text
 - Local HTTP API and MCP server for automation
 
-For installation and first-run guidance, see [Install Yomika](docs/en-US/how-to/install-yomika.md) and [Translate Your First Page](docs/en-US/tutorials/translate-your-first-page.md).
+For installation and first-run guidance, see [Install Yomika](https://proxlavee.github.io/yomika/how-to/install-yomika/) and [Translate Your First Page](https://proxlavee.github.io/yomika/tutorials/translate-your-first-page/).
 
 ## Usage
 
@@ -77,7 +81,7 @@ For export behavior, PSD contents, and file naming, see [Export Pages and Manage
 
 ### MCP Server
 
-Yomika includes a built-in MCP server for local agent integrations. By default it listens on a random local port, but you can pin it with `--port`.
+Yomika includes a built-in MCP server for local agent integrations. Without `--port`, release builds start at port `4000` and advance only when that port is already in use. Use `--port` when an MCP client needs a fixed address.
 
 ```bash
 # macOS / Linux
@@ -257,7 +261,7 @@ LLMs are downloaded on demand when you activate a model. For constrained memory 
 
 Yomika supports hosted APIs from [OpenAI](https://platform.openai.com/), [Gemini](https://ai.google.dev/), [Claude](https://www.anthropic.com/api), and [DeepSeek](https://platform.deepseek.com/) instead of a local GGUF model.
 
-Built-in cloud catalogs include current text-output models for OpenAI, Gemini, Claude, and DeepSeek, including GPT-5.5/5.4/5.x, Gemini 3.1/3/2.5/2.0, Claude Opus/Sonnet/Haiku 4.x, DeepSeek V4, and compatibility aliases such as `deepseek-chat` and `deepseek-reasoner`.
+The built-in cloud catalogs include text-output models for OpenAI, Gemini, Claude, and DeepSeek, including GPT-5.5/5.4/5.x, Gemini 3.1/3/2.5/2.0, Claude Opus/Sonnet/Haiku 4.x, DeepSeek V4, and compatibility aliases such as `deepseek-chat` and `deepseek-reasoner`.
 
 #### Codex Image-to-Image Generation
 
@@ -335,8 +339,8 @@ To build Yomika from source, follow the steps below.
 
 ### Prerequisites
 
-- [Rust](https://www.rust-lang.org/tools/install) 1.95 or later (Rust 2024 edition)
-- [Bun](https://bun.sh/) 1.0 or later
+- A current stable [Rust](https://www.rust-lang.org/tools/install) toolchain (the workspace uses Rust 2024 edition)
+- A current [Bun](https://bun.sh/) release
 
 Optional dependencies for GPU acceleration builds:
 

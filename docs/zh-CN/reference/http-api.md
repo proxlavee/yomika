@@ -19,7 +19,7 @@ http://127.0.0.1:<PORT>/api/v1
 - API 与 GUI 或 headless 运行时由同一个进程提供
 - 服务器默认绑定到 `127.0.0.1`；使用 `--host` 可绑定到其他地址
 - API 与 MCP 服务器共享同一个已加载的项目、模型和管线状态
-- 没有提供 `--port` 时，Yomika 会选择一个随机本地端口
+- 未传入 `--port` 时，发布版本从 `4000` 开始并依次尝试下一个可用端口；调试版本固定绑定到 `4000`
 - 在应用完成启动之前，除 `/api/v1/downloads`、`/api/v1/operations` 与 `/api/v1/events` 之外的所有路由都会返回 `503 Service Unavailable`
 
 ## 资源模型

@@ -34,15 +34,15 @@
     "fitWindow": "Fit Window",
     "originalSize": "Original Size",
     "process": "Process",
-    "processCurrent": "Process current image",
-    "redoInpaintRender": "Redo inpaint and render",
-    "processAll": "Process all images",
+    "processCurrent": "Process Current Image",
+    "redoInpaintRender": "Redo Inpainting and Rendering",
+    "processAll": "Process All Images",
     "help": "Help",
     "settings": "Settings",
     "discord": "Discord",
     "github": "GitHub",
     "version": "Version: {{version}}",
-    "versionUnknown": "Version: Unknown",
+    "versionUnknown": "Version unavailable",
     "language": "Language",
     "customPipeline": "Custom Pipeline",
     "runCustomCurrent": "Run Custom (Current)",
@@ -79,7 +79,7 @@
   },
   "operations": {
     "title": "Working",
-    "inProgress": "Please wait while we finish up.",
+    "inProgress": "The current operation may take a moment.",
     "loadYmk": "Loading project",
     "saveYmk": "Saving project",
     "loadModel": "Loading LLM model",
@@ -314,7 +314,7 @@
   },
   "providers": {
     "openai": "OpenAI",
-    "openaiCompatible": "OpenAI Compatible",
+    "openaiCompatible": "OpenAI-compatible",
     "gemini": "Gemini",
     "claude": "Claude",
     "deepseek": "DeepSeek",
@@ -364,7 +364,7 @@
     "deviceDescription": "Hardware acceleration information.",
     "deviceMl": "ML Compute",
     "apiKeys": "API Keys",
-    "apiKeysDescription": "Manage your API keys for different providers. Your keys are stored securely on your device keychain and are never shared with anyone.",
+    "apiKeysDescription": "Manage API keys for external providers. Keys are stored in your system keychain and sent only to the provider you configure when Yomika makes a request.",
     "ai": "AI",
     "codex": "Codex",
     "codexDescription": "Sign in with your ChatGPT Codex account for image generation.",
@@ -391,7 +391,7 @@
     "localLlmSystemPrompt": "Custom system prompt",
     "localLlmSystemPromptPlaceholder": "Leave empty to use the default manga translation prompt",
     "localLlmSystemPromptReset": "Reset to default",
-    "localLlmTestConnection": "Test Connection",
+    "localLlmTestConnection": "Test connection",
     "localLlmTesting": "Testing...",
     "localLlmTestSuccess": "Connected. Found {{count}} model(s). Latency: {{latency}}ms",
     "localLlmTestFailed": "Connection failed: {{error}}",
@@ -411,7 +411,7 @@
     "apiKeySaved": "Saved!",
     "dataPath": "Data Path",
     "dataPathDescription": "Yomika stores models, runtime packages, page manifests, and image blobs under this directory. Changing the path requires an app restart.",
-    "dataPathApply": "Apply & Restart",
+    "dataPathApply": "Apply and restart",
     "dataPathApplying": "Applying...",
     "dataPathDesktopOnly": "Runtime settings are only available in the desktop app.",
     "runtimeDescription": "Data path and HTTP settings used for downloads and provider requests. Changes require an app restart.",
@@ -421,7 +421,7 @@
     "httpReadTimeoutDescription": "Maximum time to wait for HTTP response reads before failing.",
     "httpMaxRetries": "HTTP Max Retries",
     "httpMaxRetriesDescription": "Number of automatic retries for transient HTTP failures.",
-    "restartApply": "Apply & Restart",
+    "restartApply": "Apply and restart",
     "restartApplying": "Applying...",
     "restartRequiredDescription": "These settings are loaded at startup. Applying them will save the config and restart the app.",
     "engines": "Engines",
@@ -447,7 +447,7 @@
   "updater": {
     "available": {
       "title": "Update available",
-      "description": "Yomika <strong>{{version}}</strong> is ready to install"
+      "description": "Yomika <strong>{{version}}</strong> is ready to install."
     },
     "noNotes": "No release notes provided.",
     "later": "Later",
@@ -458,7 +458,7 @@
     },
     "error": {
       "title": "Update failed",
-      "description": "Something went wrong while updating"
+      "description": "Something went wrong while updating."
     },
     "close": "Close",
     "retry": "Retry"

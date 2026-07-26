@@ -329,7 +329,7 @@
     "deviceDescription": "Donanım hızlandırma bilgileri.",
     "deviceMl": "ML Compute",
     "apiKeys": "API Anahtarları",
-    "apiKeysDescription": "Farklı sağlayıcılar için API anahtarlarınızı yönetin. Anahtarlarınız cihazınızın anahtar zincirinde güvenle saklanır ve asla başka biriyle paylaşılmaz.",
+    "apiKeysDescription": "Harici sağlayıcıların API anahtarlarını yönetin. Anahtarlar sistem anahtar zincirinde güvenle saklanır ve yalnızca Yomika bir istek gönderdiğinde yapılandırdığınız sağlayıcıya iletilir.",
     "freeTier": "Ücretsiz Katman",
     "localLlm": "Yerel LLM",
     "localLlmTitle": "Yerel LLM",

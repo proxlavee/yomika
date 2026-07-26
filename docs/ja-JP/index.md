@@ -1,7 +1,7 @@
 ---
 title: 概要
 social_title: Yomika
-description: Yomika は Rust 製の local-first な漫画翻訳ツールです。OCR、inpainting、ローカル / リモート LLM、Web UI、MCP 自動化に対応しています。
+description: Yomika は OCR、インペインティング、ローカル／リモート LLM、Web UI、MCP 自動化に対応するローカルファーストのマンガ翻訳ツールです。
 hide:
   - navigation
   - toc
@@ -473,10 +473,11 @@ hide:
       </div>
 
       <div class="ym-hero__copy">
-        <h1>漫画翻訳を、ローカルで、プライベートに、自然に。</h1>
+        <h1>ローカルファーストの制作パイプラインで、マンガを翻訳・組版。</h1>
         <p class="ym-hero__lede">
-          Yomika は Rust で書かれた最先端の漫画翻訳デスクトップアプリです。
-          OCR、クリーンアップ、翻訳、レビュー、書き出しまでを Windows、macOS、Linux で扱えます。
+          Yomika は Windows、macOS、Linux で OCR、クリーンアップ、翻訳、レビュー、
+          書き出しまでを扱います。内蔵ビジョンパイプラインとダウンロードした LLM は端末上で実行でき、
+          必要に応じてリモート翻訳プロバイダーも選べます。
         </p>
         <div class="ym-hero__model-row">
           <div class="ym-hero__model-label">対応するローカルモデル例</div>
@@ -551,7 +552,7 @@ yomika.exe --port 4000 --headless</code></pre>
     <div class="ym-shell">
       <div class="ym-section__header">
         <div class="ym-kicker">MCP 連携</div>
-        <h2>モデルとページデータをローカルに置いたまま、エージェントから Yomika を操作できます。</h2>
+        <h2>MCP を通じて、エージェントから同じローカル Yomika ランタイムを操作できます。</h2>
         <p>
           Yomika には MCP サポートがあるため、デスクトップ編集、headless モード、エージェントワークフローのすべてが、
           別々のスタックに分かれず同じローカル翻訳ランタイムを共有できます。

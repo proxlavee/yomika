@@ -2,7 +2,7 @@ name: Lint
 
 on:
   push:
-    branches: ['main']
+    branches: [main]
   pull_request:
 
 permissions:
@@ -14,14 +14,14 @@ env:
 jobs:
   rust:
     name: Rust
-    env:
-      REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
-      # refer: https://v2.tauri.app/start/prerequisites/#linux
-      - run: |
-          sudo apt update
-          sudo apt install libwebkit2gtk-4.1-dev \
+      # Refer to https://v2.tauri.app/start/prerequisites/#linux
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            libwebkit2gtk-4.1-dev \
             build-essential \
             libclang-dev \
             curl \
@@ -31,22 +31,43 @@ jobs:
             libssl-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev
-      - uses: actions/checkout@v7
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo fmt -- --check
-      - run: cargo check
-      - run: cargo clippy -- -D warnings
+
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Restore Rust cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check Rust formatting
+        run: cargo fmt -- --check
+
+      - name: Check Rust workspace
+        run: cargo check
+
+      - name: Run Clippy
+        run: cargo clippy -- -D warnings
 
   ui:
     name: UI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
-      - uses: actions/cache@v6
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Restore Bun cache
+        uses: actions/cache@v6
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-      - run: bun install --frozen-lockfile
+
+      - name: Install UI dependencies
+        run: bun install --frozen-lockfile
+
       - name: Lint UI
-        run: bun lint:ui
+        run: bun run lint:ui
+
+      - name: Check UI formatting
+        run: bun run format:check

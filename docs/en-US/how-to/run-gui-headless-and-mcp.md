@@ -50,7 +50,7 @@ Headless mode stays in the foreground until you stop it, typically with `Ctrl+C`
 
 ## Run with a fixed port
 
-By default, Yomika uses a random local port. Use `--port` when you need a stable address for bookmarks, scripts, reverse proxies, or MCP clients.
+Without `--port`, release builds start at `4000` and advance to the next available local port if necessary. Debug builds bind exactly to `4000`. Use `--port` when you need a stable address for bookmarks, scripts, reverse proxies, or MCP clients.
 
 ```bash
 # macOS / Linux
@@ -60,7 +60,7 @@ yomika --port 9999
 yomika.exe --port 9999
 ```
 
-If you do not specify `--port`, Yomika still starts the server, but the chosen port is dynamic.
+When you specify `--port`, Yomika uses that exact port and reports an error if it is unavailable.
 
 ## Bind to a non-loopback address
 

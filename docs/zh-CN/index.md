@@ -1,7 +1,7 @@
 ---
 title: 概览
 social_title: Yomika 中文文档
-description: Yomika 是一款用 Rust 编写的本地优先漫画翻译工具，支持 OCR、修复、本地与远程 LLM、Web UI 以及 MCP 自动化。
+description: Yomika 是一款本地优先的漫画翻译工具，支持 OCR、图像修复、本地与远程 LLM、Web UI 以及 MCP 自动化。
 hide:
   - navigation
   - toc
@@ -473,10 +473,10 @@ hide:
       </div>
 
       <div class="ym-hero__copy">
-        <h1>在本地翻译漫画，私密而顺手。</h1>
+        <h1>使用本地优先的生产流水线翻译并排版漫画。</h1>
         <p class="ym-hero__lede">
-          Yomika 是一款用 Rust 编写的先进漫画翻译桌面应用，在 Windows、macOS 和 Linux 上提供
-          OCR、清理、翻译、校对与导出流程。
+          Yomika 在 Windows、macOS 和 Linux 上提供 OCR、清理、翻译、校对与导出流程。
+          内置视觉管线和下载的 LLM 可在设备上运行，也可以按需选择远程翻译提供商。
         </p>
         <div class="ym-hero__model-row">
           <div class="ym-hero__model-label">内置本地模型包括</div>
@@ -550,7 +550,7 @@ yomika.exe --port 4000 --headless</code></pre>
     <div class="ym-shell">
       <div class="ym-section__header">
         <div class="ym-kicker">MCP 集成</div>
-        <h2>让代理驱动 Yomika，同时把模型和页面数据保留在本地。</h2>
+        <h2>通过 MCP，让代理驱动同一套本地 Yomika 运行时。</h2>
         <p>
           Yomika 内置 MCP 支持，因此桌面编辑、Headless 模式和代理工作流都可以接入同一套本地翻译运行时，
           而不是拆成几套彼此割裂的系统。

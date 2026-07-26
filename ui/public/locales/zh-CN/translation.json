@@ -329,7 +329,7 @@
     "deviceDescription": "硬件加速信息",
     "deviceMl": "ML 计算",
     "apiKeys": "API 密钥",
-    "apiKeysDescription": "管理您在不同提供商的 API 密钥。您的密钥会安全地存储在设备的密钥链中，绝不会与他人共享。",
+    "apiKeysDescription": "管理外部提供商的 API 密钥。密钥会安全地存储在系统密钥链中，仅在 Yomika 发出请求时发送给您配置的提供商。",
     "freeTier": "免费等级",
     "localLlm": "本地 LLM",
     "localLlmTitle": "本地 LLM",

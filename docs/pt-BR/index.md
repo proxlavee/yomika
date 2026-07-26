@@ -1,7 +1,7 @@
 ---
 title: Visão geral
 social_title: Yomika
-description: Yomika é um tradutor de mangá local-first feito em Rust, com OCR, inpainting, suporte a LLMs locais e remotas, Web UI e automação via MCP.
+description: Yomika oferece tradução de mangá local-first com OCR, inpainting, LLMs locais e remotos, Web UI e automação via MCP.
 hide:
   - navigation
   - toc
@@ -473,10 +473,11 @@ hide:
       </div>
 
       <div class="ym-hero__copy">
-        <h1>Traduza mangá localmente, com privacidade e com um pipeline de produção de verdade.</h1>
+        <h1>Traduza e faça a diagramação de mangás com um pipeline local-first.</h1>
         <p class="ym-hero__lede">
-          Yomika é um aplicativo desktop em Rust para tradução de mangá. Ele cuida de
-          OCR, limpeza, tradução, revisão e exportação no Windows, macOS e Linux.
+          O Yomika cuida de OCR, limpeza, tradução, revisão e exportação no Windows,
+          macOS e Linux. O pipeline visual integrado e os LLMs baixados rodam no
+          dispositivo; provedores remotos de tradução são opcionais.
         </p>
         <div class="ym-hero__model-row">
           <div class="ym-hero__model-label">Modelos locais incluídos</div>
@@ -553,7 +554,7 @@ yomika.exe --port 4000 --headless</code></pre>
     <div class="ym-shell">
       <div class="ym-section__header">
         <div class="ym-kicker">Integração com MCP</div>
-        <h2>Deixe agentes operarem o Yomika enquanto os modelos e os dados das páginas permanecem na máquina local.</h2>
+        <h2>Permita que agentes operem o mesmo runtime local do Yomika via MCP.</h2>
         <p>
           O Yomika tem suporte a MCP, então a UI desktop, o modo headless e fluxos de
           trabalho com agentes conversam com o mesmo runtime local de tradução, sem

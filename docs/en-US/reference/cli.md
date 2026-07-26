@@ -29,7 +29,7 @@ yomika.exe [OPTIONS]
 | --- | --- |
 | `-d`, `--download` | Prefetch runtime libraries and the default vision and OCR stack, then exit |
 | `--cpu` | Force CPU mode even when a GPU is available |
-| `-p`, `--port <PORT>` | Bind the local HTTP server to a specific port instead of a random one |
+| `-p`, `--port <PORT>` | Bind the local HTTP server to a specific port |
 | `--host <HOST>` | Bind the HTTP service to a specific host instead of `127.0.0.1` |
 | `--headless` | Run without starting the desktop GUI |
 | `--debug` | Enable debug-oriented console output |
@@ -38,7 +38,7 @@ yomika.exe [OPTIONS]
 
 Some flags affect more than startup appearance:
 
-- without `--port`, Yomika chooses a random local port
+- without `--port`, release builds start at `4000` and advance to the next available port; debug builds bind exactly to `4000`
 - without `--host`, Yomika binds only to `127.0.0.1` so the API is reachable from the same machine only
 - with `--headless`, Yomika skips the Tauri window but still serves the Web UI and API
 - with `--download`, Yomika exits after dependency prefetch and does not stay running
