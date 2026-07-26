@@ -26,7 +26,7 @@ use yomika_runtime::{ComputePolicy, RuntimeManager};
 use crate::ai::AiManager;
 use crate::autosave::{self, AutosaveSignal};
 use crate::bus::EventBus;
-use crate::config::AppConfig;
+use crate::config::{self, AppConfig};
 use crate::llm;
 use crate::pipeline::Registry;
 use crate::renderer;
@@ -57,6 +57,7 @@ impl Default for AppSharedState {
 /// Top-level app.
 pub struct App {
     pub config: Arc<ArcSwap<AppConfig>>,
+    config_path: Utf8PathBuf,
     pub runtime: Arc<RuntimeManager>,
     pub registry: Arc<Registry>,
     pub session: Arc<ArcSwapOption<ProjectSession>>,
@@ -92,12 +93,34 @@ impl App {
         shared: AppSharedState,
         version: &'static str,
     ) -> Result<Self> {
+        let config_path = config::config_path()?;
+        Self::new_with_shared_state_and_config_path(
+            config,
+            runtime,
+            cpu,
+            shared,
+            version,
+            config_path,
+        )
+    }
+
+    /// Construct with an explicit persistence path. Test and embedded callers
+    /// use this to isolate app instances without mutating process-global state.
+    pub fn new_with_shared_state_and_config_path(
+        config: AppConfig,
+        runtime: Arc<RuntimeManager>,
+        cpu: bool,
+        shared: AppSharedState,
+        version: &'static str,
+        config_path: Utf8PathBuf,
+    ) -> Result<Self> {
         let backend = shared_llama_backend(&runtime)?;
         let llm = Arc::new(llm::Model::new((*runtime).clone(), cpu, backend));
         let ai = Arc::new(AiManager::new(&runtime));
-        let renderer = Arc::new(renderer::Renderer::new()?);
+        let renderer = Arc::new(renderer::Renderer::new(&config.data.path)?);
         Ok(Self {
             config: Arc::new(ArcSwap::from_pointee(config)),
+            config_path,
             runtime,
             registry: Arc::new(Registry::new()),
             session: Arc::new(ArcSwapOption::empty()),
@@ -110,6 +133,11 @@ impl App {
             autosave: Mutex::new(None),
             version,
         })
+    }
+
+    /// Persist configuration to the path captured when this app was created.
+    pub fn save_config(&self, config: &AppConfig) -> Result<()> {
+        config::save_to(&self.config_path, config)
     }
 
     /// Currently-open session, if any.

@@ -13,6 +13,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
+use camino::Utf8Path;
 use image::{DynamicImage, GrayImage, RgbaImage, imageops};
 use yomika_core::{
     FontFaceInfo, FontPrediction, FontSource, NodeId, TextDirection, TextShaderEffect,
@@ -87,12 +88,11 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn new() -> Result<Self> {
+    pub fn new(app_data_root: &Utf8Path) -> Result<Self> {
         let mut fontbook = FontBook::new();
         let symbol_fallbacks = load_symbol_fallbacks(&mut fontbook);
-        let app_data_root = yomika_runtime::default_app_data_root();
         let google_fonts = Arc::new(
-            GoogleFontService::new(&app_data_root)
+            GoogleFontService::new(app_data_root)
                 .context("failed to initialize Google Fonts service")?,
         );
         Ok(Self {

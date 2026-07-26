@@ -10,6 +10,9 @@
     "test:ui": "bun run --filter ui test",
     "format": "oxfmt ui package.json .oxfmtrc.json .vscode",
     "format:check": "oxfmt --check ui package.json .oxfmtrc.json .vscode",
+    "verify:rust": "bun cargo fmt -- --check && bun cargo check && bun cargo clippy -- -D warnings && bun cargo test --workspace --tests",
+    "verify:ui": "bun run format:check && bun run lint:ui && bun run test:ui",
+    "verify": "bun run verify:rust && bun run verify:ui",
     "generate:openapi": "cargo run -p yomika-rpc --bin openapi -- ui/openapi.json",
     "generate:client": "openapi-generator-cli generate -i ui/openapi.json -g rust -o tests/integration-tests/client --package-name yomika-client --additional-properties=library=reqwest,supportAsync=true,preferUnsignedInt=true,packageVersion=0.0.0"
   },

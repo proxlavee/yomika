@@ -1,9 +1,30 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::{HashMap, VecDeque},
+    fmt,
+    sync::{Arc, Mutex},
+};
 
 use anyhow::Context;
 pub use fontdb::FaceInfo;
 use fontdb::{Database, ID};
+use harfrust::{Direction, Feature, Language, Script, ShapePlan, ShapePlanKey, Shaper, ShaperData};
 use once_cell::sync::OnceCell;
+
+const SHAPE_PLAN_CACHE_CAPACITY: usize = 16;
+
+#[derive(Default)]
+struct ShapingCache {
+    data: OnceCell<ShaperData>,
+    plans: Mutex<VecDeque<Arc<ShapePlan>>>,
+}
+
+impl fmt::Debug for ShapingCache {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("ShapingCache")
+            .finish_non_exhaustive()
+    }
+}
 
 /// A loaded font ready for shaping and rendering.
 #[derive(Clone, Debug)]
@@ -11,6 +32,7 @@ pub struct Font {
     data: Arc<[u8]>,
     face: FaceInfo,
     fontdue: Arc<OnceCell<Arc<fontdue::Font>>>,
+    shaping: Arc<ShapingCache>,
     pub weight: u16,
     pub style: String,
 }
@@ -26,6 +48,49 @@ impl Font {
     pub fn harfrust(&self) -> anyhow::Result<harfrust::FontRef<'_>> {
         harfrust::FontRef::from_index(self.data.as_ref(), self.face.index)
             .context("failed to create harfrust FontRef")
+    }
+
+    pub(crate) fn shaper_data(&self, font_ref: &harfrust::FontRef<'_>) -> &ShaperData {
+        self.shaping.data.get_or_init(|| ShaperData::new(font_ref))
+    }
+
+    pub(crate) fn shape_plan(
+        &self,
+        shaper: &Shaper<'_>,
+        direction: Direction,
+        script: Option<Script>,
+        language: Option<&Language>,
+        features: &[Feature],
+    ) -> Arc<ShapePlan> {
+        let key = ShapePlanKey::new(script, direction)
+            .language(language)
+            .features(features);
+        let mut plans = self
+            .shaping
+            .plans
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
+        if let Some(plan) = plans.iter().find(|plan| key.matches(plan)) {
+            return Arc::clone(plan);
+        }
+
+        let plan = Arc::new(ShapePlan::new(
+            shaper, direction, script, language, features,
+        ));
+        if plans.len() == SHAPE_PLAN_CACHE_CAPACITY {
+            plans.pop_front();
+        }
+        plans.push_back(Arc::clone(&plan));
+        plan
+    }
+
+    #[cfg(test)]
+    pub(crate) fn shape_plan_cache_len(&self) -> usize {
+        self.shaping
+            .plans
+            .lock()
+            .unwrap_or_else(|error| error.into_inner())
+            .len()
     }
 
     pub fn fontdue(&self) -> anyhow::Result<Arc<fontdue::Font>> {
@@ -157,6 +222,7 @@ impl FontBook {
             data,
             face,
             fontdue: Arc::new(OnceCell::new()),
+            shaping: Arc::new(ShapingCache::default()),
             weight,
             style,
         };

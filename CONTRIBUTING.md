@@ -1,13 +1,13 @@
 # Contributing to Yomika
 
-Thank you for improving Yomika. Start by reading [AGENTS.md](AGENTS.md), then search [existing issues](https://github.com/proxlavee/yomika/issues) before opening a duplicate.
+Thank you for improving Yomika. Search [existing issues](https://github.com/proxlavee/yomika/issues) before opening a duplicate.
 
 ## Development Workflow
 
 1. Install dependencies with `bun install --frozen-lockfile`.
 2. Keep changes focused and add a regression test for behavior fixes.
-3. Run Rust formatting and the affected Cargo tests.
-4. Run `bun run format:check`, `bun run lint:ui`, and `bun run test:ui` for UI changes.
+3. Run focused tests while iterating; `bun run verify:rust` and `bun run verify:ui` check each workspace side.
+4. Run `bun run verify` before opening a pull request.
 5. Describe user-visible effects, platform limitations, and checks in the pull request.
 
 Use concise Conventional Commit subjects such as `fix: preserve color picker drag value` or `refactor: rename project archive format`. Do not include generated build output, credentials, downloaded models, or unrelated cleanup.

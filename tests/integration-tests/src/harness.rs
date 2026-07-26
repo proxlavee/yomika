@@ -61,6 +61,7 @@ pub struct TestApp {
     pub addr: SocketAddr,
     pub base_url: String,
     pub client_config: Configuration,
+    pub config_path: Utf8PathBuf,
     _server: tokio::task::JoinHandle<Result<()>>,
     _data_dir: tempfile::TempDir,
 }
@@ -76,31 +77,23 @@ impl TestApp {
         let data_dir = tempfile::tempdir()?;
         let data_root = Utf8PathBuf::from_path_buf(data_dir.path().to_path_buf())
             .map_err(|p| anyhow::anyhow!("tempdir not UTF-8: {}", p.display()))?;
-
-        // Redirect `default_app_data_root()` to the per-test tempdir so
-        // routes like `config::save` / `config::config_path` don't clobber
-        // the user's real `~/AppData/Local/Yomika/config.toml`. Set
-        // unconditionally — last writer wins, but each `App` instance only
-        // needs its own `ArcSwap<AppConfig>` which is read at construction.
-        // SAFETY: set_var on a single-process test harness is fine.
-        unsafe {
-            std::env::set_var("YOMIKA_DATA_ROOT", data_root.as_str());
-        }
+        let config_path = data_root.join("config.toml");
 
         let mut config = AppConfig::default();
-        config.data.path = data_root;
+        config.data.path = data_root.clone();
         tweak(&mut config);
 
         // Shared runtime (prepared once per process).
         let runtime = shared_runtime().await?;
         let state = BootstrapManager::new(runtime.clone());
         state.spawn_download_forwarder();
-        let app = Arc::new(App::new_with_shared_state(
+        let app = Arc::new(App::new_with_shared_state_and_config_path(
             config,
             runtime,
             true,
             state.shared_state(),
             "test",
+            config_path.clone(),
         )?);
         app.spawn_llm_forwarder();
         state
@@ -129,6 +122,7 @@ impl TestApp {
             addr,
             base_url,
             client_config,
+            config_path,
             _server: server,
             _data_dir: data_dir,
         })

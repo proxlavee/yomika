@@ -1,5 +1,5 @@
 use anyhow::Result;
-use harfrust::{Direction, Feature, Script, ShapeOptions, ShaperData, Tag, UnicodeBuffer};
+use harfrust::{Direction, Feature, Script, ShapeOptions, Tag, UnicodeBuffer, script};
 use icu_properties::{CodePointMapData, props::Script as IcuScript};
 use skrifa::raw::TableProvider;
 
@@ -47,8 +47,6 @@ pub struct ShapingOptions<'a> {
 }
 
 /// Text shaper using HarfRust.
-///
-/// TODO: add shaper plan cache
 #[derive(Debug, Clone, Default)]
 pub struct TextShaper;
 
@@ -74,11 +72,20 @@ impl TextShaper {
             buffer.set_script(script);
         }
 
-        let shaper_data = ShaperData::new(&font_ref);
+        let shaper_data = font.shaper_data(&font_ref);
         let shaper = shaper_data.shaper(&font_ref).build();
+        let buffer_script = buffer.script();
+        let plan = font.shape_plan(
+            &shaper,
+            buffer.direction(),
+            (buffer_script != script::UNKNOWN).then_some(buffer_script),
+            buffer.language().as_ref(),
+            options.features,
+        );
         let output = shaper.shape(
             buffer,
             ShapeOptions::new()
+                .plan(Some(&plan))
                 .features(options.features)
                 .point_size(Some(options.font_size)),
         );
@@ -379,6 +386,37 @@ mod tests {
         assert!(shaped.len() >= 2); // Arabic+space, Hebrew (or maybe space separate)
         assert!(shaped[0].glyphs[0].cluster < shaped[shaped.len() - 1].glyphs[0].cluster);
 
+        Ok(())
+    }
+
+    #[test]
+    fn shape_plan_cache_reuses_entries_and_stays_bounded() -> Result<()> {
+        let mut book = FontBook::new();
+        let font = PRIMARY_FAMILIES
+            .iter()
+            .find_map(|name| query_font(&mut book, name))
+            .expect("no font available");
+        let shaper = TextShaper::new();
+        let base_options = ShapingOptions {
+            direction: Direction::LeftToRight,
+            script: None,
+            font_size: 16.0,
+            features: &[],
+        };
+
+        shaper.shape("cache", &font, &base_options)?;
+        shaper.shape("cache", &font, &base_options)?;
+        assert_eq!(font.shape_plan_cache_len(), 1);
+
+        for value in 0..24 {
+            let features = [Feature::new(Tag::new(b"kern"), value, ..)];
+            let options = ShapingOptions {
+                features: &features,
+                ..base_options.clone()
+            };
+            shaper.shape("cache", &font, &options)?;
+        }
+        assert_eq!(font.shape_plan_cache_len(), 16);
         Ok(())
     }
 }

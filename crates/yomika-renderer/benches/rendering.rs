@@ -11,6 +11,9 @@ use yomika_renderer::{
 
 const FONT_SIZE: f32 = 24.0;
 const SAMPLE_TEXT: &str = "The quick brown fox jumps over the lazy dog.";
+const AUTO_SIZE_TEXT: &str =
+    "The translated line needs to fit inside a constrained speech bubble without clipping.";
+const MIXED_SCRIPT_TEXT: &str = "Hello, 世界 — مرحبا — שלום";
 
 fn rendering_benchmark(c: &mut Criterion) {
     let mut fontbook = FontBook::new();
@@ -33,7 +36,7 @@ fn rendering_benchmark(c: &mut Criterion) {
         ..Default::default()
     };
 
-    c.bench_function("layout", |b| {
+    c.bench_function("layout/fixed_latin", |b| {
         b.iter(|| {
             let layout = TextLayout::new(&font, Some(FONT_SIZE))
                 .run(black_box(SAMPLE_TEXT))
@@ -42,7 +45,28 @@ fn rendering_benchmark(c: &mut Criterion) {
         })
     });
 
-    c.bench_function("render", |b| {
+    c.bench_function("layout/auto_constrained", |b| {
+        b.iter(|| {
+            let layout = TextLayout::new(&font, None)
+                .with_max_width(240.0)
+                .with_max_height(160.0)
+                .run(black_box(AUTO_SIZE_TEXT))
+                .expect("Failed to create auto-sized layout");
+            black_box(layout);
+        })
+    });
+
+    c.bench_function("layout/mixed_script", |b| {
+        b.iter(|| {
+            let layout = TextLayout::new(&font, Some(FONT_SIZE))
+                .with_max_width(320.0)
+                .run(black_box(MIXED_SCRIPT_TEXT))
+                .expect("Failed to create mixed-script layout");
+            black_box(layout);
+        })
+    });
+
+    c.bench_function("render/horizontal", |b| {
         b.iter(|| {
             let image = renderer
                 .render(&layout, WritingMode::Horizontal, &options)

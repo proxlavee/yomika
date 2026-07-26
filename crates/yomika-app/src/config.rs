@@ -1,7 +1,9 @@
 use std::fs;
+use std::io::Write;
 
 use anyhow::{Context, Result};
-use camino::Utf8PathBuf;
+use atomicwrites::{AtomicFile, OverwriteBehavior};
+use camino::{Utf8Path, Utf8PathBuf};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use utoipa::ToSchema;
 use yomika_runtime::default_app_data_root;
@@ -163,12 +165,12 @@ pub fn load() -> Result<AppConfig> {
         toml::from_str(&content).with_context(|| format!("failed to parse `{path}`"))?
     } else {
         let config = AppConfig::default();
-        save(&config)?;
+        save_to(&path, &config)?;
         config
     };
 
     if validate_pipeline_config(&mut config) {
-        save(&config)?;
+        save_to(&path, &config)?;
     }
 
     // Populate api_key from credential storage for every known provider.
@@ -186,13 +188,19 @@ pub fn load() -> Result<AppConfig> {
 
 pub fn save(config: &AppConfig) -> Result<()> {
     let path = config_path()?;
+    save_to(&path, config)
+}
+
+pub fn save_to(path: &Utf8Path, config: &AppConfig) -> Result<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)
             .with_context(|| format!("failed to create config dir `{parent}`"))?;
     }
-    // `api_key` is `#[serde(skip)]`, so it is never written to the TOML file.
+    // Provider keys serialize as `[REDACTED]`, so plaintext never reaches TOML.
     let content = toml::to_string_pretty(config).context("failed to serialize config")?;
-    fs::write(&path, content).with_context(|| format!("failed to write config to `{path}`"))
+    AtomicFile::new(path.as_std_path(), OverwriteBehavior::AllowOverwrite)
+        .write(|file| file.write_all(content.as_bytes()))
+        .with_context(|| format!("failed to write config to `{path}`"))
 }
 
 // ---------------------------------------------------------------------------

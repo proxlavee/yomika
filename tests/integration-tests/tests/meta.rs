@@ -73,6 +73,61 @@ async fn config_patch_merges_and_persists() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
+async fn concurrent_config_patches_stay_instance_scoped() -> anyhow::Result<()> {
+    let first = TestApp::spawn().await?;
+    let second = TestApp::spawn().await?;
+
+    let first_patch = models::ConfigPatch {
+        data: None,
+        http: Some(Some(Box::new(models::HttpConfigPatch {
+            connect_timeout: Some(Some(41)),
+            read_timeout: None,
+            max_retries: None,
+        }))),
+        pipeline: None,
+        providers: None,
+    };
+    let second_patch = models::ConfigPatch {
+        data: None,
+        http: Some(Some(Box::new(models::HttpConfigPatch {
+            connect_timeout: Some(Some(73)),
+            read_timeout: None,
+            max_retries: None,
+        }))),
+        pipeline: None,
+        providers: None,
+    };
+
+    let (first_response, second_response) = tokio::join!(
+        api::patch_config(&first.client_config, first_patch),
+        api::patch_config(&second.client_config, second_patch),
+    );
+    assert_eq!(
+        first_response?
+            .http
+            .expect("first http section")
+            .connect_timeout,
+        Some(41)
+    );
+    assert_eq!(
+        second_response?
+            .http
+            .expect("second http section")
+            .connect_timeout,
+        Some(73)
+    );
+
+    let first_saved: yomika_app::AppConfig =
+        toml::from_str(&std::fs::read_to_string(&first.config_path)?)?;
+    let second_saved: yomika_app::AppConfig =
+        toml::from_str(&std::fs::read_to_string(&second.config_path)?)?;
+    assert_ne!(first.config_path, second.config_path);
+    assert_eq!(first_saved.http.connect_timeout, 41);
+    assert_eq!(second_saved.http.connect_timeout, 73);
+    Ok(())
+}
+
+#[tokio::test]
 async fn fonts_endpoint_returns_available_fonts() -> anyhow::Result<()> {
     let app = TestApp::spawn().await?;
     let _fonts = api::list_fonts(&app.client_config).await?;

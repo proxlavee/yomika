@@ -52,10 +52,6 @@ interface is built with [Next.js](https://nextjs.org/).
 
 ## Installation
 
-> [!IMPORTANT]
-> Yomika does not currently have a published prebuilt release. Build it from
-> source until packages appear on the [Releases page](https://github.com/proxlavee/yomika/releases).
-
 ### Requirements
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.95 or later
@@ -179,16 +175,14 @@ bun install --frozen-lockfile
 bun run dev
 ```
 
-Before opening a pull request, run the checks relevant to your change:
+Before opening a pull request, run the complete verification suite:
 
 ```bash
-bun cargo fmt -- --check
-bun cargo check
-bun cargo test --workspace --tests
-bun run format:check
-bun run lint:ui
-bun run test:ui
+bun run verify
 ```
+
+While iterating, use `bun run verify:rust` or `bun run verify:ui` to check one
+side of the workspace.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting changes.
 

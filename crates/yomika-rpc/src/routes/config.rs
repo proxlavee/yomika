@@ -43,7 +43,7 @@ async fn patch_config(
     let mut next = current;
     config::apply_patch(&mut next, patch);
     config::sync_secrets(&next).map_err(ApiError::internal)?;
-    config::save(&next).map_err(ApiError::internal)?;
+    app.save_config(&next).map_err(ApiError::internal)?;
     app.config.store(Arc::new(next.clone()));
     Ok(Json(next))
 }
@@ -72,7 +72,7 @@ async fn set_provider_secret(
     let mut next = (**app.config.load()).clone();
     upsert_provider_secret(&mut next, &id, Some(&req.secret));
     config::sync_secrets(&next).map_err(ApiError::internal)?;
-    config::save(&next).map_err(ApiError::internal)?;
+    app.save_config(&next).map_err(ApiError::internal)?;
     app.config.store(Arc::new(next));
     Ok(StatusCode::NO_CONTENT)
 }
@@ -91,7 +91,7 @@ async fn clear_provider_secret(
     let mut next = (**app.config.load()).clone();
     upsert_provider_secret(&mut next, &id, None);
     config::sync_secrets(&next).map_err(ApiError::internal)?;
-    config::save(&next).map_err(ApiError::internal)?;
+    app.save_config(&next).map_err(ApiError::internal)?;
     app.config.store(Arc::new(next));
     Ok(StatusCode::NO_CONTENT)
 }
