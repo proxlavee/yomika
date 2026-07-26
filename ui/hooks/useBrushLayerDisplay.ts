@@ -4,14 +4,13 @@ import { useEffect, useRef } from 'react'
 
 import type { Page } from '@/lib/api/schemas'
 
-async function bytesToBitmap(bytes: Uint8Array): Promise<ImageBitmap> {
-  const blob = new Blob([bytes as unknown as BlobPart])
+async function blobToBitmap(blob: Blob): Promise<ImageBitmap> {
   return createImageBitmap(blob)
 }
 
 type BrushLayerDisplayOptions = {
   page: Page | null
-  brushLayerData?: Uint8Array
+  brushLayerData?: Blob
   visible: boolean
 }
 
@@ -42,7 +41,7 @@ export function useBrushLayerDisplay({ page, brushLayerData, visible }: BrushLay
     if (visible && brushLayerData) {
       void (async () => {
         try {
-          const bitmap = await bytesToBitmap(brushLayerData)
+          const bitmap = await blobToBitmap(brushLayerData)
           if (cancelled) {
             bitmap.close()
             return
@@ -63,7 +62,7 @@ export function useBrushLayerDisplay({ page, brushLayerData, visible }: BrushLay
     return () => {
       cancelled = true
     }
-  }, [page?.id, page?.width, page?.height, brushLayerData, visible])
+  }, [page, brushLayerData, visible])
 
   return { canvasRef, visible }
 }

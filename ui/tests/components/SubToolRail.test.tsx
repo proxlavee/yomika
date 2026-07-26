@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SubToolRail } from '@/components/canvas/SubToolRail'
@@ -62,12 +62,12 @@ describe('SubToolRail', () => {
     expect(screen.getByText('toolbar.brushColor')).toBeInTheDocument()
 
     // Switch to Eraser
-    useEditorUiStore.setState({ mode: 'eraser' })
+    act(() => useEditorUiStore.setState({ mode: 'eraser' }))
     rerender(<SubToolRail />)
     expect(screen.queryByText('toolbar.brushColor')).not.toBeInTheDocument()
 
     // Switch to Repair Brush
-    useEditorUiStore.setState({ mode: 'repairBrush' })
+    act(() => useEditorUiStore.setState({ mode: 'repairBrush' }))
     rerender(<SubToolRail />)
     expect(screen.queryByText('toolbar.brushColor')).not.toBeInTheDocument()
   })

@@ -19,7 +19,7 @@ DICT_FILENAME = "alphabet-all-v7.txt"
 
 
 def parse_args() -> argparse.Namespace:
-    default_output = Path.home() / ".cache" / "Koharu" / "models" / "mit48px-ocr"
+    default_output = Path.home() / ".cache" / "Yomika" / "models" / "mit48px-ocr"
     parser = argparse.ArgumentParser(description="Convert mit48px OCR checkpoint to safetensors.")
     parser.add_argument(
         "--checkpoint",

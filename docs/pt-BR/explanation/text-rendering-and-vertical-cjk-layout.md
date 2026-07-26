@@ -1,15 +1,15 @@
 ---
 title: Renderização de Texto e Layout Vertical CJK
-description: Como o renderizador de texto do Koharu funciona, por que a renderização de texto é difícil e o que a implementação atual faz para o layout vertical CJK de mangá.
+description: Como o renderizador de texto do Yomika funciona, por que a renderização de texto é difícil e o que a implementação atual faz para o layout vertical CJK de mangá.
 ---
 
 # Renderização de Texto e Layout Vertical CJK
 
 A renderização de texto é uma das partes mais difíceis de um tradutor de mangá. Detecção, OCR e inpainting decidem o que deve acontecer com a página, mas o renderizador decide se o resultado ainda se lê como uma página de mangá finalizada em vez de uma sobreposição de depuração.
 
-Uma referência externa útil é [Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) de Aria Desires. O ponto central se aplica diretamente ao Koharu: a renderização de texto não é um problema linear e limpo, e não existe uma resposta universalmente correta. Layout, shaping, fallback de fonte, rasterização e composição afetam uns aos outros.
+Uma referência externa útil é [Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) de Aria Desires. O ponto central se aplica diretamente ao Yomika: a renderização de texto não é um problema linear e limpo, e não existe uma resposta universalmente correta. Layout, shaping, fallback de fonte, rasterização e composição afetam uns aos outros.
 
-O Koharu não tenta ser um mecanismo completo de publicação desktop. Ele busca ser muito bom nos padrões de layout de texto que as páginas de mangá mais precisam, especialmente texto vertical CJK em balões.
+O Yomika não tenta ser um mecanismo completo de publicação desktop. Ele busca ser muito bom nos padrões de layout de texto que as páginas de mangá mais precisam, especialmente texto vertical CJK em balões.
 
 ## Por que esse problema é difícil
 
@@ -38,9 +38,9 @@ O texto vertical de mangá torna o problema ainda mais difícil:
 - algumas fontes suportam formas verticais adequadas e outras não
 - japonês, chinês, latim, números, símbolos e emojis misturados frequentemente aparecem no mesmo bloco
 
-## O que o Koharu realmente faz
+## O que o Yomika realmente faz
 
-No nível da implementação, o renderizador vive no crate `koharu-renderer`, e a orquestração principal acontece em `koharu-app/src/renderer.rs`, `src/layout.rs`, `src/shape.rs`, `src/segment.rs` e `src/renderer.rs`.
+Na implementação, a orquestração da aplicação fica em `crates/yomika-app/src/renderer.rs`; layout, shaping, segmentação e rasterização ficam em `crates/yomika-renderer/src/`.
 
 A pipeline para um `TextBlock` traduzido é aproximadamente:
 
@@ -65,9 +65,9 @@ Em termos concretos:
 - `TinySkiaRenderer` rasteriza contornos com `skrifa` e faz fallback para bitmaps do `fontdue` quando necessário
 - `Renderer::render_text_block` une tudo isso com dicas de fonte, escolhas de traço e posicionamento na página
 
-## Como o Koharu escolhe o layout vertical
+## Como o Yomika escolhe o layout vertical
 
-O Koharu não força cegamente todo texto CJK para o modo vertical. A heurística atual em `text/script.rs` é:
+O Yomika não força cegamente todo texto CJK para o modo vertical. A heurística atual em `text/script.rs` é:
 
 - se a tradução contém texto CJK e o bloco é mais alto do que largo, usa `VerticalRl`
 - caso contrário, mantém o bloco horizontal
@@ -87,18 +87,18 @@ Ainda é uma heurística, não um mecanismo geral de modo de escrita. Isso impor
 
 `WritingMode::VerticalRl` não é apenas um truque final de rotação do canvas.
 
-O Koharu o converte em uma direção de shaping de cima para baixo antes do HarfBuzz executar. Isso significa que a fonte e o engine de shaping podem produzir avanços verticais e formas verticais de glifos em vez de fingir que texto horizontal foi rotacionado depois.
+O Yomika o converte em uma direção de shaping de cima para baixo antes do HarfBuzz executar. Isso significa que a fonte e o engine de shaping podem produzir avanços verticais e formas verticais de glifos em vez de fingir que texto horizontal foi rotacionado depois.
 
 ### 2. Features OpenType verticais são ativadas
 
-Quando o Koharu faz shaping de texto vertical, ele ativa as features OpenType:
+Quando o Yomika faz shaping de texto vertical, ele ativa as features OpenType:
 
 - `vert`
 - `vrt2`
 
 Essas são as alternativas verticais padrão expostas por fontes que realmente suportam escrita vertical. Essa é uma das principais razões pelas quais o renderizador pode produzir um layout vertical CJK convincente em vez de parecer texto horizontal rotacionado.
 
-Se a fonte tiver substituições apropriadas de glifos verticais, o Koharu pode usá-las. Se a fonte não tiver, o resultado degrada para o que a fonte fornecer.
+Se a fonte tiver substituições apropriadas de glifos verticais, o Yomika pode usá-las. Se a fonte não tiver, o resultado degrada para o que a fonte fornecer.
 
 ### 3. Linhas se tornam colunas
 
@@ -118,7 +118,7 @@ Esse é o fluxo `vertical-rl` esperado usado em balões tradicionais de mangá j
 
 ### 4. Pontuação fullwidth é recentralizada
 
-O layout vertical CJK fica errado muito rápido se a pontuação for deixada com centralização horizontal ingênua. O Koharu tem tratamento explícito para pontuação fullwidth e recentraliza esses glifos a partir de seus limites reais na fonte.
+O layout vertical CJK fica errado muito rápido se a pontuação for deixada com centralização horizontal ingênua. O Yomika tem tratamento explícito para pontuação fullwidth e recentraliza esses glifos a partir de seus limites reais na fonte.
 
 Isso cobre casos como:
 
@@ -137,7 +137,7 @@ Isso ajuda a preservar a aparência vertical que os leitores esperam da pontuaç
 
 ### 6. Os limites de tinta são medidos com precisão
 
-Após o layout, o Koharu computa uma bounding box apertada de tinta a partir das métricas por glifo e, em seguida, translada as baselines para que a origem real da tinta comece em `(0, 0)`.
+Após o layout, o Yomika computa uma bounding box apertada de tinta a partir das métricas por glifo e, em seguida, translada as baselines para que a origem real da tinta comece em `(0, 0)`.
 
 Isso é importante porque:
 
@@ -149,7 +149,7 @@ Na prática, essa passagem de limites é uma das razões pelas quais o renderiza
 
 ## Por que a saída é boa em balões de mangá
 
-O Koharu acerta várias coisas de alto valor para o caso comum de mangá:
+O Yomika acerta várias coisas de alto valor para o caso comum de mangá:
 
 - ele usa shaping real, não desenho caractere por caractere
 - ele ativa features verticais de fonte em vez de rotacionar texto horizontal finalizado
@@ -167,7 +167,7 @@ Essa combinação é por que o renderizador pode produzir texto vertical CJK que
 
 Essa distinção importa.
 
-O Koharu é melhor entendido como:
+O Yomika é melhor entendido como:
 
 - muito melhor do que rotacionar texto horizontal
 - bom no layout vertical de balões com fontes CJK modernas
@@ -189,7 +189,7 @@ Isso funciona surpreendentemente bem para balões, mas ainda é uma heurística.
 
 ### A quebra de linha CJK ainda usa o comportamento padrão do ICU
 
-`segment.rs` nota explicitamente um `TODO` para customização específica de CJK. Então, embora o ICU4X já dê ao Koharu uma base muito melhor do que um wrapping ad hoc, ele ainda não é uma implementação kinsoku especializada para mangá.
+`segment.rs` nota explicitamente um `TODO` para customização específica de CJK. Então, embora o ICU4X já dê ao Yomika uma base muito melhor do que um wrapping ad hoc, ele ainda não é uma implementação kinsoku especializada para mangá.
 
 ### O suporte da fonte importa muito
 
@@ -197,7 +197,7 @@ As alternativas verticais só ficam tão boas quanto a fonte escolhida permite. 
 
 ### Sem features completas de engine de publicação
 
-O Koharu não está tentando fazer todas as features avançadas de texto que você esperaria de um sistema completo de composição. O renderizador atual não é uma implementação completa de coisas como:
+O Yomika não está tentando fazer todas as features avançadas de texto que você esperaria de um sistema completo de composição. O renderizador atual não é uma implementação completa de coisas como:
 
 - anotação ruby
 - warichu e outras features avançadas de layout japonês
@@ -208,9 +208,9 @@ O Koharu não está tentando fazer todas as features avançadas de texto que voc
 
 Mesmo com um bom shaping, uma tradução pode simplesmente ser muito longa ou muito desajeitada para o balão disponível. O renderizador pode encaixar e alinhar texto, mas nem sempre consegue transformar uma geometria de bloco ruim ou uma tradução excessivamente verbosa em uma letragem perfeita.
 
-## Por que o Koharu não apenas rotaciona o texto
+## Por que o Yomika não apenas rotaciona o texto
 
-A solução barata para texto vertical é dispô-lo horizontalmente e rotacionar o resultado. O Koharu evita isso porque os modos de falha são óbvios:
+A solução barata para texto vertical é dispô-lo horizontalmente e rotacionar o resultado. O Yomika evita isso porque os modos de falha são óbvios:
 
 - a pontuação fica incorretamente posicionada
 - os avanços dos glifos ficam errados
@@ -218,16 +218,15 @@ A solução barata para texto vertical é dispô-lo horizontalmente e rotacionar
 - as fontes não conseguem aplicar suas alternativas verticais
 - os limites e o clipping ficam mais difíceis de raciocinar
 
-Em vez disso, o Koharu empurra o tratamento vertical de volta para os estágios de shaping e layout. Essa é a principal decisão arquitetural por trás de sua saída vertical CJK.
+Em vez disso, o Yomika empurra o tratamento vertical de volta para os estágios de shaping e layout. Essa é a principal decisão arquitetural por trás de sua saída vertical CJK.
 
 ## Referência externa que vale a leitura
 
-[Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) é útil porque explica o problema do renderizador de uma forma agnóstica à linguagem. O stack do Koharu é diferente de um engine de navegador, mas as mesmas lições centrais aparecem aqui:
+[Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) é útil porque explica o problema do renderizador de uma forma agnóstica à linguagem. O stack do Yomika é diferente de um engine de navegador, mas as mesmas lições centrais aparecem aqui:
 
 - shaping não é opcional
 - fontes de fallback são inevitáveis
 - layout e shaping dependem um do outro
 - renderização de texto "perfeita" é principalmente uma história que as pessoas contam antes de implementá-la
 
-Se você quer a versão curta: o renderizador do Koharu é cuidadoso porque a renderização de texto é um problema de sistemas acoplados, não uma etapa final de pintura.
-
+Se você quer a versão curta: o renderizador do Yomika é cuidadoso porque a renderização de texto é um problema de sistemas acoplados, não uma etapa final de pintura.

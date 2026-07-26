@@ -37,7 +37,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useDeleteProject, useListProjects } from '@/lib/api/default/default'
 import type { ProjectSummary } from '@/lib/api/schemas'
-import { importKhrFile } from '@/lib/io/pagesIo'
+import { importYmkFile } from '@/lib/io/pagesIo'
 import { createAndOpenProject, switchProject } from '@/lib/io/scene'
 import { cn } from '@/lib/utils'
 
@@ -103,11 +103,11 @@ export function WelcomeScreen() {
     }
   }, [])
 
-  const importKhr = useCallback(async () => {
+  const importYmk = useCallback(async () => {
     setError(null)
     setBusy('import')
     try {
-      await importKhrFile()
+      await importYmkFile()
       await refetchProjects()
     } catch (e) {
       setError(`Import failed: ${e instanceof Error ? e.message : String(e)}`)
@@ -125,7 +125,7 @@ export function WelcomeScreen() {
 
       <div className='relative z-10 mx-auto flex w-full max-w-md flex-col gap-8 px-6 pt-24 pb-10'>
         <header className='flex flex-col items-center gap-2 text-center'>
-          <Image src='/icon.png' alt='Koharu' width={56} height={56} priority />
+          <Image src='/icon.png' alt='Yomika' width={56} height={56} priority />
           <div className='mt-1 flex flex-col gap-0.5'>
             <h1 className='text-2xl font-semibold tracking-tight text-foreground'>
               {t('welcome.title')}
@@ -158,11 +158,11 @@ export function WelcomeScreen() {
             description={t('welcome.newDescription')}
           />
           <SecondaryAction
-            onClick={importKhr}
+            onClick={importYmk}
             disabled={!!busy}
             loading={busy === 'import'}
             icon={<FileArchiveIcon className='h-4 w-4' />}
-            label={t('welcome.importKhr')}
+            label={t('welcome.importYmk')}
           />
         </div>
 

@@ -35,13 +35,13 @@ export function AppInitializationSkeleton() {
       <div className='flex flex-col items-center gap-6'>
         <img
           src='/icon-large.png'
-          alt='Koharu'
+          alt='Yomika'
           className='h-20 w-20 opacity-80'
           draggable={false}
         />
         <div className='flex flex-col items-center gap-1'>
           <h1 className='text-lg font-semibold tracking-widest text-foreground uppercase'>
-            Koharu
+            Yomika
           </h1>
           <p className='text-xs text-muted-foreground'>{t('common.initializing')}</p>
         </div>

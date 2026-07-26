@@ -4,11 +4,11 @@ title: Run GUI, Headless, and MCP Modes
 
 # Run GUI, Headless, and MCP Modes
 
-Koharu can run as a normal desktop app, a headless local server with a Web UI, or an MCP server for AI agents. These are not separate backends. They all sit on top of the same local runtime and HTTP server.
+Yomika can run as a normal desktop app, a headless local server with a Web UI, or an MCP server for AI agents. These are not separate backends. They all sit on top of the same local runtime and HTTP server.
 
 ## What stays the same across modes
 
-No matter how you launch Koharu, the runtime model is the same:
+No matter how you launch Yomika, the runtime model is the same:
 
 - the server binds to `127.0.0.1` by default (override with `--host`)
 - the UI and API are served by the same local process
@@ -26,9 +26,9 @@ That is why desktop editing, headless automation, and MCP tooling stay aligned.
 
 ## Run the desktop app
 
-Launch Koharu normally from your installed application.
+Launch Yomika normally from your installed application.
 
-Even in desktop mode, Koharu still starts a local HTTP server internally. The embedded window talks to that local server instead of calling the pipeline directly.
+Even in desktop mode, Yomika still starts a local HTTP server internally. The embedded window talks to that local server instead of calling the pipeline directly.
 
 This is the default mode and is the best choice for most users.
 
@@ -38,10 +38,10 @@ Headless mode starts the local server without opening the desktop GUI.
 
 ```bash
 # macOS / Linux
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 
 # Windows
-koharu.exe --port 4000 --headless
+yomika.exe --port 4000 --headless
 ```
 
 After startup, open the Web UI at `http://localhost:4000`.
@@ -50,31 +50,31 @@ Headless mode stays in the foreground until you stop it, typically with `Ctrl+C`
 
 ## Run with a fixed port
 
-By default, Koharu uses a random local port. Use `--port` when you need a stable address for bookmarks, scripts, reverse proxies, or MCP clients.
+By default, Yomika uses a random local port. Use `--port` when you need a stable address for bookmarks, scripts, reverse proxies, or MCP clients.
 
 ```bash
 # macOS / Linux
-koharu --port 9999
+yomika --port 9999
 
 # Windows
-koharu.exe --port 9999
+yomika.exe --port 9999
 ```
 
-If you do not specify `--port`, Koharu still starts the server, but the chosen port is dynamic.
+If you do not specify `--port`, Yomika still starts the server, but the chosen port is dynamic.
 
 ## Bind to a non-loopback address
 
 By default the server binds to `127.0.0.1`, which means only the same machine can reach it. Pass `--host` to bind elsewhere.
 
 ```bash
-koharu --host 0.0.0.0 --port 4000 --headless
+yomika --host 0.0.0.0 --port 4000 --headless
 ```
 
-This is useful in containers, VMs, or remote-development setups where the desktop client lives on a different host than the Koharu process. Anything other than `127.0.0.1` is a deliberate choice — there is no built-in authentication on the local API, so only set `--host` when you actually want non-loopback access and have your own access controls in place.
+This is useful in containers, VMs, or remote-development setups where the desktop client lives on a different host than the Yomika process. Anything other than `127.0.0.1` is a deliberate choice — there is no built-in authentication on the local API, so only set `--host` when you actually want non-loopback access and have your own access controls in place.
 
 ## Connect to the local API
 
-When Koharu is running on a fixed port, the main endpoints are:
+When Yomika is running on a fixed port, the main endpoints are:
 
 - Web UI: `http://localhost:9999/`
 - RPC / HTTP API: `http://localhost:9999/api/v1`
@@ -82,13 +82,13 @@ When Koharu is running on a fixed port, the main endpoints are:
 
 Replace `9999` with the port you chose.
 
-Because Koharu binds to loopback, these endpoints are local by default. If you want access from another machine, you need to expose that port yourself through your own network setup.
+Because Yomika binds to loopback, these endpoints are local by default. If you want access from another machine, you need to expose that port yourself through your own network setup.
 
 For endpoint-level details, see [HTTP API Reference](../reference/http-api.md).
 
 ## Connect to the MCP server
 
-Koharu includes a built-in MCP server that uses the same loaded documents, models, and page pipeline as the rest of the app.
+Yomika includes a built-in MCP server that uses the same loaded documents, models, and page pipeline as the rest of the app.
 
 Point your MCP client or agent at:
 
@@ -111,24 +111,24 @@ Use `--cpu` when you want to disable GPU inference explicitly.
 
 ```bash
 # macOS / Linux
-koharu --cpu
+yomika --cpu
 
 # Windows
-koharu.exe --cpu
+yomika.exe --cpu
 ```
 
 This is useful for compatibility testing, driver issues, or low-risk debugging when GPU setup is uncertain.
 
 ## Download runtime dependencies only
 
-Use `--download` if you want Koharu to prefetch runtime dependencies and exit without starting the app.
+Use `--download` if you want Yomika to prefetch runtime dependencies and exit without starting the app.
 
 ```bash
 # macOS / Linux
-koharu --download
+yomika --download
 
 # Windows
-koharu.exe --download
+yomika.exe --download
 ```
 
 In the current implementation, this path initializes:
@@ -144,16 +144,16 @@ Use `--debug` when you want console-oriented startup with log output.
 
 ```bash
 # macOS / Linux
-koharu --debug
+yomika --debug
 
 # Windows
-koharu.exe --debug
+yomika.exe --debug
 ```
 
-On Windows, debug and headless runs also influence how Koharu attaches to or creates a console window.
+On Windows, debug and headless runs also influence how Yomika attaches to or creates a console window.
 
 ## Credential storage
 
-By default, Koharu stores API keys outside `config.toml`. macOS and Windows use the system keyring. Linux uses Koharu's local filesystem credential store under the app data directory with owner-only file permissions; this Linux store relies on filesystem permissions rather than OS-level encryption.
+By default, Yomika stores API keys outside `config.toml`. macOS and Windows use the system keyring. Linux uses Yomika's local filesystem credential store under the app data directory with owner-only file permissions; this Linux store relies on filesystem permissions rather than OS-level encryption.
 
 Headless and container runs use the same credential storage behavior as the desktop app. For containers, keep the app data directory on a persistent volume if you want saved API keys to survive container replacement.

@@ -1,7 +1,7 @@
 # BRIEFING — 2026-07-19T07:43:00Z
 
 ## Mission
-Manage the orchestrator to rebrand `koharu` to `yomika` and port fixes/features from upstream `mayocream/koharu` to `yomika`.
+Manage the orchestrator to rebrand `the source project` to `yomika` and port fixes/features from upstream `the upstream source repository` to `yomika`.
 
 ## 🔒 My Identity
 - Archetype: sentinel
@@ -15,7 +15,7 @@ Manage the orchestrator to rebrand `koharu` to `yomika` and port fixes/features 
 - Must use `actionbook/rust-skills` installed in `.agents/skills/`
 
 ## User Context
-- **Last user request**: Rebrand `koharu` to `yomika` and port upstream fixes/features with tests. **UPDATE**: Do NOT clone original koharu. Clone `https://github.com/proxlavee/yomika` instead and port issues into it.
+- **Last user request**: Rebrand `the source project` to `yomika` and port upstream fixes/features with tests. **UPDATE**: Do NOT clone original the source project. Clone `https://github.com/proxlavee/yomika` instead and port issues into it.
 - **Pending clarifications**: none
 - **Delivered results**: []
 

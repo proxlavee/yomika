@@ -4,7 +4,7 @@ title: Troubleshooting
 
 # Troubleshooting
 
-This page covers the most common Koharu problems in the current implementation: first-run downloads, runtime initialization, GPU fallback, headless and MCP access, pipeline-stage ordering, and source-build setup.
+This page covers the most common Yomika problems in the current implementation: first-run downloads, runtime initialization, GPU fallback, headless and MCP access, pipeline-stage ordering, and source-build setup.
 
 ## Before you start
 
@@ -19,7 +19,7 @@ When troubleshooting, first identify which layer is failing:
 
 That usually narrows the problem quickly.
 
-## Koharu does not start cleanly on first launch
+## Yomika does not start cleanly on first launch
 
 Possible causes:
 
@@ -31,27 +31,27 @@ Possible causes:
 Try this:
 
 1. wait longer on the very first launch, especially on slower disks or networks
-2. start Koharu once with `--download` to prefetch runtime dependencies without opening the GUI
+2. start Yomika once with `--download` to prefetch runtime dependencies without opening the GUI
 3. start once with `--cpu` to check whether the problem is GPU-related
 4. start once with `--debug` to get console-oriented logs
 
 ```bash
 # macOS / Linux
-koharu --download
-koharu --cpu
-koharu --debug
+yomika --download
+yomika --cpu
+yomika --debug
 
 # Windows
-koharu.exe --download
-koharu.exe --cpu
-koharu.exe --debug
+yomika.exe --download
+yomika.exe --cpu
+yomika.exe --debug
 ```
 
 If `--cpu` works and the normal launch does not, the problem is usually in the GPU path rather than general app startup.
 
 ## Model or runtime downloads fail
 
-Koharu needs network access on first use for:
+Yomika needs network access on first use for:
 
 - llama.cpp runtime packages
 - GPU runtime support files where applicable
@@ -72,11 +72,11 @@ What to check:
 
 If downloads keep failing, test on a different network first. That is the fastest way to separate a machine-local problem from an upstream reachability issue.
 
-For a deeper explanation of Koharu's runtime and model download paths, plus browser and `curl` checks for Hugging Face, GitHub, and PyPI, see [Runtime and Model Downloads](runtime-and-model-downloads.md).
+For a deeper explanation of Yomika's runtime and model download paths, plus browser and `curl` checks for Hugging Face, GitHub, and PyPI, see [Runtime and Model Downloads](runtime-and-model-downloads.md).
 
-## Koharu falls back to CPU even though you have an NVIDIA GPU
+## Yomika falls back to CPU even though you have an NVIDIA GPU
 
-This is expected when Koharu cannot confirm support for CUDA 13.0.
+This is expected when Yomika cannot confirm support for CUDA 13.0.
 
 The current runtime behavior is:
 
@@ -89,10 +89,10 @@ The current runtime behavior is:
 Try this:
 
 1. update the NVIDIA driver
-2. restart Koharu after the update
+2. restart Yomika after the update
 3. verify behavior with `--debug`
 
-If the driver is old or the CUDA check fails, Koharu deliberately prefers CPU over a partially working CUDA configuration.
+If the driver is old or the CUDA check fails, Yomika deliberately prefers CPU over a partially working CUDA configuration.
 
 ## OCR, inpainting, or export says something is missing
 
@@ -147,7 +147,7 @@ Check the basics first:
 Example:
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 Then open:
@@ -158,7 +158,7 @@ http://localhost:4000
 
 Important implementation detail:
 
-- Koharu binds to `127.0.0.1`
+- Yomika binds to `127.0.0.1`
 
 That means the local Web UI is only available on the same machine unless you expose it yourself through your own networking setup.
 
@@ -176,7 +176,7 @@ Common mistakes:
 
 - using the root URL instead of `/mcp`
 - forgetting `--port`
-- trying to connect after the Koharu process has already exited
+- trying to connect after the Yomika process has already exited
 - trying to reach the service from another machine without explicitly exposing the port
 
 If normal headless Web UI access works but MCP does not, check the exact URL first. Wrong path selection is more common than server failure.
@@ -185,7 +185,7 @@ If the client is Antigravity, Claude Desktop, or Claude Code, follow the client-
 
 ## Import appears to do nothing
 
-The current documented import flow is image-based. Koharu accepts:
+The current documented import flow is image-based. Yomika accepts:
 
 - `.png`
 - `.jpg`
@@ -206,9 +206,9 @@ Use the output type that matches the current pipeline state:
 
 Also remember:
 
-- rendered exports use a `_koharu` suffix
+- rendered exports use a `_yomika` suffix
 - inpainted exports use an `_inpainted` suffix
-- PSD export uses `_koharu.psd`
+- PSD export uses `_yomika.psd`
 - classic PSD export rejects images above `30000 x 30000`
 
 If the page is extremely large, resize or split it before expecting PSD export to succeed.
@@ -225,7 +225,7 @@ The Bun wrapper script tries to discover both automatically, but if either one i
 Use the project wrapper commands:
 
 ```bash
-bun install
+bun install --frozen-lockfile
 bun run build
 ```
 
@@ -238,7 +238,7 @@ bun tauri build --release --no-bundle
 If you want lower-level Rust builds, prefer:
 
 ```bash
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 ```
 
 If you only need to confirm that the app works at all, try a CPU-only runtime launch first instead of debugging the full CUDA toolchain immediately.
@@ -271,7 +271,7 @@ At that point, collect:
 
 ## Related pages
 
-- [Install Koharu](install-koharu.md)
+- [Install Yomika](install-yomika.md)
 - [Run GUI, Headless, and MCP Modes](run-gui-headless-and-mcp.md)
 - [Configure MCP Clients](configure-mcp-clients.md)
 - [Build From Source](build-from-source.md)

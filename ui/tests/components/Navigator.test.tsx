@@ -25,7 +25,10 @@ import { useSelectionStore } from '@/lib/stores/selectionStore'
 import { renderWithQuery } from '../helpers'
 import { server } from '../msw/server'
 
-beforeEach(() => useSelectionStore.getState().setPage(null))
+beforeEach(() => {
+  useSelectionStore.getState().setPage(null)
+  useSelectionStore.getState().clear()
+})
 
 function sceneWithPages(ids: string[]) {
   const pages: Record<string, unknown> = {}
@@ -278,6 +281,29 @@ describe('Navigator', () => {
 
     await userEvent.click(card0)
     fireEvent.click(card1, { ctrlKey: true })
+
+    card0.focus()
+    await userEvent.keyboard('{Delete}')
+
+    expect(applied).toBe(false)
+  })
+
+  it('does not delete the page when text blocks are selected — block deletion takes precedence', async () => {
+    let applied = false
+    server.use(
+      http.get('/api/v1/scene.json', () => HttpResponse.json(sceneWithPages(['a', 'b']))),
+      http.post('/api/v1/history/apply', async () => {
+        applied = true
+        return HttpResponse.json({ epoch: 1 })
+      }),
+    )
+    renderWithQuery(<Navigator />)
+    const card0 = await screen.findByTestId('navigator-page-0')
+
+    // The user picks a page (focus lands inside the navigator), then selects
+    // a text block and hits Delete — the page must survive.
+    await userEvent.click(card0)
+    useSelectionStore.getState().select('t1', false)
 
     card0.focus()
     await userEvent.keyboard('{Delete}')

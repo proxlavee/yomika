@@ -84,13 +84,13 @@ export async function openImageFolder(): Promise<ImagePickerResult> {
   }
 }
 
-/** Pick one `.khr` archive file. Returns `null` if cancelled. */
-export async function openKhrFile(): Promise<File | null> {
+/** Pick one `.ymk` archive file. Returns `null` if cancelled. */
+export async function openYmkFile(): Promise<File | null> {
   if (isTauri()) {
     const { open } = await import('@tauri-apps/plugin-dialog')
     const picked = await open({
       multiple: false,
-      filters: [{ name: 'Koharu archive', extensions: ['khr'] }],
+      filters: [{ name: 'Yomika archive', extensions: ['ymk'] }],
     })
     if (!picked || typeof picked !== 'string') return null
     const [file] = await readTauriFiles([picked])
@@ -101,8 +101,8 @@ export async function openKhrFile(): Promise<File | null> {
   try {
     const result = await fileOpen({
       multiple: false,
-      extensions: ['.khr'],
-      description: 'Koharu archive',
+      extensions: ['.ymk'],
+      description: 'Yomika archive',
     })
     return Array.isArray(result) ? (result[0] ?? null) : result
   } catch (e) {
@@ -132,7 +132,7 @@ function mimeFromName(name: string): string {
   if (lower.endsWith('.png')) return 'image/png'
   if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg'
   if (lower.endsWith('.webp')) return 'image/webp'
-  if (lower.endsWith('.khr')) return 'application/zip'
+  if (lower.endsWith('.ymk')) return 'application/zip'
   return 'application/octet-stream'
 }
 

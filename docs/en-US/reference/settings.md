@@ -4,7 +4,7 @@ title: Settings Reference
 
 # Settings Reference
 
-Koharu's Settings screen currently exposes six main areas:
+Yomika's Settings screen currently exposes six main areas:
 
 - `Appearance`
 - `Engines`
@@ -21,7 +21,7 @@ The `Appearance` tab currently includes:
 
 - theme: `Light`, `Dark`, or `System`
 - UI language from the bundled translation list
-- `Rendering Font`, which is used when Koharu renders translated text onto the page
+- `Rendering Font`, which is used when Yomika renders translated text onto the page
 
 Theme, language, and rendering-font changes apply immediately in the frontend.
 
@@ -64,7 +64,7 @@ Current behavior:
 
 - provider API keys are not written to `config.toml`
 - on macOS and Windows, provider API keys are stored through the system keyring
-- on Linux, provider API keys are stored in Koharu's local filesystem credential store under the app data directory with owner-only file permissions
+- on Linux, provider API keys are stored in Yomika's local filesystem credential store under the app data directory with owner-only file permissions
 - provider base URLs are stored in the app config
 - `OpenAI Compatible` requires a custom `Base URL`; models are discovered dynamically by calling `GET /v1/models` against that URL
 - machine-translation providers (`DeepL`, `Google Cloud Translation`, `Caiyun`) only need an API key; `Caiyun` supports a limited set of target languages
@@ -101,9 +101,9 @@ The `Runtime` tab groups restart-required settings that affect the shared local 
 
 Current behavior:
 
-- `Data Path` controls where Koharu stores runtime packages, downloaded models, page manifests, and image blobs
-- `HTTP Connect Timeout` sets how long Koharu waits while establishing HTTP connections
-- `HTTP Read Timeout` sets how long Koharu waits while reading HTTP responses
+- `Data Path` controls where Yomika stores runtime packages, downloaded models, page manifests, and image blobs
+- `HTTP Connect Timeout` sets how long Yomika waits while establishing HTTP connections
+- `HTTP Read Timeout` sets how long Yomika waits while reading HTTP responses
 - `HTTP Max Retries` controls automatic retries for transient HTTP failures
 - these HTTP values are used by the shared runtime HTTP client for downloads and provider-backed requests
 - applying changes saves the config and restarts the desktop app because the runtime client is built at startup
@@ -117,7 +117,7 @@ The `About` tab currently shows:
 - the author link
 - the repository link
 
-In packaged app mode, the version check compares the local app version against the latest GitHub release for `mayocream/koharu`.
+In packaged app mode, the version check compares the local app version against the latest GitHub release for `proxlavee/yomika`.
 
 ## Persistence model
 

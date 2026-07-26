@@ -118,7 +118,7 @@ export const usePreferencesStore = create<PreferencesState>()(
       resetPreferences: () => set({ ...initialPreferences }),
     }),
     {
-      name: 'koharu-config',
+      name: 'yomika-config',
       version: 7,
       migrate: (persisted: any, version: number) => {
         if (version < 2 && persisted) {

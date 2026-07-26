@@ -1,15 +1,15 @@
 ---
 title: テキストレンダリングと縦書き CJK レイアウト
-description: Koharu のテキストレンダラの仕組み、テキストレンダリングが難しい理由、そして現行実装が縦書き CJK 漫画レイアウトに対して何をしているかを説明します。
+description: Yomika のテキストレンダラの仕組み、テキストレンダリングが難しい理由、そして現行実装が縦書き CJK 漫画レイアウトに対して何をしているかを説明します。
 ---
 
 # テキストレンダリングと縦書き CJK レイアウト
 
 テキストレンダリングは、漫画翻訳ツールの中でも特に難しい部分です。detection、OCR、inpainting はページに何を起こすべきかを決めますが、最終結果が「デバッグ用オーバーレイ」ではなく本物の漫画ページに見えるかどうかを決めるのはレンダラです。
 
-外部資料として特に有用なのが、Aria Desires による [Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) です。Koharu にもその主張はそのまま当てはまります。テキストレンダリングはきれいな直列問題ではなく、完全な正解もありません。レイアウト、shaping、font fallback、rasterization、composition は相互に影響し合います。
+外部資料として特に有用なのが、Aria Desires による [Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) です。Yomika にもその主張はそのまま当てはまります。テキストレンダリングはきれいな直列問題ではなく、完全な正解もありません。レイアウト、shaping、font fallback、rasterization、composition は相互に影響し合います。
 
-Koharu はフル機能の DTP エンジンを目指してはいません。代わりに、漫画ページで特によく必要になるテキストレイアウト、特に縦書き CJK の吹き出しテキストをかなり高い水準で扱うことを目指しています。
+Yomika はフル機能の DTP エンジンを目指してはいません。代わりに、漫画ページで特によく必要になるテキストレイアウト、特に縦書き CJK の吹き出しテキストをかなり高い水準で扱うことを目指しています。
 
 ## なぜこの問題は難しいのか
 
@@ -38,9 +38,9 @@ flowchart LR
 - 正しい縦書き字形を持つフォントもあれば、持たないフォントもある
 - 日本語、中国語、ラテン文字、数字、記号、emoji が同じブロックに混在することが多い
 
-## Koharu が実際にやっていること
+## Yomika が実際にやっていること
 
-実装としては、レンダラは `koharu-renderer` クレートにあり、主な調停は `koharu-app/src/renderer.rs`、`src/layout.rs`、`src/shape.rs`、`src/segment.rs`、`src/renderer.rs` で行われています。
+実装では、アプリ側の調停は `crates/yomika-app/src/renderer.rs` にあり、レイアウト、シェーピング、セグメンテーション、ラスタライズは `crates/yomika-renderer/src/` 配下にあります。
 
 翻訳済み `TextBlock` 1 つに対する流れは、おおむね次の通りです。
 
@@ -65,9 +65,9 @@ flowchart TD
 - `TinySkiaRenderer` は `skrifa` でアウトラインを rasterize し、必要なら `fontdue` の bitmap にフォールバックする
 - `Renderer::render_text_block` がそれらをフォントヒント、縁取り設定、ページ上の配置と統合する
 
-## Koharu はどうやって縦書きレイアウトを選ぶのか
+## Yomika はどうやって縦書きレイアウトを選ぶのか
 
-Koharu は、CJK を含むテキストを無条件で全部縦書きにするわけではありません。`text/script.rs` にある現在のヒューリスティックは次です。
+Yomika は、CJK を含むテキストを無条件で全部縦書きにするわけではありません。`text/script.rs` にある現在のヒューリスティックは次です。
 
 - 翻訳文に CJK が含まれ、かつブロックが横幅より高さのほうが大きければ `VerticalRl` を使う
 - それ以外は横書きのままにする
@@ -87,16 +87,16 @@ Koharu は、CJK を含むテキストを無条件で全部縦書きにするわ
 
 `WritingMode::VerticalRl` は、最終キャンバス上で回転させるだけの仕組みではありません。
 
-Koharu はこれを HarfBuzz 実行前に top-to-bottom の shaping direction へ変換します。これにより、フォントと shaping engine は「横書きテキストを後から回しただけ」の扱いではなく、縦書き用の advance や glyph form を本物として生成できます。
+Yomika はこれを HarfBuzz 実行前に top-to-bottom の shaping direction へ変換します。これにより、フォントと shaping engine は「横書きテキストを後から回しただけ」の扱いではなく、縦書き用の advance や glyph form を本物として生成できます。
 
 ### 2. 縦書き OpenType feature を有効にする
 
-Koharu は縦書き shaping のときに次の OpenType feature を有効にします。
+Yomika は縦書き shaping のときに次の OpenType feature を有効にします。
 
 - `vert`
 - `vrt2`
 
-これらは、縦書きに正しく対応したフォントが使う標準的な vertical alternates です。Koharu の縦書き出力が、単に横書きを回転した見た目ではなく、かなり自然な縦書き CJK レイアウトになる大きな理由の 1 つがここです。
+これらは、縦書きに正しく対応したフォントが使う標準的な vertical alternates です。Yomika の縦書き出力が、単に横書きを回転した見た目ではなく、かなり自然な縦書き CJK レイアウトになる大きな理由の 1 つがここです。
 
 フォントに proper vertical glyph substitution があればそれを使えますし、なければそのフォントが提供できる水準まで品質が落ちます。
 
@@ -118,7 +118,7 @@ Koharu は縦書き shaping のときに次の OpenType feature を有効にし�
 
 ### 4. 全角句読点を再センタリングする
 
-縦書き CJK レイアウトでは、句読点を横書き前提のまま配置するとすぐに不自然になります。Koharu は全角句読点を明示的に扱い、実際の font bounds から再センタリングします。
+縦書き CJK レイアウトでは、句読点を横書き前提のまま配置するとすぐに不自然になります。Yomika は全角句読点を明示的に扱い、実際の font bounds から再センタリングします。
 
 対象となるのは次のようなケースです。
 
@@ -137,7 +137,7 @@ Koharu は縦書き shaping のときに次の OpenType feature を有効にし�
 
 ### 6. ink bounds をきつく測る
 
-レイアウト後、Koharu は glyph ごとのメトリクスからタイトな ink bounding box を計算し、その後 baseline を平行移動して真の ink origin が `(0, 0)` から始まるようにします。
+レイアウト後、Yomika は glyph ごとのメトリクスからタイトな ink bounding box を計算し、その後 baseline を平行移動して真の ink origin が `(0, 0)` から始まるようにします。
 
 これが重要なのは次の理由です。
 
@@ -149,7 +149,7 @@ Koharu は縦書き shaping のときに次の OpenType feature を有効にし�
 
 ## なぜ漫画の吹き出しで見た目が良いのか
 
-Koharu は、一般的な漫画ケースで価値の高い点をいくつもきちんと押さえています。
+Yomika は、一般的な漫画ケースで価値の高い点をいくつもきちんと押さえています。
 
 - 文字単位描画ではなく、本物の shaping を使う
 - 完成後の横書きテキストを回すのではなく、縦書き font feature を有効にする
@@ -159,7 +159,7 @@ Koharu は、一般的な漫画ケースで価値の高い点をいくつもき�
 - 縦書き時に全角句読点を中央寄せする
 - 縦方向フローや縦書き中国語 / 日本語出力を確認するテストがある
 
-この組み合わせにより、Koharu のレンダラは「一応対応している」ではなく、意図のある読みやすい縦書き CJK を出せます。
+この組み合わせにより、Yomika のレンダラは「一応対応している」ではなく、意図のある読みやすい縦書き CJK を出せます。
 
 ## どれくらい完璧なのか
 
@@ -167,7 +167,7 @@ Koharu は、一般的な漫画ケースで価値の高い点をいくつもき�
 
 ここははっきり区別すべきです。
 
-Koharu は次のように理解するのが適切です。
+Yomika は次のように理解するのが適切です。
 
 - 横書きを回転するだけの方式よりはるかに良い
 - 現代的な CJK フォントでの縦書き吹き出しレイアウトには強い
@@ -197,7 +197,7 @@ Koharu は次のように理解するのが適切です。
 
 ### フル組版エンジンの機能はない
 
-Koharu は、完全な composition system が持つ高度な文字組み機能を全部実装しようとはしていません。現在のレンダラには、少なくとも次のような機能はフル実装されていません。
+Yomika は、完全な composition system が持つ高度な文字組み機能を全部実装しようとはしていません。現在のレンダラには、少なくとも次のような機能はフル実装されていません。
 
 - ルビ
 - 割注などの高度な日本語レイアウト機能
@@ -208,9 +208,9 @@ Koharu は、完全な composition system が持つ高度な文字組み機能�
 
 shaping が良くても、翻訳文そのものが長すぎたり、与えられた吹き出しに対して不自然すぎたりすることはあります。レンダラは text fitting と整列を助けますが、悪い box 形状や冗長な翻訳を常に完璧なレタリングへ変えられるわけではありません。
 
-## なぜ Koharu は単純にテキストを回転させないのか
+## なぜ Yomika は単純にテキストを回転させないのか
 
-縦書きテキストの安易な方法は、横書きで並べてから全部回転することです。Koharu がそれを避けるのは、破綻が明白だからです。
+縦書きテキストの安易な方法は、横書きで並べてから全部回転することです。Yomika がそれを避けるのは、破綻が明白だからです。
 
 - 句読点の位置が不自然になる
 - glyph の advance が正しくない
@@ -218,16 +218,16 @@ shaping が良くても、翻訳文そのものが長すぎたり、与えられ
 - フォントが vertical alternate を適用できない
 - bounds と clipping の扱いも難しくなる
 
-Koharu は代わりに、縦書き処理を shaping とレイアウト段階へ押し戻しています。これが縦書き CJK 出力の根本的な設計判断です。
+Yomika は代わりに、縦書き処理を shaping とレイアウト段階へ押し戻しています。これが縦書き CJK 出力の根本的な設計判断です。
 
 ## 読んでおく価値のある外部資料
 
-[Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) が有用なのは、特定言語や特定実装に依存しない形でレンダラ問題を説明しているからです。Koharu の具体的なスタックはブラウザエンジンとは違いますが、根本の教訓は同じです。
+[Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) が有用なのは、特定言語や特定実装に依存しない形でレンダラ問題を説明しているからです。Yomika の具体的なスタックはブラウザエンジンとは違いますが、根本の教訓は同じです。
 
 - shaping は省略できない
 - fallback font は避けられない
 - レイアウトと shaping は相互依存している
 - 「完璧な」テキストレンダリングというものは、実装してみる前にだけ簡単に思える
 
-短く言えば、Koharu のレンダラが慎重なのは、テキストレンダリングが本当に面倒だからです。
+短く言えば、Yomika のレンダラが慎重なのは、テキストレンダリングが本当に面倒だからです。
 

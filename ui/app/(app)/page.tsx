@@ -21,7 +21,7 @@ import { useGetMeta } from '@/lib/api/default/default'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { cn } from '@/lib/utils'
 
-const LAYOUT_ID = 'koharu-main-layout-v3'
+const LAYOUT_ID = 'yomika-main-layout-v3'
 
 export default function Page() {
   const hasProject = useScene().scene !== null

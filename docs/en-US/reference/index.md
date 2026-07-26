@@ -4,7 +4,7 @@ title: Reference
 
 # Reference
 
-Reference pages collect factual details you may want to look up quickly while working with Koharu.
+Reference pages collect factual details you may want to look up quickly while working with Yomika.
 
 ## Available references
 

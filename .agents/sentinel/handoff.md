@@ -1,8 +1,8 @@
 # Handoff Report
 
 ## Observation
-Received user request to rebrand `koharu` to `yomika` and port upstream fixes/features with tests. Need to use `actionbook/rust-skills`.
-CRITICAL UPDATE: Must clone `https://github.com/proxlavee/yomika` instead of the original `koharu` repo, and port issues/PRs from koharu into it.
+Received user request to rebrand `the source project` to `yomika` and port upstream fixes/features with tests. Need to use `actionbook/rust-skills`.
+CRITICAL UPDATE: Must clone `https://github.com/proxlavee/yomika` instead of the original `the source project` repo, and port issues/PRs from the source project into it.
 
 ## Logic Chain
 - Initialized workspace and recorded original user request to `/mnt/c/Users/KaanReyiz/Desktop/KodProjeleri/yomika/.agents/ORIGINAL_REQUEST.md`.

@@ -25,12 +25,12 @@ impl AppEventOneOf8 {
 ///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Event {
-    #[serde(rename = "projectClosed")]
-    ProjectClosed,
+    #[serde(rename = "llmUnloaded")]
+    LlmUnloaded,
 }
 
 impl Default for Event {
     fn default() -> Event {
-        Self::ProjectClosed
+        Self::LlmUnloaded
     }
 }

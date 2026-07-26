@@ -12,6 +12,8 @@ use super::{ContentType, Error, configuration};
 use crate::{apis::ResponseContent, models};
 use reqwest;
 use serde::{Deserialize, Serialize, de::Error as _};
+use tokio::fs::File as TokioFile;
+use tokio_util::codec::{BytesCodec, FramedRead};
 
 /// struct for typed errors of method [`add_image_layer`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,10 +50,24 @@ pub enum CreatePagesError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`create_pages_from_paths`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CreatePagesFromPathsError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`create_project`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CreateProjectError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`delete_codex_session`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteCodexSessionError {
     UnknownValue(serde_json::Value),
 }
 
@@ -66,6 +82,16 @@ pub enum DeleteCurrentLlmError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum DeleteCurrentProjectError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`delete_project`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteProjectError {
+    Status400(),
+    Status404(),
+    Status500(),
     UnknownValue(serde_json::Value),
 }
 
@@ -101,6 +127,13 @@ pub enum GetBlobError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetCatalogError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`get_codex_auth_status`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetCodexAuthStatusError {
     UnknownValue(serde_json::Value),
 }
 
@@ -174,10 +207,24 @@ pub enum ImportProjectError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`list_downloads`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ListDownloadsError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`list_fonts`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListFontsError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`list_operations`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ListOperationsError {
     UnknownValue(serde_json::Value),
 }
 
@@ -223,10 +270,31 @@ pub enum RedoError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`reorder_text_nodes`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ReorderTextNodesError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`set_provider_secret`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SetProviderSecretError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`start_codex_device_login`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum StartCodexDeviceLoginError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`start_codex_image_generation`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum StartCodexImageGenerationError {
     UnknownValue(serde_json::Value),
 }
 
@@ -254,9 +322,11 @@ pub enum UndoError {
 pub async fn add_image_layer(
     configuration: &configuration::Configuration,
     id: &str,
+    file: std::path::PathBuf,
 ) -> Result<models::AddImageLayerResponse, Error<AddImageLayerError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_id = id;
+    let p_form_file = file;
 
     let uri_str = format!(
         "{}/pages/{id}/image-layers",
@@ -270,6 +340,17 @@ pub async fn add_image_layer(
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
+    let mut multipart_form = reqwest::multipart::Form::new();
+    let file = TokioFile::open(&p_form_file).await?;
+    let stream = FramedRead::new(file, BytesCodec::new());
+    let file_name = p_form_file
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let file_part =
+        reqwest::multipart::Part::stream(reqwest::Body::wrap_stream(stream)).file_name(file_name);
+    multipart_form = multipart_form.part("file", file_part);
+    req_builder = req_builder.multipart(multipart_form);
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -440,7 +521,13 @@ pub async fn clear_provider_secret(
 
 pub async fn create_pages(
     configuration: &configuration::Configuration,
+    file: Vec<std::path::PathBuf>,
+    replace: Option<bool>,
 ) -> Result<models::CreatePagesResponse, Error<CreatePagesError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_form_file = file;
+    let p_form_replace = replace;
+
     let uri_str = format!("{}/pages", configuration.base_path);
     let mut req_builder = configuration
         .client
@@ -449,6 +536,22 @@ pub async fn create_pages(
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
+    let mut multipart_form = reqwest::multipart::Form::new();
+    for value in &p_form_file {
+        let file = TokioFile::open(value).await?;
+        let stream = FramedRead::new(file, BytesCodec::new());
+        let file_name = value
+            .file_name()
+            .map(|n| n.to_string_lossy().to_string())
+            .unwrap_or_default();
+        let file_part = reqwest::multipart::Part::stream(reqwest::Body::wrap_stream(stream))
+            .file_name(file_name);
+        multipart_form = multipart_form.part("file", file_part);
+    }
+    if let Some(param_value) = p_form_replace {
+        multipart_form = multipart_form.text("replace", param_value.to_string());
+    }
+    req_builder = req_builder.multipart(multipart_form);
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -479,6 +582,61 @@ pub async fn create_pages(
     } else {
         let content = resp.text().await?;
         let entity: Option<CreatePagesError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+/// Web clients should keep using `POST /pages` with multipart.
+pub async fn create_pages_from_paths(
+    configuration: &configuration::Configuration,
+    create_pages_from_paths_request: models::CreatePagesFromPathsRequest,
+) -> Result<models::CreatePagesResponse, Error<CreatePagesFromPathsError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_body_create_pages_from_paths_request = create_pages_from_paths_request;
+
+    let uri_str = format!("{}/pages/from-paths", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&p_body_create_pages_from_paths_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::CreatePagesResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::CreatePagesResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreatePagesFromPathsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -533,6 +691,36 @@ pub async fn create_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<CreateProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn delete_codex_session(
+    configuration: &configuration::Configuration,
+) -> Result<(), Error<DeleteCodexSessionError>> {
+    let uri_str = format!("{}/ai/codex/auth/session", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteCodexSessionError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -601,6 +789,44 @@ pub async fn delete_current_project(
     }
 }
 
+pub async fn delete_project(
+    configuration: &configuration::Configuration,
+    id: &str,
+) -> Result<(), Error<DeleteProjectError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_id = id;
+
+    let uri_str = format!(
+        "{}/projects/{id}",
+        configuration.base_path,
+        id = crate::apis::urlencode(p_path_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 pub async fn events(
     configuration: &configuration::Configuration,
 ) -> Result<models::AppEvent, Error<EventsError>> {
@@ -651,7 +877,7 @@ pub async fn events(
 pub async fn export_current_project(
     configuration: &configuration::Configuration,
     export_project_request: models::ExportProjectRequest,
-) -> Result<(), Error<ExportCurrentProjectError>> {
+) -> Result<reqwest::Response, Error<ExportCurrentProjectError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_body_export_project_request = export_project_request;
 
@@ -671,7 +897,7 @@ pub async fn export_current_project(
     let status = resp.status();
 
     if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
+        Ok(resp)
     } else {
         let content = resp.text().await?;
         let entity: Option<ExportCurrentProjectError> = serde_json::from_str(&content).ok();
@@ -724,7 +950,7 @@ pub async fn fetch_google_font(
 pub async fn get_blob(
     configuration: &configuration::Configuration,
     hash: &str,
-) -> Result<(), Error<GetBlobError>> {
+) -> Result<reqwest::Response, Error<GetBlobError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_hash = hash;
 
@@ -745,7 +971,7 @@ pub async fn get_blob(
     let status = resp.status();
 
     if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
+        Ok(resp)
     } else {
         let content = resp.text().await?;
         let entity: Option<GetBlobError> = serde_json::from_str(&content).ok();
@@ -796,6 +1022,53 @@ pub async fn get_catalog(
     } else {
         let content = resp.text().await?;
         let entity: Option<GetCatalogError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn get_codex_auth_status(
+    configuration: &configuration::Configuration,
+) -> Result<models::CodexAuthStatus, Error<GetCodexAuthStatusError>> {
+    let uri_str = format!("{}/ai/codex/auth/status", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::CodexAuthStatus`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::CodexAuthStatus`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetCodexAuthStatusError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -949,7 +1222,7 @@ pub async fn get_google_font_file(
     configuration: &configuration::Configuration,
     family: &str,
     file: &str,
-) -> Result<(), Error<GetGoogleFontFileError>> {
+) -> Result<reqwest::Response, Error<GetGoogleFontFileError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_family = family;
     let p_path_file = file;
@@ -972,7 +1245,7 @@ pub async fn get_google_font_file(
     let status = resp.status();
 
     if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
+        Ok(resp)
     } else {
         let content = resp.text().await?;
         let entity: Option<GetGoogleFontFileError> = serde_json::from_str(&content).ok();
@@ -1081,7 +1354,7 @@ pub async fn get_meta(
 pub async fn get_page_thumbnail(
     configuration: &configuration::Configuration,
     id: &str,
-) -> Result<(), Error<GetPageThumbnailError>> {
+) -> Result<reqwest::Response, Error<GetPageThumbnailError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_id = id;
 
@@ -1102,7 +1375,7 @@ pub async fn get_page_thumbnail(
     let status = resp.status();
 
     if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
+        Ok(resp)
     } else {
         let content = resp.text().await?;
         let entity: Option<GetPageThumbnailError> = serde_json::from_str(&content).ok();
@@ -1116,7 +1389,7 @@ pub async fn get_page_thumbnail(
 
 pub async fn get_scene_bin(
     configuration: &configuration::Configuration,
-) -> Result<(), Error<GetSceneBinError>> {
+) -> Result<reqwest::Response, Error<GetSceneBinError>> {
     let uri_str = format!("{}/scene.bin", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
@@ -1130,7 +1403,7 @@ pub async fn get_scene_bin(
     let status = resp.status();
 
     if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
+        Ok(resp)
     } else {
         let content = resp.text().await?;
         let entity: Option<GetSceneBinError> = serde_json::from_str(&content).ok();
@@ -1191,7 +1464,11 @@ pub async fn get_scene_json(
 
 pub async fn import_project(
     configuration: &configuration::Configuration,
+    body: std::path::PathBuf,
 ) -> Result<models::ProjectSummary, Error<ImportProjectError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_body_body = body;
+
     let uri_str = format!("{}/projects/import", configuration.base_path);
     let mut req_builder = configuration
         .client
@@ -1200,6 +1477,9 @@ pub async fn import_project(
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
+    let file = TokioFile::open(p_body_body).await?;
+    let stream = FramedRead::new(file, BytesCodec::new());
+    req_builder = req_builder.body(reqwest::Body::wrap_stream(stream));
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -1230,6 +1510,53 @@ pub async fn import_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<ImportProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn list_downloads(
+    configuration: &configuration::Configuration,
+) -> Result<models::ListDownloadsResponse, Error<ListDownloadsError>> {
+    let uri_str = format!("{}/downloads", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::ListDownloadsResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::ListDownloadsResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ListDownloadsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -1277,6 +1604,53 @@ pub async fn list_fonts(
     } else {
         let content = resp.text().await?;
         let entity: Option<ListFontsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn list_operations(
+    configuration: &configuration::Configuration,
+) -> Result<models::ListOperationsResponse, Error<ListOperationsError>> {
+    let uri_str = format!("{}/operations", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::ListOperationsResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::ListOperationsResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ListOperationsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -1475,10 +1849,22 @@ pub async fn put_mask(
     configuration: &configuration::Configuration,
     id: &str,
     role: models::MaskRole,
+    body: std::path::PathBuf,
+    pipeline: Option<&str>,
+    x: Option<f32>,
+    y: Option<f32>,
+    width: Option<f32>,
+    height: Option<f32>,
 ) -> Result<models::PutMaskResponse, Error<PutMaskError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_id = id;
     let p_path_role = role;
+    let p_body_body = body;
+    let p_query_pipeline = pipeline;
+    let p_query_x = x;
+    let p_query_y = y;
+    let p_query_width = width;
+    let p_query_height = height;
 
     let uri_str = format!(
         "{}/pages/{id}/masks/{role}",
@@ -1488,9 +1874,27 @@ pub async fn put_mask(
     );
     let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
 
+    if let Some(ref param_value) = p_query_pipeline {
+        req_builder = req_builder.query(&[("pipeline", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_query_x {
+        req_builder = req_builder.query(&[("x", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_query_y {
+        req_builder = req_builder.query(&[("y", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_query_width {
+        req_builder = req_builder.query(&[("width", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_query_height {
+        req_builder = req_builder.query(&[("height", &param_value.to_string())]);
+    }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
+    let file = TokioFile::open(p_body_body).await?;
+    let stream = FramedRead::new(file, BytesCodec::new());
+    req_builder = req_builder.body(reqwest::Body::wrap_stream(stream));
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -1578,6 +1982,47 @@ pub async fn redo(
     }
 }
 
+pub async fn reorder_text_nodes(
+    configuration: &configuration::Configuration,
+    page_id: &str,
+    body: String,
+) -> Result<(), Error<ReorderTextNodesError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_page_id = page_id;
+    let p_body_body = body;
+
+    let uri_str = format!(
+        "{}/pages/{page_id}/reorder-text-nodes",
+        configuration.base_path,
+        page_id = crate::apis::urlencode(p_path_page_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&p_body_body);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ReorderTextNodesError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 pub async fn set_provider_secret(
     configuration: &configuration::Configuration,
     id: &str,
@@ -1609,6 +2054,109 @@ pub async fn set_provider_secret(
     } else {
         let content = resp.text().await?;
         let entity: Option<SetProviderSecretError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn start_codex_device_login(
+    configuration: &configuration::Configuration,
+) -> Result<models::CodexDeviceLogin, Error<StartCodexDeviceLoginError>> {
+    let uri_str = format!("{}/ai/codex/auth/device-code", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::CodexDeviceLogin`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::CodexDeviceLogin`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<StartCodexDeviceLoginError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn start_codex_image_generation(
+    configuration: &configuration::Configuration,
+    codex_image_generation_options: models::CodexImageGenerationOptions,
+) -> Result<models::CodexImageGenerationResponse, Error<StartCodexImageGenerationError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_body_codex_image_generation_options = codex_image_generation_options;
+
+    let uri_str = format!("{}/ai/codex/images", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&p_body_codex_image_generation_options);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::CodexImageGenerationResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::CodexImageGenerationResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<StartCodexImageGenerationError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

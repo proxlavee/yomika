@@ -4,11 +4,11 @@ title: Export Pages and Manage Projects
 
 # Export Pages and Manage Projects
 
-Koharu's workflow is page-based. You import one or more page images, run the pipeline, review text blocks, and then export either flattened output or a layered handoff file for manual finishing.
+Yomika's workflow is page-based. You import one or more page images, run the pipeline, review text blocks, and then export either flattened output or a layered handoff file for manual finishing.
 
 ## Supported page inputs
 
-The current import flow is image-based. Koharu accepts:
+The current import flow is image-based. Yomika accepts:
 
 - `.png`
 - `.jpg`
@@ -19,24 +19,24 @@ Folder import recursively scans for supported image files and ignores everything
 
 ## Export rendered output
 
-Koharu can export the current page as a rendered image.
+Yomika can export the current page as a rendered image.
 
 Use this when you want a final flattened result for reading, sharing, or publishing.
 
 Implementation details:
 
 - rendered export uses the page's original image extension when possible
-- Koharu names the exported file with a `_koharu` suffix
+- Yomika names the exported file with a `_yomika` suffix
 - rendered export requires the page to already have a rendered layer
 
 Example output names:
 
-- `page-001_koharu.png`
-- `chapter-03_koharu.jpg`
+- `page-001_yomika.png`
+- `chapter-03_yomika.jpg`
 
 ## Export inpainted output
 
-Koharu also keeps an inpainted layer in the pipeline, which is useful when you want a cleaned page without translated lettering.
+Yomika also keeps an inpainted layer in the pipeline, which is useful when you want a cleaned page without translated lettering.
 
 This is most useful for:
 
@@ -44,11 +44,11 @@ This is most useful for:
 - cleanup review
 - batch export of text-removed pages
 
-When exported, Koharu uses an `_inpainted` filename suffix.
+When exported, Yomika uses an `_inpainted` filename suffix.
 
 ## Export layered PSD files
 
-Koharu can also export a layered Photoshop PSD.
+Yomika can also export a layered Photoshop PSD.
 
 PSD export is the handoff format for users who want to keep working in Photoshop or a PSD-compatible editor after the ML pipeline has done its first pass.
 
@@ -68,17 +68,17 @@ That makes the PSD much more useful than a flat image when you still need to:
 - repaint artifacts
 - hide or inspect helper layers
 
-Koharu names PSD exports with a `_koharu.psd` suffix.
+Yomika names PSD exports with a `_yomika.psd` suffix.
 
 ## PSD export limitations
 
-Koharu currently writes classic PSD files, not PSB files. That means very large pages can fail to export.
+Yomika currently writes classic PSD files, not PSB files. That means very large pages can fail to export.
 
 The implementation rejects dimensions above `30000 x 30000`.
 
 ## Manage loaded page sets
 
-Koharu lets you work with multiple loaded pages in one session.
+Yomika lets you work with multiple loaded pages in one session.
 
 The practical choices are:
 
@@ -101,6 +101,6 @@ This is the main way to manage a chapter or batch job inside the app today.
 
 If you care about polish, a practical pattern is:
 
-1. run detection, OCR, translation, and render in Koharu
+1. run detection, OCR, translation, and render in Yomika
 2. export a rendered image for quick review
 3. export a PSD when you want editable text and helper layers for final cleanup

@@ -24,6 +24,24 @@ export async function convertToBlob(bytes: Uint8Array): Promise<Blob> {
   return new Blob([bytes as unknown as BlobPart])
 }
 
+/**
+ * Normalize a server blob for browser image display without materializing
+ * encoded PNG/WebP/JPEG files as large JavaScript typed arrays.
+ *
+ * Renderer sprites may use the compact `RGBA` wire format and still need the
+ * canvas conversion. All standard encoded images stay as native `Blob`
+ * instances, which avoids WebKit enumerating millions of numeric properties
+ * when React inspects query data.
+ */
+export async function prepareDisplayBlob(blob: Blob): Promise<Blob> {
+  if (blob.size < 12) return blob
+
+  const header = new Uint8Array(await blob.slice(0, 12).arrayBuffer())
+  if (!isRgbaHeader(header)) return blob
+
+  return convertToBlob(new Uint8Array(await blob.arrayBuffer()))
+}
+
 function isRgbaHeader(b: Uint8Array): boolean {
   return b[0] === 0x52 && b[1] === 0x47 && b[2] === 0x42 && b[3] === 0x41
 }
@@ -39,10 +57,10 @@ const pendingRevokes = new Map<string, number>()
  * URL before the timer fires to cancel. Prevents tearing when React re-renders
  * faster than the browser repaint.
  */
-export function revokeObjectUrlLater(url: string | null | undefined, delayMs = 30_000): void {
+export function revokeObjectUrlLater(url: string | null | undefined, delayMs = 1_000): void {
   if (!url) return
   const existing = pendingRevokes.get(url)
-  if (existing) clearTimeout(existing)
+  if (existing !== undefined) clearTimeout(existing)
   const id = window.setTimeout(() => {
     pendingRevokes.delete(url)
     URL.revokeObjectURL(url)
@@ -53,7 +71,7 @@ export function revokeObjectUrlLater(url: string | null | undefined, delayMs = 3
 export function cancelObjectUrlRevoke(url: string | null | undefined): void {
   if (!url) return
   const id = pendingRevokes.get(url)
-  if (id) {
+  if (id !== undefined) {
     clearTimeout(id)
     pendingRevokes.delete(url)
   }

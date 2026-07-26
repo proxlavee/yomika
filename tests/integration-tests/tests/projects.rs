@@ -2,9 +2,9 @@
 //! projects live under the managed `{data.path}/projects/` directory; no
 //! client-side paths involved.
 
-use koharu_client::apis::default_api as api;
-use koharu_client::models;
-use koharu_integration_tests::TestApp;
+use yomika_client::apis::default_api as api;
+use yomika_client::models;
+use yomika_integration_tests::TestApp;
 
 #[tokio::test]
 async fn create_and_close_project() -> anyhow::Result<()> {
@@ -118,7 +118,7 @@ async fn list_projects_enumerates_managed_dir() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn export_empty_project_as_khr() -> anyhow::Result<()> {
+async fn export_empty_project_as_ymk() -> anyhow::Result<()> {
     let app = TestApp::spawn().await?;
     api::create_project(
         &app.client_config,
@@ -131,7 +131,7 @@ async fn export_empty_project_as_khr() -> anyhow::Result<()> {
     let client = reqwest::Client::new();
     let res = client
         .post(format!("{}/projects/current/export", app.base_url))
-        .json(&serde_json::json!({ "format": "khr" }))
+        .json(&serde_json::json!({ "format": "ymk" }))
         .send()
         .await?;
     assert!(res.status().is_success(), "status: {}", res.status());
@@ -151,7 +151,7 @@ async fn export_empty_project_as_khr() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn import_khr_round_trips() -> anyhow::Result<()> {
+async fn import_ymk_round_trips() -> anyhow::Result<()> {
     let app = TestApp::spawn().await?;
     api::create_project(
         &app.client_config,
@@ -164,7 +164,7 @@ async fn import_khr_round_trips() -> anyhow::Result<()> {
     let client = reqwest::Client::new();
     let res = client
         .post(format!("{}/projects/current/export", app.base_url))
-        .json(&serde_json::json!({ "format": "khr" }))
+        .json(&serde_json::json!({ "format": "ymk" }))
         .send()
         .await?;
     assert!(res.status().is_success());

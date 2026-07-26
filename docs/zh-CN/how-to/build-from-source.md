@@ -4,13 +4,13 @@ title: 从源码构建
 
 # 从源码构建
 
-如果你想在本地编译 Koharu，而不是使用预构建发行版，请优先使用仓库提供的 Bun 包装命令。它符合项目的常规开发流程，并能处理直接调用 Tauri 时不会自动完成的平台初始化。
+如果你想在本地编译 Yomika，而不是使用预构建发行版，请优先使用仓库提供的 Bun 包装命令。它符合项目的常规开发流程，并能处理直接调用 Tauri 时不会自动完成的平台初始化。
 
 ## 构建内容包含什么
 
 一次完整的桌面构建包括：
 
-- `koharu/` 中的 Rust 应用
+- `crates/yomika/` 中的 Rust 应用
 - `ui/` 中嵌入的界面
 - GUI 和 headless 模式共用的本地 HTTP、RPC 和 MCP 服务
 
@@ -26,6 +26,10 @@ title: 从源码构建
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.95 或更高版本（Rust 2024 edition）
 - [Bun](https://bun.sh/) 1.0 或更高版本
+- 带有可用 `libclang` 共享库的 LLVM/Clang（Rust bindgen 需要）
+
+Linux 构建还需要标准的 Tauri 系统依赖。在 Debian、Ubuntu 或 WSL 上，
+请在安装这些依赖时一并安装 `libclang-dev`。
 
 在 Windows 上从源码构建时，还需要：
 
@@ -37,7 +41,7 @@ title: 从源码构建
 ## 安装依赖
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 ## 推荐的桌面构建方式
@@ -52,8 +56,8 @@ bun run build
 
 主二进制会输出到 `target/release`：
 
-- `target/release/koharu`
-- Windows 上为 `target/release/koharu.exe`
+- `target/release/yomika`
+- Windows 上为 `target/release/yomika.exe`
 
 ## 开发构建
 
@@ -85,17 +89,17 @@ bun tauri build --release --no-bundle
 
 ```bash
 # Windows / Linux
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 
 # macOS Apple Silicon
-bun cargo build --release -p koharu --features=metal
+bun cargo build --release -p yomika --features=metal
 ```
 
 这适合更底层的 Rust 开发工作。但如果你的目标是正常的桌面应用构建，`bun run build` 仍然是更好的选择，因为它保留了完整的 Tauri 打包流程。
 
 ## 构建完成后，运行时还会发生什么
 
-构建应用并不会把所有模型权重都打包进二进制。首次启动时，Koharu 仍然需要：
+构建应用并不会把所有模型权重都打包进二进制。首次启动时，Yomika 仍然需要：
 
 - 在本地应用数据目录下初始化运行时库
 - 下载默认的视觉与 OCR 模型

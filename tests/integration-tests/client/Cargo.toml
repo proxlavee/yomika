@@ -1,5 +1,5 @@
 [package]
-name = "koharu-client"
+name = "yomika-client"
 version = "0.0.0"
 edition = "2024"
 publish = false
@@ -11,4 +11,6 @@ serde_with = { version = "3", default-features = false, features = ["base64", "s
 serde_repr = "0.1"
 url = "2"
 uuid = { workspace = true, features = ["serde", "v4"] }
-reqwest = { workspace = true, features = ["json", "multipart", "query", "form"] }
+tokio = { workspace = true }
+tokio-util = { version = "0.7", features = ["codec"] }
+reqwest = { workspace = true, features = ["json", "multipart", "query", "form", "stream"] }

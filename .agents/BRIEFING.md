@@ -1,7 +1,7 @@
 # BRIEFING — 2026-07-19T07:51:19Z
 
 ## Mission
-Rebrand koharu to yomika, port upstream fixes into the new yomika repo, implement tests, and enforce safe commands only.
+Rebrand the source project to yomika, port upstream fixes into the new yomika repo, implement tests, and enforce safe commands only.
 
 ## 🔒 My Identity
 - Archetype: sentinel
@@ -13,7 +13,7 @@ Rebrand koharu to yomika, port upstream fixes into the new yomika repo, implemen
 - No technical decisions — relay only
 - Victory Audit is MANDATORY before reporting completion
 - Agents MUST NOT run destructive shell commands (rm, cp, mv). Terminal commands strictly limited to safe operations.
-- Do NOT clone the original koharu repository; clone from https://github.com/proxlavee/yomika if not already cloned.
+- Do NOT clone the original the source project repository; clone from https://github.com/proxlavee/yomika if not already cloned.
 - The agent team MUST use the actionbook/rust-skills in .agents/skills/.
 
 ## User Context

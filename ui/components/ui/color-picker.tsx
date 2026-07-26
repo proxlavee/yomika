@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { restoreAppWindowInteraction } from '@/lib/backend'
 import { cn } from '@/lib/utils'
 
 type ColorPickerProps = {
@@ -49,18 +50,36 @@ export function ColorPicker({
 }: ColorPickerProps) {
   const [localColor, setLocalColor] = useState(value)
   const dragging = useRef(false)
+  const localColorRef = useRef(localColor)
+  localColorRef.current = localColor
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
 
   // Sync external value when not dragging
   useEffect(() => {
-    if (!dragging.current) setLocalColor(value)
+    if (!dragging.current) {
+      localColorRef.current = value
+      setLocalColor(value)
+    }
   }, [value])
 
-  const handlePointerUp = useCallback(() => {
-    if (dragging.current) {
+  // Commit on pointer release *anywhere*. A drag that ends outside the
+  // picker bounds (e.g. a fast drag toward the bottom-left corner) never
+  // fires the picker's own onPointerUp, which used to silently drop the
+  // color change.
+  useEffect(() => {
+    const commitDrag = () => {
+      if (!dragging.current) return
       dragging.current = false
-      onChange(localColor)
+      onChangeRef.current(localColorRef.current)
     }
-  }, [localColor, onChange])
+    window.addEventListener('pointerup', commitDrag)
+    window.addEventListener('pointercancel', commitDrag)
+    return () => {
+      window.removeEventListener('pointerup', commitDrag)
+      window.removeEventListener('pointercancel', commitDrag)
+    }
+  }, [])
 
   const canUseEyeDropper =
     typeof window !== 'undefined' && typeof (window as EyeDropperWindow).EyeDropper === 'function'
@@ -73,12 +92,19 @@ export function ColorPicker({
       const eyeDropper = new EyeDropperCtor()
       const result = await eyeDropper.open()
       const color = normalizeHex(result.sRGBHex)
+      dragging.current = false
+      localColorRef.current = color
       setLocalColor(color)
       onChange(color)
     } catch (error) {
       const maybeDomException = error as DOMException | undefined
-      if (maybeDomException?.name === 'AbortError') return
-      console.error(error)
+      if (maybeDomException?.name !== 'AbortError') {
+        console.error(error)
+      }
+    } finally {
+      // Windows/WebView2 can leave the native window disabled or unfocused
+      // after the screen picker closes. No-op outside the desktop shell.
+      void restoreAppWindowInteraction()
     }
   }
 
@@ -104,13 +130,13 @@ export function ColorPicker({
       </PopoverTrigger>
       <PopoverContent className='w-64 p-3' sideOffset={8}>
         <div className='space-y-3'>
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-          <div data-testid={pickerTestId} onPointerUp={handlePointerUp}>
+          <div data-testid={pickerTestId}>
             <HexColorPicker
               color={localColor}
               onChange={(color) => {
                 const normalized = normalizeHex(color)
                 dragging.current = true
+                localColorRef.current = normalized
                 setLocalColor(normalized)
               }}
             />
@@ -127,6 +153,8 @@ export function ColorPicker({
               className='h-8 min-w-0 flex-1 rounded-md border border-input bg-background px-2 font-mono text-xs uppercase shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
               onChange={(color) => {
                 const normalized = normalizeHex(color)
+                dragging.current = false
+                localColorRef.current = normalized
                 setLocalColor(normalized)
                 onChange(normalized)
               }}

@@ -1,0 +1,3 @@
+# OpenAPI Generator intentionally emits terminal blank lines in Markdown output.
+tests/integration-tests/client/README.md whitespace=-blank-at-eof
+tests/integration-tests/client/**/*.md whitespace=-blank-at-eof

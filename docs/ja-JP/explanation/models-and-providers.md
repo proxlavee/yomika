@@ -4,13 +4,13 @@ title: モデルとプロバイダ
 
 # モデルとプロバイダ
 
-Koharu は vision モデルと language モデルの両方を使います。vision スタックがページを整え、language スタックが翻訳を担当します。
+Yomika は vision モデルと language モデルの両方を使います。vision スタックがページを整え、language スタックが翻訳を担当します。
 
 これらがアーキテクチャ上でどう組み合わさっているかを知りたい場合は、このページのあとに [技術的な詳細解説](technical-deep-dive.md) を読んでください。
 
 ## Vision モデル
 
-Koharu は、必要な vision モデルを初回利用時に自動でダウンロードします。
+Yomika は、必要な vision モデルを初回利用時に自動でダウンロードします。
 
 現在の既定スタックには次が含まれます。
 
@@ -24,7 +24,7 @@ Koharu は、必要な vision モデルを初回利用時に自動でダウン�
 
 ### 各 vision モデルの役割
 
-| モデル                       | モデル種別             | Koharu で使う理由                                    |
+| モデル                       | モデル種別             | Yomika で使う理由                                    |
 | ---------------------------- | ---------------------- | ---------------------------------------------------- |
 | `comic-text-bubble-detector` | object detector        | テキストブロックと吹き出し領域を 1 回で見つける      |
 | `comic-text-detector`        | segmentation network   | クリーンアップ用の text mask を作る                  |
@@ -32,7 +32,7 @@ Koharu は、必要な vision モデルを初回利用時に自動でダウン�
 | `aot-inpainting`             | inpainting network     | 文字除去後の masked 領域を補完する                   |
 | `YuzuMarker.FontDetection`   | classifier / regressor | レンダリング用のフォントやスタイルのヒントを推定する |
 
-重要なのは、Koharu がページ上の全作業を 1 つのモデルに任せていないことです。検出、segmentation、OCR、inpainting はそれぞれ欲しい出力が異なります。
+重要なのは、Yomika がページ上の全作業を 1 つのモデルに任せていないことです。検出、segmentation、OCR、inpainting はそれぞれ欲しい出力が異なります。
 
 - joint detection が欲しいのはテキストブロックと吹き出し領域
 - segmentation が欲しいのはピクセル単位の mask
@@ -51,7 +51,7 @@ Koharu は、必要な vision モデルを初回利用時に自動でダウン�
 
 ## ローカル LLM
 
-Koharu は [llama.cpp](https://github.com/ggml-org/llama.cpp) を通じてローカル GGUF モデルをサポートします。これらのモデルは手元のマシンで動き、LLM ピッカーで選んだときに必要に応じてダウンロードされます。
+Yomika は [llama.cpp](https://github.com/ggml-org/llama.cpp) を通じてローカル GGUF モデルをサポートします。これらのモデルは手元のマシンで動き、LLM ピッカーで選んだときに必要に応じてダウンロードされます。
 
 実際には、ローカルモデルの多くは量子化済みの decoder-only transformer です。GGUF はファイル形式であり、`llama.cpp` は推論ランタイムです。
 
@@ -83,7 +83,7 @@ LLM ピッカーには、翻訳専用ではない汎用ファミリも含まれ�
 
 ## リモートプロバイダ
 
-Koharu は、ローカルモデルをダウンロードせずに、リモートまたはセルフホストの API を使って翻訳することもできます。
+Yomika は、ローカルモデルをダウンロードせずに、リモートまたはセルフホストの API を使って翻訳することもできます。
 
 対応しているプロバイダファミリ:
 
@@ -116,7 +116,7 @@ LM Studio、OpenRouter、類似エンドポイントの具体的な設定手順�
 
 ### Codex 画像生成
 
-Koharu は Codex を使ったエンドツーエンドの image-to-image 生成にも対応しています。テキストブロックの翻訳とローカルレンダリングを別々の手順として行う代わりに、このワークフローでは元ページ画像とプロンプトを Codex に送り、生成されたページ画像を受け取ります。
+Yomika は Codex を使ったエンドツーエンドの image-to-image 生成にも対応しています。テキストブロックの翻訳とローカルレンダリングを別々の手順として行う代わりに、このワークフローでは元ページ画像とプロンプトを Codex に送り、生成されたページ画像を受け取ります。
 
 これはローカルモデルではなく、リモート画像生成ワークフローです。Codex にアクセスできる ChatGPT アカウントと、デバイスコードログインを完了するための 2 要素認証が必要です。利用上の注意と制限は [Codex 画像生成を使う](../how-to/use-codex-image-generation.md) を参照してください。
 
@@ -136,7 +136,7 @@ Koharu は Codex を使ったエンドツーエンドの image-to-image 生成�
 
 !!! note
 
-    リモートプロバイダを使う場合、Koharu が送るのは翻訳対象として選ばれた OCR テキストです。
+    リモートプロバイダを使う場合、Yomika が送るのは翻訳対象として選ばれた OCR テキストです。
 
 ## 背景知識
 

@@ -4,11 +4,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**detector** | Option<**String**> |  | [optional][default to comic-text-bubble-detector]
+**bubble_segmenter** | Option<**String**> |  | [optional][default to speech-bubble-segmentation]
+**detector** | Option<**String**> |  | [optional][default to pp-doclayout-v3]
 **font_detector** | Option<**String**> |  | [optional][default to yuzumarker-font-detection]
-**inpainter** | Option<**String**> |  | [optional][default to aot-inpainting]
-**ocr** | Option<**String**> |  | [optional][default to paddle-ocr-vl-1.5]
-**renderer** | Option<**String**> |  | [optional][default to koharu-renderer]
+**inpainter** | Option<**String**> |  | [optional][default to lama-manga]
+**ocr** | Option<**String**> |  | [optional][default to paddle-ocr-vl-1.6]
+**renderer** | Option<**String**> |  | [optional][default to yomika-renderer]
 **segmenter** | Option<**String**> |  | [optional][default to comic-text-detector-seg]
 **translator** | Option<**String**> |  | [optional][default to llm]
 

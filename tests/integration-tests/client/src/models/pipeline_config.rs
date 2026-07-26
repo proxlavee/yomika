@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 /// PipelineConfig : Engine selection for each pipeline stage. Values are engine IDs (e.g. \"pp-doclayout-v3\", \"comic-text-detector\"). Empty string means use default.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PipelineConfig {
+    #[serde(rename = "bubble_segmenter", skip_serializing_if = "Option::is_none")]
+    pub bubble_segmenter: Option<String>,
     #[serde(rename = "detector", skip_serializing_if = "Option::is_none")]
     pub detector: Option<String>,
     #[serde(rename = "font_detector", skip_serializing_if = "Option::is_none")]
@@ -34,6 +36,7 @@ impl PipelineConfig {
     /// Engine selection for each pipeline stage. Values are engine IDs (e.g. \"pp-doclayout-v3\", \"comic-text-detector\"). Empty string means use default.
     pub fn new() -> PipelineConfig {
         PipelineConfig {
+            bubble_segmenter: None,
             detector: None,
             font_detector: None,
             inpainter: None,

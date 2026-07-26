@@ -44,11 +44,11 @@
     "runCustomAll": "Executar personalizado (Todas as páginas)"
   },
   "welcome": {
-    "title": "Koharu",
+    "title": "Yomika",
     "subtitle": "Espaço de trabalho de tradução de mangá",
     "new": "Novo projeto",
     "newDescription": "Comece em branco e importe páginas depois",
-    "importKhr": "Importar arquivo .khr",
+    "importYmk": "Importar arquivo .ymk",
     "projects": "Recentes",
     "emptyHint": "Seus projetos recentes aparecerão aqui",
     "delete": "Excluir",
@@ -64,8 +64,8 @@
   "operations": {
     "title": "Trabalhando",
     "inProgress": "Por favor, aguarde enquanto finalizamos.",
-    "loadKhr": "Carregando projeto",
-    "saveKhr": "Salvando projeto",
+    "loadYmk": "Carregando projeto",
+    "saveYmk": "Salvando projeto",
     "loadModel": "Carregando modelo LLM",
     "processCurrent": "Processando imagem atual",
     "processAll": "Processando todas as imagens",
@@ -310,7 +310,7 @@
     "httpProxyDescription": "Usado para downloads do runtime e dos modelos. As alterações são salvas automaticamente.",
     "title": "Configurações",
     "appearance": "Aparência",
-    "appearanceDescription": "Personalize a aparência do Koharu no seu dispositivo.",
+    "appearanceDescription": "Personalize a aparência do Yomika no seu dispositivo.",
     "theme": "Tema",
     "themeDescription": "Selecione o esquema de cores de sua preferência.",
     "themeLight": "Claro",
@@ -372,7 +372,7 @@
     "apiKeySave": "Salvar",
     "apiKeySaved": "Salva!",
     "dataPath": "Caminho dos Dados",
-    "dataPathDescription": "O Koharu armazena modelos, pacotes de runtime, manifestos de páginas e blobs de imagens neste diretório. Alterar o caminho requer reiniciar o aplicativo.",
+    "dataPathDescription": "O Yomika armazena modelos, pacotes de runtime, manifestos de páginas e blobs de imagens neste diretório. Alterar o caminho requer reiniciar o aplicativo.",
     "dataPathApply": "Aplicar e Reiniciar",
     "dataPathApplying": "Aplicando...",
     "dataPathDesktopOnly": "As configurações de runtime estão disponíveis apenas no aplicativo de desktop.",
@@ -409,14 +409,14 @@
   "updater": {
     "available": {
       "title": "Atualização disponível",
-      "description": "Koharu <strong>{{version}}</strong> está pronto para instalar"
+      "description": "Yomika <strong>{{version}}</strong> está pronto para instalar"
     },
     "noNotes": "Nenhuma nota de versão fornecida.",
     "later": "Mais tarde",
     "update": "Atualizar",
     "downloading": {
       "title": "Baixando atualização…",
-      "subtitle": "Koharu {{version}}"
+      "subtitle": "Yomika {{version}}"
     },
     "error": {
       "title": "Falha na atualização",

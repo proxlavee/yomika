@@ -6,7 +6,7 @@
 
 export type ImportProjectParams = {
   /**
- * Optional absolute destination path for the extracted `.khrproj/`
+ * Optional absolute destination path for the extracted `.ymkproj/`
 directory. When omitted, the server allocates a directory under
 `{data.path}/projects/` using a timestamp-and-random suffix. Must not
 already exist when provided.

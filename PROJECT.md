@@ -1,18 +1,21 @@
-# Project: yomika
+# Project: Yomika
 
 ## Architecture
-- A Rust-based CLI or app originally named `koharu`, now rebranded to `yomika`.
 
-## Milestones
-| # | Name | Scope | Dependencies | Status |
-|---|------|-------|-------------|--------|
-| 1 | Rebranding | Replace `koharu` with `yomika` in all source files, docs, and README. Integrate `yomika.png`. | none | PLANNED |
-| 2 | Code Search | Investigate open issues/PRs from `https://github.com/mayocream/koharu`. Select/prioritize what to port. | none | PLANNED |
-| 3 | Port & Test Fixes | Apply chosen upstream fixes/features to the `yomika` codebase. Ensure passing unit/integration tests for each. | M2 | PLANNED |
+Yomika is a Rust workspace with a Tauri desktop shell and a statically exported Next.js editor. The Rust backend owns project state, history, model execution, rendering, HTTP APIs, and MCP tools; React Query treats that backend as the source of truth.
+
+## Current Priorities
+
+| Area | Scope | Status |
+| --- | --- | --- |
+| Identity | Yomika names, assets, crates, executable, docs, and storage formats | In progress |
+| Reliability | Confirmed editor, runtime-loader, and geometry regressions | Implemented |
+| Memory | Bounded GPU FFT plans and short-lived browser image blobs | Implemented |
+| Verification | Formatting, unit tests, lint, Cargo metadata, and build checks | Pending |
 
 ## Interface Contracts
-- CLI and Web/API inputs/outputs must match new branding.
 
-## Code Layout
-- Standard Cargo project structure.
-- `.agents/skills/` contains Rust skills to be used.
+- Managed project directories end in `.ymkproj`; portable archives end in `.ymk`.
+- The local API remains under `/api/v1`; the MCP endpoint is `/mcp`.
+- Pipeline engine identifiers use the `yomika-*` namespace.
+- Hosted providers are opt-in and must not receive page data unless selected by the user.

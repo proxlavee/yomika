@@ -131,7 +131,7 @@ async function updateConfig(next: UpdateConfigBody): Promise<AppConfig> {
   return (await patchConfig(appConfigToPatch(next))) as AppConfig
 }
 
-const GITHUB_REPO = 'mayocream/koharu'
+const GITHUB_REPO = 'proxlavee/yomika'
 
 const TABS = [
   { id: 'appearance', icon: PaletteIcon, labelKey: 'settings.appearance' },
@@ -196,6 +196,12 @@ export function SettingsDialog({
     })()
   }, [open])
 
+  const checkForUpdates = updater.checkForUpdates
+  useEffect(() => {
+    if (!open || !isTauri()) return
+    void checkForUpdates()
+  }, [open, checkForUpdates])
+
   useEffect(() => {
     if (!open) return
     let cancelled = false
@@ -212,12 +218,6 @@ export function SettingsDialog({
       cancelled = true
     }
   }, [open])
-
-  const checkForUpdates = updater.checkForUpdates
-  useEffect(() => {
-    if (!open || !isTauri()) return
-    void checkForUpdates()
-  }, [open, checkForUpdates])
 
   useEffect(() => {
     if (!appConfig?.data) return
@@ -1282,9 +1282,9 @@ function AboutPane({
 
   return (
     <div className='flex h-full flex-col items-center justify-center gap-5 py-8'>
-      <img src='/icon-large.png' alt='Koharu' className='size-20' draggable={false} />
+      <img src='/icon-large.png' alt='Yomika' className='size-20' draggable={false} />
       <div className='text-center'>
-        <h2 className='text-lg font-bold tracking-wide text-foreground'>Koharu</h2>
+        <h2 className='text-lg font-bold tracking-wide text-foreground'>Yomika</h2>
         <p className='mt-1 text-sm text-muted-foreground'>{t('settings.aboutTagline')}</p>
       </div>
 
@@ -1321,13 +1321,7 @@ function AboutPane({
             </div>
           </InfoRow>
           <InfoRow label={t('settings.aboutAuthor')}>
-            <Button
-              variant='link'
-              size='xs'
-              onClick={() => void openExternalUrl('https://github.com/mayocream')}
-            >
-              Mayo
-            </Button>
+            <span className='text-xs font-medium'>Yomika contributors</span>
           </InfoRow>
           <InfoRow label={t('settings.aboutRepository')}>
             <Button

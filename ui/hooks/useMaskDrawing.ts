@@ -11,8 +11,7 @@ import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { usePreferencesStore } from '@/lib/stores/preferencesStore'
 import type { ToolMode } from '@/lib/types'
 
-async function convertBytesToBitmap(bytes: Uint8Array): Promise<ImageBitmap> {
-  const blob = new Blob([bytes as unknown as BlobPart])
+async function convertBlobToBitmap(blob: Blob): Promise<ImageBitmap> {
   return createImageBitmap(blob)
 }
 
@@ -20,7 +19,7 @@ type MaskDrawingOptions = {
   mode: ToolMode
   page: Page | null
   maskHash?: string | null
-  segmentData?: Uint8Array
+  segmentData?: Blob
   pointerToDocument: PointerToDocumentFn
   showMask: boolean
   enabled: boolean
@@ -62,7 +61,7 @@ export function useMaskDrawing({
       if (segmentData) {
         void (async () => {
           try {
-            const bitmap = await convertBytesToBitmap(segmentData)
+            const bitmap = await convertBlobToBitmap(segmentData)
             ctx.save()
             ctx.clearRect(0, 0, d.width, d.height)
             ctx.drawImage(bitmap, 0, 0, d.width, d.height)
@@ -122,7 +121,7 @@ export function useMaskDrawing({
     let cancelled = false
     void (async () => {
       try {
-        const bitmap = await convertBytesToBitmap(segmentData)
+        const bitmap = await convertBlobToBitmap(segmentData)
         if (cancelled) {
           bitmap.close()
           return
@@ -139,7 +138,7 @@ export function useMaskDrawing({
     return () => {
       cancelled = true
     }
-  }, [segmentData, page?.id, page?.width, page?.height, canvasRef, showMask])
+  }, [segmentData, page, canvasRef, showMask])
 
   const bind = isActive ? rawBind : () => ({})
   return { canvasRef, visible: showMask, bind }

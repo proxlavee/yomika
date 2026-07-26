@@ -4,13 +4,13 @@ title: Models and Providers
 
 # Models and Providers
 
-Koharu uses both vision models and language models. The vision stack prepares the page; the language stack handles translation.
+Yomika uses both vision models and language models. The vision stack prepares the page; the language stack handles translation.
 
 If you want the architecture-level view of how these pieces fit together, read [Technical Deep Dive](technical-deep-dive.md) after this page.
 
 ## Vision models
 
-Koharu downloads required vision models automatically the first time you use them.
+Yomika downloads required vision models automatically the first time you use them.
 
 The current default stack includes:
 
@@ -20,11 +20,11 @@ The current default stack includes:
 - [aot-inpainting](https://huggingface.co/mayocream/aot-inpainting) for default inpainting
 - [YuzuMarker.FontDetection](https://huggingface.co/fffonion/yuzumarker-font-detection) for font and color detection
 
-Some models are used directly from upstream Hugging Face repos, while converted `safetensors` weights are hosted on [Hugging Face](https://huggingface.co/mayocream) when Koharu needs a Rust-friendly bundle.
+Some models are used directly from upstream Hugging Face repos, while converted `safetensors` weights are hosted on [Hugging Face](https://huggingface.co/mayocream) when Yomika needs a Rust-friendly bundle.
 
 ### What each vision model is
 
-| Model                        | Model type             | Why Koharu uses it                                      |
+| Model                        | Model type             | Why Yomika uses it                                      |
 | ---------------------------- | ---------------------- | ------------------------------------------------------- |
 | `comic-text-bubble-detector` | object detector        | finds text blocks and speech bubble regions in one pass |
 | `comic-text-detector`        | segmentation network   | produces a text mask for cleanup                        |
@@ -32,7 +32,7 @@ Some models are used directly from upstream Hugging Face repos, while converted 
 | `aot-inpainting`             | inpainting network     | reconstructs masked image regions after text removal    |
 | `YuzuMarker.FontDetection`   | classifier / regressor | estimates font and style hints for rendering            |
 
-The important design choice is that Koharu does not use one model for every page task. Detection, segmentation, OCR, and inpainting all need different output shapes:
+The important design choice is that Yomika does not use one model for every page task. Detection, segmentation, OCR, and inpainting all need different output shapes:
 
 - joint detection wants text blocks and bubble regions
 - segmentation wants per-pixel masks
@@ -51,7 +51,7 @@ You can swap individual stages in **Settings > Engines**. Built-in alternatives 
 
 ## Local LLMs
 
-Koharu supports local GGUF models through [llama.cpp](https://github.com/ggml-org/llama.cpp). These models run on your machine and are downloaded on demand when you select them in the LLM picker.
+Yomika supports local GGUF models through [llama.cpp](https://github.com/ggml-org/llama.cpp). These models run on your machine and are downloaded on demand when you select them in the LLM picker.
 
 In practice, the local models are usually quantized decoder-only transformers. GGUF is the model format; `llama.cpp` is the inference runtime.
 
@@ -83,7 +83,7 @@ The local picker also includes general-purpose families that are not translation
 
 ## Remote providers
 
-Koharu can also translate through remote or self-hosted APIs instead of downloading a local model.
+Yomika can also translate through remote or self-hosted APIs instead of downloading a local model.
 
 Supported provider families are:
 
@@ -116,7 +116,7 @@ For a step-by-step setup guide for LM Studio, OpenRouter, and similar endpoints,
 
 ### Codex image generation
 
-Koharu can also use Codex for end-to-end image-to-image generation. Instead of translating text blocks and rendering text locally as separate steps, this workflow sends the source page image and prompt to Codex and receives a generated page image.
+Yomika can also use Codex for end-to-end image-to-image generation. Instead of translating text blocks and rendering text locally as separate steps, this workflow sends the source page image and prompt to Codex and receives a generated page image.
 
 This is a remote image-generation workflow, not a local model. It requires a ChatGPT account with Codex access and two-factor authentication enabled before device-code login can complete. See [Use Codex Image Generation](../how-to/use-codex-image-generation.md) for usage notes and caveats.
 
@@ -136,7 +136,7 @@ Use remote providers when you want:
 
 !!! note
 
-    When you use a remote provider, Koharu sends OCR text selected for translation to the provider you configured.
+    When you use a remote provider, Yomika sends OCR text selected for translation to the provider you configured.
 
 ## Background reading
 

@@ -1,7 +1,7 @@
 //! Binary reads: /scene.bin, /blobs/:hash, /pages/:id/thumbnail.
 
-use koharu_integration_tests::TestApp;
 use reqwest::multipart::{Form, Part};
+use yomika_integration_tests::TestApp;
 
 async fn import_one(app: &TestApp, png: Vec<u8>) -> anyhow::Result<String> {
     let form = Form::new().part(
@@ -37,7 +37,7 @@ async fn scene_bin_deserializes_with_postcard() -> anyhow::Result<()> {
         .error_for_status()?;
     let epoch_header = resp
         .headers()
-        .get("x-koharu-epoch")
+        .get("x-yomika-epoch")
         .expect("epoch header set");
     assert!(epoch_header.to_str()?.parse::<u64>()? > 0);
 
@@ -48,7 +48,7 @@ async fn scene_bin_deserializes_with_postcard() -> anyhow::Result<()> {
     #[derive(serde::Deserialize)]
     struct WireSnapshot {
         epoch: u64,
-        scene: koharu_core::Scene,
+        scene: yomika_core::Scene,
     }
     let snap: WireSnapshot = postcard::from_bytes(&bytes)?;
     assert!(snap.epoch > 0);
@@ -71,7 +71,7 @@ async fn blob_fetch_returns_stored_bytes() -> anyhow::Result<()> {
         page.nodes
             .values()
             .find_map(|n| match &n.kind {
-                koharu_core::NodeKind::Image(i) if i.role == koharu_core::ImageRole::Source => {
+                yomika_core::NodeKind::Image(i) if i.role == yomika_core::ImageRole::Source => {
                     Some(i.blob.clone())
                 }
                 _ => None,

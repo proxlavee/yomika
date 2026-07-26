@@ -7,8 +7,8 @@ title: 環境構築
 ## リポジトリを取得する
 
 ```bash
-git clone https://github.com/mayocream/koharu.git
-cd koharu
+git clone https://github.com/proxlavee/yomika.git
+cd yomika
 ```
 
 ## 前提ツール
@@ -34,10 +34,10 @@ cd koharu
 ## 依存を入れる
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
-Rust のツールチェーンは初回ビルド時に `rust-toolchain.toml` から自動解決されます。
+`rustc --version` で必要なツールチェーンを確認してください。このリポジトリには個別のツールチェーン固定ファイルはありません。
 
 ## ローカルで起動する
 
@@ -53,7 +53,7 @@ Tauri アプリが開発モードで起動し、バンドルされた UI に接�
 bun run build
 ```
 
-バイナリはプロファイルに応じて `target/release-with-debug/` または `target/release/` に出力されます。
+`bun run build` は `target/release/` にリリースバイナリを出力し、`bun run dev` は `target/release-with-debug/` を使用します。
 
 ## よく使うコマンド
 
@@ -81,14 +81,14 @@ bun run test:ui
 
 ## ML の作業
 
-`koharu-ml` や `koharu-llm` を触るときは、マシンに合ったバックエンドを有効にします。
+`yomika-ml` や `yomika-llm` を触るときは、マシンに合ったバックエンドを有効にします。
 
 ```bash
 # Windows / Linux + NVIDIA
-bun cargo test -p koharu-ml --features=cuda
+bun cargo test -p yomika-ml --features=cuda
 
 # macOS (Apple Silicon)
-bun cargo test -p koharu-ml --features=metal
+bun cargo test -p yomika-ml --features=metal
 ```
 
 バックエンドの選択の詳細は [アクセラレーションとランタイム](../explanation/acceleration-and-runtime.md) を参照してください。

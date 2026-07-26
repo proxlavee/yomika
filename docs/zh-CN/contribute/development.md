@@ -7,8 +7,8 @@ title: 入门
 ## 克隆仓库
 
 ```bash
-git clone https://github.com/mayocream/koharu.git
-cd koharu
+git clone https://github.com/proxlavee/yomika.git
+cd yomika
 ```
 
 ## 前置依赖
@@ -34,10 +34,10 @@ cd koharu
 ## 安装依赖
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
-Rust 工具链会在首次构建时根据 `rust-toolchain.toml` 自动解析。
+请使用 `rustc --version` 确认所需工具链；本仓库没有单独的工具链固定文件。
 
 ## 本地运行
 
@@ -53,7 +53,7 @@ Tauri 应用会以开发模式启动，并连上内嵌的 UI。
 bun run build
 ```
 
-产物根据 profile 位于 `target/release-with-debug/` 或 `target/release/`。
+`bun run build` 将发布二进制写入 `target/release/`；`bun run dev` 使用 `target/release-with-debug/`。
 
 ## 常用命令
 
@@ -81,14 +81,14 @@ bun run test:ui
 
 ## ML 开发
 
-在修改 `koharu-ml` 或 `koharu-llm` 时，按你机器的实际情况打开对应后端：
+在修改 `yomika-ml` 或 `yomika-llm` 时，按你机器的实际情况打开对应后端：
 
 ```bash
 # Windows / Linux + NVIDIA
-bun cargo test -p koharu-ml --features=cuda
+bun cargo test -p yomika-ml --features=cuda
 
 # macOS (Apple Silicon)
-bun cargo test -p koharu-ml --features=metal
+bun cargo test -p yomika-ml --features=metal
 ```
 
 后端的选择逻辑见 [加速与运行时](../explanation/acceleration-and-runtime.md)。

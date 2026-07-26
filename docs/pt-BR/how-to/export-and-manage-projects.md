@@ -4,11 +4,11 @@ title: Exportar Páginas e Gerenciar Projetos
 
 # Exportar Páginas e Gerenciar Projetos
 
-O workflow do Koharu é baseado em páginas. Você importa uma ou mais imagens de páginas, roda o pipeline, revisa os blocos de texto e então exporta ou uma saída achatada ou um arquivo em camadas para finalização manual.
+O workflow do Yomika é baseado em páginas. Você importa uma ou mais imagens de páginas, roda o pipeline, revisa os blocos de texto e então exporta ou uma saída achatada ou um arquivo em camadas para finalização manual.
 
 ## Entradas de página suportadas
 
-O fluxo atual de importação é baseado em imagem. O Koharu aceita:
+O fluxo atual de importação é baseado em imagem. O Yomika aceita:
 
 - `.png`
 - `.jpg`
@@ -19,24 +19,24 @@ A importação de pasta varre recursivamente em busca de arquivos de imagem supo
 
 ## Exportar saída renderizada
 
-O Koharu pode exportar a página atual como uma imagem renderizada.
+O Yomika pode exportar a página atual como uma imagem renderizada.
 
 Use isso quando quiser um resultado final achatado para leitura, compartilhamento ou publicação.
 
 Detalhes de implementação:
 
 - o export renderizado usa a extensão original da imagem da página quando possível
-- o Koharu nomeia o arquivo exportado com um sufixo `_koharu`
+- o Yomika nomeia o arquivo exportado com um sufixo `_yomika`
 - o export renderizado exige que a página já tenha uma camada renderizada
 
 Exemplos de nomes de saída:
 
-- `page-001_koharu.png`
-- `chapter-03_koharu.jpg`
+- `page-001_yomika.png`
+- `chapter-03_yomika.jpg`
 
 ## Exportar saída inpainted
 
-O Koharu também mantém uma camada inpainted no pipeline, útil quando você quer uma página limpa sem o lettering traduzido.
+O Yomika também mantém uma camada inpainted no pipeline, útil quando você quer uma página limpa sem o lettering traduzido.
 
 Isso é mais útil para:
 
@@ -44,11 +44,11 @@ Isso é mais útil para:
 - revisão de limpeza
 - export em lote de páginas com texto removido
 
-Ao exportar, o Koharu usa o sufixo de arquivo `_inpainted`.
+Ao exportar, o Yomika usa o sufixo de arquivo `_inpainted`.
 
 ## Exportar arquivos PSD com camadas
 
-O Koharu também pode exportar um PSD do Photoshop com camadas.
+O Yomika também pode exportar um PSD do Photoshop com camadas.
 
 O export em PSD é o formato de handoff para usuários que querem continuar trabalhando no Photoshop ou em um editor compatível com PSD depois que o pipeline de ML fez sua primeira passagem.
 
@@ -68,17 +68,17 @@ Isso torna o PSD muito mais útil do que uma imagem achatada quando você ainda 
 - repintar artefatos
 - ocultar ou inspecionar camadas auxiliares
 
-O Koharu nomeia os exports em PSD com um sufixo `_koharu.psd`.
+O Yomika nomeia os exports em PSD com um sufixo `_yomika.psd`.
 
 ## Limitações do export em PSD
 
-O Koharu atualmente grava arquivos PSD clássicos, não PSB. Isso significa que páginas muito grandes podem falhar na exportação.
+O Yomika atualmente grava arquivos PSD clássicos, não PSB. Isso significa que páginas muito grandes podem falhar na exportação.
 
 A implementação rejeita dimensões acima de `30000 x 30000`.
 
 ## Gerenciar conjuntos de páginas carregadas
 
-O Koharu permite trabalhar com várias páginas carregadas em uma única sessão.
+O Yomika permite trabalhar com várias páginas carregadas em uma única sessão.
 
 As escolhas práticas são:
 
@@ -101,6 +101,6 @@ Essa é a principal forma de gerenciar um capítulo ou job em lote dentro do app
 
 Se você se importa com acabamento, um padrão prático é:
 
-1. rode detection, OCR, tradução e render no Koharu
+1. rode detection, OCR, tradução e render no Yomika
 2. exporte uma imagem renderizada para revisão rápida
 3. exporte um PSD quando quiser texto editável e camadas auxiliares para limpeza final

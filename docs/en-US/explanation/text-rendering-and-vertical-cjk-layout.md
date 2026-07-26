@@ -1,15 +1,15 @@
 ---
 title: Text Rendering and Vertical CJK Layout
-description: How Koharu's text renderer works, why text rendering is difficult, and what the current implementation does for vertical CJK manga layout.
+description: How Yomika's text renderer works, why text rendering is difficult, and what the current implementation does for vertical CJK manga layout.
 ---
 
 # Text Rendering and Vertical CJK Layout
 
 Text rendering is one of the hardest parts of a manga translator. Detection, OCR, and inpainting decide what should happen to the page, but the renderer decides whether the result still reads like a finished manga page instead of a debug overlay.
 
-A useful outside reference is Aria Desires's [Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/). The core point applies directly to Koharu: text rendering is not a clean linear problem, and there is no universally correct answer. Layout, shaping, font fallback, rasterization, and composition all affect one another.
+A useful outside reference is Aria Desires's [Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/). The core point applies directly to Yomika: text rendering is not a clean linear problem, and there is no universally correct answer. Layout, shaping, font fallback, rasterization, and composition all affect one another.
 
-Koharu does not try to be a full desktop publishing engine. It aims to be very good at the text layout patterns manga pages need most, especially vertical CJK bubble text.
+Yomika does not try to be a full desktop publishing engine. It aims to be very good at the text layout patterns manga pages need most, especially vertical CJK bubble text.
 
 ## Why this problem is hard
 
@@ -38,9 +38,9 @@ Vertical manga text makes the problem harder again:
 - some fonts support proper vertical forms and some do not
 - mixed Japanese, Chinese, Latin, numbers, symbols, and emoji often appear in the same block
 
-## What Koharu actually does
+## What Yomika actually does
 
-At the implementation level, the renderer lives in the `koharu-renderer` crate, and the main orchestration happens in `koharu-app/src/renderer.rs`, `src/layout.rs`, `src/shape.rs`, `src/segment.rs`, and `src/renderer.rs`.
+At the implementation level, application orchestration lives in `crates/yomika-app/src/renderer.rs`; layout, shaping, segmentation, and rasterization live under `crates/yomika-renderer/src/`.
 
 The pipeline for one translated `TextBlock` is roughly:
 
@@ -65,9 +65,9 @@ In concrete terms:
 - `TinySkiaRenderer` rasterizes outlines with `skrifa` and falls back to `fontdue` bitmaps when needed
 - `Renderer::render_text_block` glues that together with font hints, stroke choices, and page placement
 
-## How Koharu chooses vertical layout
+## How Yomika chooses vertical layout
 
-Koharu does not blindly force all CJK text into vertical mode. The current heuristic in `text/script.rs` is:
+Yomika does not blindly force all CJK text into vertical mode. The current heuristic in `text/script.rs` is:
 
 - if the translation contains CJK text and the block is taller than it is wide, use `VerticalRl`
 - otherwise, keep the block horizontal
@@ -87,18 +87,18 @@ It is still a heuristic, not a general writing-mode engine. That matters for edg
 
 `WritingMode::VerticalRl` is not just a final canvas rotation trick.
 
-Koharu converts it into a top-to-bottom shaping direction before HarfBuzz runs. That means the font and shaping engine can produce vertical advances and vertical glyph forms instead of pretending horizontal text was rotated after the fact.
+Yomika converts it into a top-to-bottom shaping direction before HarfBuzz runs. That means the font and shaping engine can produce vertical advances and vertical glyph forms instead of pretending horizontal text was rotated after the fact.
 
 ### 2. Vertical OpenType features are enabled
 
-When Koharu shapes vertical text, it enables the OpenType features:
+When Yomika shapes vertical text, it enables the OpenType features:
 
 - `vert`
 - `vrt2`
 
 These are the standard vertical alternates exposed by fonts that actually support vertical writing. This is one of the main reasons the renderer can produce convincing vertical CJK layout instead of looking like rotated horizontal text.
 
-If the font has proper vertical glyph substitutions, Koharu can use them. If the font does not, the result degrades to whatever the font provides.
+If the font has proper vertical glyph substitutions, Yomika can use them. If the font does not, the result degrades to whatever the font provides.
 
 ### 3. Lines become columns
 
@@ -118,7 +118,7 @@ That is the expected `vertical-rl` flow used in traditional Japanese manga bubbl
 
 ### 4. Fullwidth punctuation is recentered
 
-Vertical CJK layout looks wrong very quickly if punctuation is left with naive horizontal centering. Koharu has explicit handling for fullwidth punctuation and recenters those glyphs from their actual font bounds.
+Vertical CJK layout looks wrong very quickly if punctuation is left with naive horizontal centering. Yomika has explicit handling for fullwidth punctuation and recenters those glyphs from their actual font bounds.
 
 This covers cases such as:
 
@@ -137,7 +137,7 @@ That helps preserve the vertical look readers expect from manga punctuation inst
 
 ### 6. Ink bounds are measured tightly
 
-After layout, Koharu computes a tight ink bounding box from per-glyph metrics and then translates the baselines so the true ink origin starts at `(0, 0)`.
+After layout, Yomika computes a tight ink bounding box from per-glyph metrics and then translates the baselines so the true ink origin starts at `(0, 0)`.
 
 This is important because:
 
@@ -149,7 +149,7 @@ In practice, this bounds pass is one of the reasons the renderer feels stable in
 
 ## Why the output is good on manga bubbles
 
-Koharu gets several high-value things right for the common manga case:
+Yomika gets several high-value things right for the common manga case:
 
 - it uses real shaping, not character-by-character drawing
 - it enables vertical font features instead of rotating finished horizontal text
@@ -167,7 +167,7 @@ It is strong for common manga cases. It is not a full Japanese typesetting engin
 
 That distinction matters.
 
-Koharu is best understood as:
+Yomika is best understood as:
 
 - much better than rotating horizontal text
 - good at vertical bubble layout with modern CJK fonts
@@ -189,7 +189,7 @@ That works surprisingly well for bubbles, but it is still a heuristic. Mixed-scr
 
 ### CJK line breaking still uses default ICU behavior
 
-`segment.rs` explicitly notes a `TODO` for CJK-specific customization. So while ICU4X already gives Koharu a much better base than ad hoc wrapping, it is not yet a manga-specialized kinsoku implementation.
+`segment.rs` explicitly notes a `TODO` for CJK-specific customization. So while ICU4X already gives Yomika a much better base than ad hoc wrapping, it is not yet a manga-specialized kinsoku implementation.
 
 ### Font support matters a lot
 
@@ -197,7 +197,7 @@ Vertical alternates only look as good as the chosen font allows. If the system f
 
 ### No full publishing-engine features
 
-Koharu is not trying to do every advanced text feature you would expect from a full composition system. The current renderer is not a full implementation of things such as:
+Yomika is not trying to do every advanced text feature you would expect from a full composition system. The current renderer is not a full implementation of things such as:
 
 - ruby annotation
 - warichu and other advanced Japanese layout features
@@ -208,9 +208,9 @@ Koharu is not trying to do every advanced text feature you would expect from a f
 
 Even with good shaping, a translation can simply be too long or too awkward for the available bubble. The renderer can fit and align text, but it cannot always turn a bad block geometry or overly verbose translation into perfect lettering.
 
-## Why Koharu does not just rotate text
+## Why Yomika does not just rotate text
 
-The cheap solution for vertical text is to lay it out horizontally and rotate the result. Koharu avoids that because the failure modes are obvious:
+The cheap solution for vertical text is to lay it out horizontally and rotate the result. Yomika avoids that because the failure modes are obvious:
 
 - punctuation sits incorrectly
 - glyph advances are wrong
@@ -218,16 +218,16 @@ The cheap solution for vertical text is to lay it out horizontally and rotate th
 - fonts cannot apply their vertical alternates
 - bounds and clipping become harder to reason about
 
-Koharu instead pushes vertical handling back into the shaping and layout stages. That is the main architectural decision behind its vertical CJK output.
+Yomika instead pushes vertical handling back into the shaping and layout stages. That is the main architectural decision behind its vertical CJK output.
 
 ## External reference worth reading
 
-[Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) is useful because it explains the renderer problem in a language-agnostic way. Koharu's stack is different from a browser engine, but the same core lessons show up here:
+[Text Rendering Hates You](https://faultlore.com/blah/text-hates-you/) is useful because it explains the renderer problem in a language-agnostic way. Yomika's stack is different from a browser engine, but the same core lessons show up here:
 
 - shaping is not optional
 - fallback fonts are unavoidable
 - layout and shaping depend on each other
 - "perfect" text rendering is mostly a story people tell before they implement it
 
-If you want the short version: Koharu's renderer is careful because text rendering is a coupled systems problem, not a final paint step.
+If you want the short version: Yomika's renderer is careful because text rendering is a coupled systems problem, not a final paint step.
 

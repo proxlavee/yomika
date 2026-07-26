@@ -4,11 +4,11 @@ title: 以 GUI、Headless 与 MCP 模式运行
 
 # 以 GUI、Headless 与 MCP 模式运行
 
-Koharu 可以作为普通桌面应用运行，也可以作为带 Web UI 的 headless 本地服务运行，还可以作为面向 AI Agent 的 MCP 服务器运行。这三者不是不同后端，而是都建立在同一个本地运行时和 HTTP 服务之上。
+Yomika 可以作为普通桌面应用运行，也可以作为带 Web UI 的 headless 本地服务运行，还可以作为面向 AI Agent 的 MCP 服务器运行。这三者不是不同后端，而是都建立在同一个本地运行时和 HTTP 服务之上。
 
 ## 各种模式下不变的部分
 
-无论你用什么方式启动 Koharu，运行时模型都相同：
+无论你用什么方式启动 Yomika，运行时模型都相同：
 
 - 服务默认绑定到 `127.0.0.1`（可通过 `--host` 覆盖）
 - UI 与 API 由同一个本地进程提供
@@ -26,9 +26,9 @@ Koharu 可以作为普通桌面应用运行，也可以作为带 Web UI 的 head
 
 ## 运行桌面应用
 
-像普通应用一样启动 Koharu。
+像普通应用一样启动 Yomika。
 
-即使在桌面模式下，Koharu 也会在内部启动本地 HTTP 服务。嵌入式窗口本质上也是通过这个本地服务工作，而不是直接绕过服务调用底层管线。
+即使在桌面模式下，Yomika 也会在内部启动本地 HTTP 服务。嵌入式窗口本质上也是通过这个本地服务工作，而不是直接绕过服务调用底层管线。
 
 这是默认模式，也是大多数用户最适合的模式。
 
@@ -38,10 +38,10 @@ Headless 模式会启动本地服务，但不打开桌面 GUI。
 
 ```bash
 # macOS / Linux
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 
 # Windows
-koharu.exe --port 4000 --headless
+yomika.exe --port 4000 --headless
 ```
 
 启动后，在浏览器中打开 `http://localhost:4000`。
@@ -50,14 +50,14 @@ Headless 模式会一直以前台进程方式运行，通常通过 `Ctrl+C` 停�
 
 ## 使用固定端口
 
-默认情况下，Koharu 会选择一个随机本地端口。当你需要稳定地址用于书签、脚本、反向代理或 MCP 客户端时，请使用 `--port`。
+默认情况下，Yomika 会选择一个随机本地端口。当你需要稳定地址用于书签、脚本、反向代理或 MCP 客户端时，请使用 `--port`。
 
 ```bash
 # macOS / Linux
-koharu --port 9999
+yomika --port 9999
 
 # Windows
-koharu.exe --port 9999
+yomika.exe --port 9999
 ```
 
 如果不指定 `--port`，服务也会启动，只是端口会动态变化。
@@ -67,14 +67,14 @@ koharu.exe --port 9999
 服务默认绑定到 `127.0.0.1`，意味着只有本机能访问。传入 `--host` 可以绑定到其他地址。
 
 ```bash
-koharu --host 0.0.0.0 --port 4000 --headless
+yomika --host 0.0.0.0 --port 4000 --headless
 ```
 
-这在容器、虚拟机或远程开发场景下很有用——桌面客户端与 Koharu 进程不在同一台主机上。任何不同于 `127.0.0.1` 的地址都属于刻意的选择：本地 API 没有内置鉴权，因此只有当你确实需要非 loopback 访问、并且自己已经准备好访问控制时，才设置 `--host`。
+这在容器、虚拟机或远程开发场景下很有用——桌面客户端与 Yomika 进程不在同一台主机上。任何不同于 `127.0.0.1` 的地址都属于刻意的选择：本地 API 没有内置鉴权，因此只有当你确实需要非 loopback 访问、并且自己已经准备好访问控制时，才设置 `--host`。
 
 ## 连接本地 API
 
-当 Koharu 在固定端口上运行时，主要端点是：
+当 Yomika 在固定端口上运行时，主要端点是：
 
 - Web UI：`http://localhost:9999/`
 - RPC / HTTP API：`http://localhost:9999/api/v1`
@@ -82,13 +82,13 @@ koharu --host 0.0.0.0 --port 4000 --headless
 
 请把 `9999` 替换成你实际使用的端口。
 
-因为 Koharu 默认只绑定到 loopback，这些端点默认只能本机访问。如果你需要让另一台机器访问，需要你自己通过网络层把端口暴露出去。
+因为 Yomika 默认只绑定到 loopback，这些端点默认只能本机访问。如果你需要让另一台机器访问，需要你自己通过网络层把端口暴露出去。
 
 端点细节请参见 [HTTP API 参考](../reference/http-api.md)。
 
 ## 连接 MCP 服务器
 
-Koharu 内置 MCP 服务器，使用与应用其余部分相同的已加载文档、模型和页面管线。
+Yomika 内置 MCP 服务器，使用与应用其余部分相同的已加载文档、模型和页面管线。
 
 让 MCP 客户端或 Agent 连接：
 
@@ -111,10 +111,10 @@ Koharu 内置 MCP 服务器，使用与应用其余部分相同的已加载文�
 
 ```bash
 # macOS / Linux
-koharu --cpu
+yomika --cpu
 
 # Windows
-koharu.exe --cpu
+yomika.exe --cpu
 ```
 
 这适合兼容性测试、驱动排查，或在 GPU 状态不确定时进行低风险调试。
@@ -125,10 +125,10 @@ koharu.exe --cpu
 
 ```bash
 # macOS / Linux
-koharu --download
+yomika --download
 
 # Windows
-koharu.exe --download
+yomika.exe --download
 ```
 
 当前实现下，这条路径会初始化：
@@ -144,16 +144,16 @@ koharu.exe --download
 
 ```bash
 # macOS / Linux
-koharu --debug
+yomika --debug
 
 # Windows
-koharu.exe --debug
+yomika.exe --debug
 ```
 
-在 Windows 上，debug 与 headless 运行方式还会影响 Koharu 如何附加到现有控制台，或创建新的控制台窗口。
+在 Windows 上，debug 与 headless 运行方式还会影响 Yomika 如何附加到现有控制台，或创建新的控制台窗口。
 
 ## 凭据存储
 
-Koharu 会把 API key 存储在 `config.toml` 之外。macOS 和 Windows 使用系统 keyring。Linux 使用应用数据目录下的 Koharu 本地文件系统凭据存储，并设置仅所有者可访问的文件权限；这个 Linux 存储依赖文件系统权限，而不是操作系统级加密。
+Yomika 会把 API key 存储在 `config.toml` 之外。macOS 和 Windows 使用系统 keyring。Linux 使用应用数据目录下的 Yomika 本地文件系统凭据存储，并设置仅所有者可访问的文件权限；这个 Linux 存储依赖文件系统权限，而不是操作系统级加密。
 
 Headless 和容器运行使用与桌面应用相同的凭据存储行为。如果你希望保存的 API key 在容器替换后继续存在，请把应用数据目录放在持久化 volume 上。

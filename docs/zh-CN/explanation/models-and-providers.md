@@ -4,13 +4,13 @@ title: 模型与提供商
 
 # 模型与提供商
 
-Koharu 同时使用视觉模型和语言模型。视觉栈负责准备页面，语言栈负责翻译文本。
+Yomika 同时使用视觉模型和语言模型。视觉栈负责准备页面，语言栈负责翻译文本。
 
 如果你想从架构层面理解这些部分如何组合，请在阅读本页后继续看 [技术深潜](technical-deep-dive.md)。
 
 ## 视觉模型
 
-Koharu 会在首次使用时自动下载所需的视觉模型。
+Yomika 会在首次使用时自动下载所需的视觉模型。
 
 当前默认栈包括：
 
@@ -20,11 +20,11 @@ Koharu 会在首次使用时自动下载所需的视觉模型。
 - 作为默认修复器的 [aot-inpainting](https://huggingface.co/mayocream/aot-inpainting)
 - 用于字体与颜色检测的 [YuzuMarker.FontDetection](https://huggingface.co/fffonion/yuzumarker-font-detection)
 
-有些模型直接使用上游 Hugging Face 仓库，另一些则因为 Koharu 需要 Rust 友好的 safetensors 版本，而由 [Hugging Face](https://huggingface.co/mayocream) 托管转换后的权重。
+有些模型直接使用上游 Hugging Face 仓库，另一些则因为 Yomika 需要 Rust 友好的 safetensors 版本，而由 [Hugging Face](https://huggingface.co/mayocream) 托管转换后的权重。
 
 ### 每个视觉模型是什么
 
-| 模型                         | 模型类型        | Koharu 使用它的原因              |
+| 模型                         | 模型类型        | Yomika 使用它的原因              |
 | ---------------------------- | --------------- | -------------------------------- |
 | `comic-text-bubble-detector` | object detector | 一次推理同时找出文本块和气泡区域 |
 | `comic-text-detector`        | 分割网络        | 生成清理用的文本掩码             |
@@ -32,7 +32,7 @@ Koharu 会在首次使用时自动下载所需的视觉模型。
 | `aot-inpainting`             | 修复网络        | 在去字后补全被掩码覆盖的区域     |
 | `YuzuMarker.FontDetection`   | 分类 / 回归模型 | 为渲染估计字体与风格提示         |
 
-最重要的设计点是：Koharu 不会用一个模型硬扛所有页面任务。检测、分割、OCR 和修复需要完全不同的输出形式：
+最重要的设计点是：Yomika 不会用一个模型硬扛所有页面任务。检测、分割、OCR 和修复需要完全不同的输出形式：
 
 - 联合检测需要文本块和气泡区域
 - 分割需要逐像素掩码
@@ -51,7 +51,7 @@ Koharu 会在首次使用时自动下载所需的视觉模型。
 
 ## 本地 LLM
 
-Koharu 通过 [llama.cpp](https://github.com/ggml-org/llama.cpp) 支持本地 GGUF 模型。这些模型运行在你的机器上，并在你从 LLM 选择器里选择它们时按需下载。
+Yomika 通过 [llama.cpp](https://github.com/ggml-org/llama.cpp) 支持本地 GGUF 模型。这些模型运行在你的机器上，并在你从 LLM 选择器里选择它们时按需下载。
 
 在实践中，这些本地模型通常是量化后的 decoder-only transformer。GGUF 是文件格式，`llama.cpp` 是推理运行时。
 
@@ -83,7 +83,7 @@ Koharu 通过 [llama.cpp](https://github.com/ggml-org/llama.cpp) 支持本地 GG
 
 ## 远程提供商
 
-Koharu 也可以通过远程或自托管 API 翻译，而不下载本地模型。
+Yomika 也可以通过远程或自托管 API 翻译，而不下载本地模型。
 
 支持的提供商家族包括：
 
@@ -116,7 +116,7 @@ LLM 驱动提供商的内置目录包括：
 
 ### Codex 图像生成
 
-Koharu 也可以使用 Codex 进行端到端 image-to-image 生成。它不会把文本块翻译和本地文字渲染作为独立步骤处理，而是把源页面图像和提示词发送给 Codex，并接收生成后的页面图像。
+Yomika 也可以使用 Codex 进行端到端 image-to-image 生成。它不会把文本块翻译和本地文字渲染作为独立步骤处理，而是把源页面图像和提示词发送给 Codex，并接收生成后的页面图像。
 
 这是远程图像生成流程，不是本地模型。它需要拥有 Codex 访问权限的 ChatGPT 账号，并且必须启用双重身份验证才能完成设备码登录。使用说明和注意事项见 [使用 Codex 图像生成](../how-to/use-codex-image-generation.md)。
 
@@ -136,7 +136,7 @@ Koharu 也可以使用 Codex 进行端到端 image-to-image 生成。它不会�
 
 !!! note
 
-    使用远程提供商时，Koharu 会把 OCR 提取出的待翻译文本发送到你配置的服务端。
+    使用远程提供商时，Yomika 会把 OCR 提取出的待翻译文本发送到你配置的服务端。
 
 ## 延伸阅读
 

@@ -4,13 +4,13 @@ title: Modelos e Provedores
 
 # Modelos e Provedores
 
-O Koharu usa tanto modelos de visão quanto modelos de linguagem. O stack de visão prepara a página; o stack de linguagem lida com a tradução.
+O Yomika usa tanto modelos de visão quanto modelos de linguagem. O stack de visão prepara a página; o stack de linguagem lida com a tradução.
 
 Se você quer a visão ao nível arquitetural de como essas peças se encaixam, leia [Mergulho Técnico Profundo](technical-deep-dive.md) depois desta página.
 
 ## Modelos de visão
 
-O Koharu baixa automaticamente os modelos de visão necessários na primeira vez que você os usa.
+O Yomika baixa automaticamente os modelos de visão necessários na primeira vez que você os usa.
 
 O stack padrão atual inclui:
 
@@ -20,11 +20,11 @@ O stack padrão atual inclui:
 - [aot-inpainting](https://huggingface.co/mayocream/aot-inpainting) para o inpainting padrão
 - [YuzuMarker.FontDetection](https://huggingface.co/fffonion/yuzumarker-font-detection) para detecção de fonte e cor
 
-Alguns modelos são usados diretamente dos repositórios upstream do Hugging Face, enquanto os pesos convertidos em `safetensors` são hospedados no [Hugging Face](https://huggingface.co/mayocream) quando o Koharu precisa de um pacote amigável para Rust.
+Alguns modelos são usados diretamente dos repositórios upstream do Hugging Face, enquanto os pesos convertidos em `safetensors` são hospedados no [Hugging Face](https://huggingface.co/mayocream) quando o Yomika precisa de um pacote amigável para Rust.
 
 ### O que é cada modelo de visão
 
-| Modelo                        | Tipo de modelo          | Por que o Koharu o usa                                     |
+| Modelo                        | Tipo de modelo          | Por que o Yomika o usa                                     |
 | ---------------------------- | ---------------------- | ------------------------------------------------------- |
 | `comic-text-bubble-detector` | detector de objetos    | encontra blocos de texto e regiões de balão de fala em uma única passagem |
 | `comic-text-detector`        | rede de segmentação    | produz uma máscara de texto para limpeza                    |
@@ -32,7 +32,7 @@ Alguns modelos são usados diretamente dos repositórios upstream do Hugging Fac
 | `aot-inpainting`             | rede de inpainting     | reconstrói regiões de imagem mascaradas após a remoção do texto    |
 | `YuzuMarker.FontDetection`   | classificador / regressor | estima dicas de fonte e estilo para a renderização            |
 
-A escolha de design importante é que o Koharu não usa um modelo para cada tarefa de página. Detecção, segmentação, OCR e inpainting precisam de formatos de saída diferentes:
+A escolha de design importante é que o Yomika não usa um modelo para cada tarefa de página. Detecção, segmentação, OCR e inpainting precisam de formatos de saída diferentes:
 
 - a detecção conjunta quer blocos de texto e regiões de balão
 - a segmentação quer máscaras por pixel
@@ -51,7 +51,7 @@ Você pode trocar estágios individuais em **Configurações > Engines**. As alt
 
 ## LLMs locais
 
-O Koharu suporta modelos GGUF locais através do [llama.cpp](https://github.com/ggml-org/llama.cpp). Esses modelos rodam na sua máquina e são baixados sob demanda quando você os seleciona no seletor de LLM.
+O Yomika suporta modelos GGUF locais através do [llama.cpp](https://github.com/ggml-org/llama.cpp). Esses modelos rodam na sua máquina e são baixados sob demanda quando você os seleciona no seletor de LLM.
 
 Na prática, os modelos locais geralmente são transformers decoder-only quantizados. GGUF é o formato do modelo; `llama.cpp` é o runtime de inferência.
 
@@ -83,7 +83,7 @@ O seletor local também inclui famílias de propósito geral que não são espec
 
 ## Provedores remotos
 
-O Koharu também pode traduzir através de APIs remotas ou auto-hospedadas em vez de baixar um modelo local.
+O Yomika também pode traduzir através de APIs remotas ou auto-hospedadas em vez de baixar um modelo local.
 
 As famílias de provedores suportados são:
 
@@ -116,7 +116,7 @@ Para um guia passo a passo de configuração para LM Studio, OpenRouter e endpoi
 
 ### Geração de imagem com Codex
 
-O Koharu também pode usar o Codex para geração image-to-image de ponta a ponta. Em vez de traduzir blocos de texto e renderizar texto localmente como etapas separadas, esse fluxo envia a imagem de página de origem e o prompt ao Codex e recebe uma imagem de página gerada.
+O Yomika também pode usar o Codex para geração image-to-image de ponta a ponta. Em vez de traduzir blocos de texto e renderizar texto localmente como etapas separadas, esse fluxo envia a imagem de página de origem e o prompt ao Codex e recebe uma imagem de página gerada.
 
 Esse é um fluxo remoto de geração de imagem, não um modelo local. Ele exige uma conta ChatGPT com acesso ao Codex e autenticação de dois fatores habilitada para concluir o login por código de dispositivo. Consulte [Usar Geração de Imagem com Codex](../how-to/use-codex-image-generation.md) para notas de uso e limitações.
 
@@ -136,7 +136,7 @@ Use provedores remotos quando você quer:
 
 !!! note
 
-    Quando você usa um provedor remoto, o Koharu envia o texto do OCR selecionado para tradução ao provedor que você configurou.
+    Quando você usa um provedor remoto, o Yomika envia o texto do OCR selecionado para tradução ao provedor que você configurou.
 
 ## Leitura de fundo
 

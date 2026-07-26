@@ -4,11 +4,11 @@ title: Executar nos Modos GUI, Headless e MCP
 
 # Executar nos Modos GUI, Headless e MCP
 
-O Koharu pode ser executado como um app desktop normal, como um servidor local headless com Web UI, ou como um servidor MCP para agentes de IA. Esses não são backends separados. Todos ficam em cima do mesmo runtime local e do mesmo servidor HTTP.
+O Yomika pode ser executado como um app desktop normal, como um servidor local headless com Web UI, ou como um servidor MCP para agentes de IA. Esses não são backends separados. Todos ficam em cima do mesmo runtime local e do mesmo servidor HTTP.
 
 ## O que continua igual entre os modos
 
-Não importa como você inicia o Koharu, o modelo de runtime é o mesmo:
+Não importa como você inicia o Yomika, o modelo de runtime é o mesmo:
 
 - o servidor faz bind em `127.0.0.1` por padrão (sobrescreva com `--host`)
 - a UI e a API são servidas pelo mesmo processo local
@@ -26,9 +26,9 @@ Por isso a edição no desktop, a automação headless e a ferramentaria MCP fic
 
 ## Executar o app desktop
 
-Abra o Koharu normalmente a partir do atalho do aplicativo instalado.
+Abra o Yomika normalmente a partir do atalho do aplicativo instalado.
 
-Mesmo no modo desktop, o Koharu ainda sobe um servidor HTTP local internamente. A janela embutida conversa com esse servidor local em vez de chamar o pipeline diretamente.
+Mesmo no modo desktop, o Yomika ainda sobe um servidor HTTP local internamente. A janela embutida conversa com esse servidor local em vez de chamar o pipeline diretamente.
 
 Este é o modo padrão e a melhor escolha para a maioria dos usuários.
 
@@ -38,10 +38,10 @@ O modo headless sobe o servidor local sem abrir a GUI desktop.
 
 ```bash
 # macOS / Linux
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 
 # Windows
-koharu.exe --port 4000 --headless
+yomika.exe --port 4000 --headless
 ```
 
 Depois da inicialização, abra a Web UI em `http://localhost:4000`.
@@ -50,31 +50,31 @@ O modo headless fica em primeiro plano até você parar, normalmente com `Ctrl+C
 
 ## Executar com uma porta fixa
 
-Por padrão, o Koharu usa uma porta local aleatória. Use `--port` quando precisar de um endereço estável para bookmarks, scripts, reverse proxies ou clientes MCP.
+Por padrão, o Yomika usa uma porta local aleatória. Use `--port` quando precisar de um endereço estável para bookmarks, scripts, reverse proxies ou clientes MCP.
 
 ```bash
 # macOS / Linux
-koharu --port 9999
+yomika --port 9999
 
 # Windows
-koharu.exe --port 9999
+yomika.exe --port 9999
 ```
 
-Se você não especificar `--port`, o Koharu ainda inicia o servidor, mas a porta escolhida é dinâmica.
+Se você não especificar `--port`, o Yomika ainda inicia o servidor, mas a porta escolhida é dinâmica.
 
 ## Vincular a um endereço fora do loopback
 
 Por padrão, o servidor faz bind em `127.0.0.1`, o que significa que apenas a mesma máquina consegue alcançá-lo. Passe `--host` para fazer bind em outro lugar.
 
 ```bash
-koharu --host 0.0.0.0 --port 4000 --headless
+yomika --host 0.0.0.0 --port 4000 --headless
 ```
 
-Isso é útil em containers, VMs ou setups de desenvolvimento remoto, onde o cliente desktop vive em um host diferente do processo do Koharu. Qualquer coisa diferente de `127.0.0.1` é uma escolha deliberada — não há autenticação embutida na API local, então só defina `--host` quando você realmente quiser acesso fora do loopback e tiver seus próprios controles de acesso no lugar.
+Isso é útil em containers, VMs ou setups de desenvolvimento remoto, onde o cliente desktop vive em um host diferente do processo do Yomika. Qualquer coisa diferente de `127.0.0.1` é uma escolha deliberada — não há autenticação embutida na API local, então só defina `--host` quando você realmente quiser acesso fora do loopback e tiver seus próprios controles de acesso no lugar.
 
 ## Conectar à API local
 
-Quando o Koharu está rodando em uma porta fixa, os endpoints principais são:
+Quando o Yomika está rodando em uma porta fixa, os endpoints principais são:
 
 - Web UI: `http://localhost:9999/`
 - RPC / HTTP API: `http://localhost:9999/api/v1`
@@ -82,13 +82,13 @@ Quando o Koharu está rodando em uma porta fixa, os endpoints principais são:
 
 Substitua `9999` pela porta que você escolheu.
 
-Como o Koharu faz bind em loopback, esses endpoints são locais por padrão. Se quiser acesso a partir de outra máquina, você precisa expor essa porta por conta própria via sua configuração de rede.
+Como o Yomika faz bind em loopback, esses endpoints são locais por padrão. Se quiser acesso a partir de outra máquina, você precisa expor essa porta por conta própria via sua configuração de rede.
 
 Para detalhes por endpoint, veja a [Referência da HTTP API](../reference/http-api.md).
 
 ## Conectar ao servidor MCP
 
-O Koharu inclui um servidor MCP embutido que usa os mesmos documentos carregados, modelos e pipeline de páginas que o restante do app.
+O Yomika inclui um servidor MCP embutido que usa os mesmos documentos carregados, modelos e pipeline de páginas que o restante do app.
 
 Aponte seu cliente MCP ou agente para:
 
@@ -111,24 +111,24 @@ Use `--cpu` quando quiser desabilitar inferência por GPU explicitamente.
 
 ```bash
 # macOS / Linux
-koharu --cpu
+yomika --cpu
 
 # Windows
-koharu.exe --cpu
+yomika.exe --cpu
 ```
 
 Isso é útil para testes de compatibilidade, problemas de driver ou debug de baixo risco quando o setup de GPU está incerto.
 
 ## Apenas baixar dependências de runtime
 
-Use `--download` se quiser que o Koharu pré-baixe as dependências de runtime e encerre sem iniciar o app.
+Use `--download` se quiser que o Yomika pré-baixe as dependências de runtime e encerre sem iniciar o app.
 
 ```bash
 # macOS / Linux
-koharu --download
+yomika --download
 
 # Windows
-koharu.exe --download
+yomika.exe --download
 ```
 
 Na implementação atual, esse caminho inicializa:
@@ -144,16 +144,16 @@ Use `--debug` quando quiser inicialização orientada a console com output de lo
 
 ```bash
 # macOS / Linux
-koharu --debug
+yomika --debug
 
 # Windows
-koharu.exe --debug
+yomika.exe --debug
 ```
 
-No Windows, execuções de debug e headless também influenciam como o Koharu anexa ou cria uma janela de console.
+No Windows, execuções de debug e headless também influenciam como o Yomika anexa ou cria uma janela de console.
 
 ## Armazenamento de credenciais
 
-Por padrão, o Koharu armazena API keys fora de `config.toml`. macOS e Windows usam o keyring do sistema. Linux usa o armazenamento local de credenciais do Koharu no diretório de dados do app com permissões somente para o usuário dono; esse armazenamento no Linux depende das permissões do filesystem em vez de criptografia em nível de sistema operacional.
+Por padrão, o Yomika armazena API keys fora de `config.toml`. macOS e Windows usam o keyring do sistema. Linux usa o armazenamento local de credenciais do Yomika no diretório de dados do app com permissões somente para o usuário dono; esse armazenamento no Linux depende das permissões do filesystem em vez de criptografia em nível de sistema operacional.
 
 Execuções headless e em container usam o mesmo comportamento de armazenamento de credenciais do app desktop. Em containers, mantenha o diretório de dados do app em um volume persistente se quiser que as API keys salvas sobrevivam à substituição do container.

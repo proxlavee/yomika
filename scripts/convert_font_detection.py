@@ -21,7 +21,7 @@ REPO_ID = "gyrojeff/YuzuMarker.FontDetection"
 
 def parse_args() -> argparse.Namespace:
     cache_dir = (
-        Path.home() / ".cache" / "Koharu" / "models" / "yuzumarker-font-detection.safetensors"
+        Path.home() / ".cache" / "Yomika" / "models" / "yuzumarker-font-detection.safetensors"
     )
     parser = argparse.ArgumentParser(description="Convert YuzuMarker.FontDetection checkpoint.")
     parser.add_argument(

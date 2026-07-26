@@ -45,6 +45,37 @@ export async function listen<T>(
   return async () => {}
 }
 
+/**
+ * Restore desktop-window interaction after system UI closes. WebView2 can
+ * leave the native window disabled as well as unfocused, so both operations
+ * are attempted independently. Best-effort and a no-op in browsers.
+ */
+export async function restoreAppWindowInteraction(): Promise<void> {
+  if (!isTauri()) return
+
+  let appWindow: {
+    setEnabled: (enabled: boolean) => Promise<void>
+    setFocus: () => Promise<void>
+  }
+  try {
+    const { getCurrentWindow } = await import('@tauri-apps/api/window')
+    appWindow = getCurrentWindow()
+  } catch {
+    return
+  }
+
+  try {
+    await appWindow.setEnabled(true)
+  } catch {
+    // Continue: focus may still be recoverable when enabling is unsupported.
+  }
+  try {
+    await appWindow.setFocus()
+  } catch {
+    // Recovery is best-effort; never break the EyeDropper caller over it.
+  }
+}
+
 export function getCurrentWindow(): ProgressTarget {
   if (isTauri()) {
     return {

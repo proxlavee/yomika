@@ -15,12 +15,12 @@ use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use camino::Utf8PathBuf;
-use koharu_app::{App, AppConfig};
-use koharu_client::apis::configuration::Configuration;
-use koharu_rpc::{BootstrapManager, server};
-use koharu_runtime::{ComputePolicy, RuntimeHttpConfig, RuntimeManager};
 use tokio::net::TcpListener;
 use tokio::sync::OnceCell;
+use yomika_app::{App, AppConfig};
+use yomika_client::apis::configuration::Configuration;
+use yomika_rpc::{BootstrapManager, server};
+use yomika_runtime::{ComputePolicy, RuntimeHttpConfig, RuntimeManager};
 
 /// Path to the shared runtime cache. Relative to the workspace root so it's
 /// a stable, reusable location across `cargo test` invocations.
@@ -79,12 +79,12 @@ impl TestApp {
 
         // Redirect `default_app_data_root()` to the per-test tempdir so
         // routes like `config::save` / `config::config_path` don't clobber
-        // the user's real `~/AppData/Local/Koharu/config.toml`. Set
+        // the user's real `~/AppData/Local/Yomika/config.toml`. Set
         // unconditionally — last writer wins, but each `App` instance only
         // needs its own `ArcSwap<AppConfig>` which is read at construction.
         // SAFETY: set_var on a single-process test harness is fine.
         unsafe {
-            std::env::set_var("KOHARU_DATA_ROOT", data_root.as_str());
+            std::env::set_var("YOMIKA_DATA_ROOT", data_root.as_str());
         }
 
         let mut config = AppConfig::default();
@@ -117,7 +117,7 @@ impl TestApp {
 
         let client_config = Configuration {
             base_path: base_url.clone(),
-            user_agent: Some("koharu-integration-tests".to_string()),
+            user_agent: Some("yomika-integration-tests".to_string()),
             client: reqwest::Client::builder()
                 .timeout(std::time::Duration::from_secs(30))
                 .build()?,
@@ -136,7 +136,7 @@ impl TestApp {
 
     /// Create a fresh project under a sub-directory of the tempdir and open it.
     pub async fn open_fresh_project(&self, name: &str) -> Result<Utf8PathBuf> {
-        let dir = Utf8PathBuf::from_path_buf(self._data_dir.path().join(format!("{name}.khrproj")))
+        let dir = Utf8PathBuf::from_path_buf(self._data_dir.path().join(format!("{name}.ymkproj")))
             .map_err(|p| anyhow::anyhow!("project path not UTF-8: {}", p.display()))?;
         self.app
             .open_project(dir.clone(), Some(name.to_string()))

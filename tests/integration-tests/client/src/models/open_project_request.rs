@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct OpenProjectRequest {
-    /// `.khrproj/` directory basename (no extension). Must exist under the managed projects directory.
+    /// `.ymkproj/` directory basename (no extension). Must exist under the managed projects directory.
     #[serde(rename = "id")]
     pub id: String,
 }

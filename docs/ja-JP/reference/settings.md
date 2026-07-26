@@ -4,7 +4,7 @@ title: 設定リファレンス
 
 # 設定リファレンス
 
-現在の Koharu の Settings 画面は、主に次の 6 セクションで構成されています。
+現在の Yomika の Settings 画面は、主に次の 6 セクションで構成されています。
 
 - `Appearance`
 - `Engines`
@@ -64,7 +64,7 @@ title: 設定リファレンス
 
 - provider の API キーは `config.toml` には書き込まれません
 - macOS と Windows では、provider の API キーはシステム keyring に保存されます
-- Linux では、provider の API キーはアプリデータディレクトリ配下の Koharu ローカルファイルシステム認証情報ストアに保存され、所有ユーザーのみが読める権限が設定されます
+- Linux では、provider の API キーはアプリデータディレクトリ配下の Yomika ローカルファイルシステム認証情報ストアに保存され、所有ユーザーのみが読める権限が設定されます
 - provider の `Base URL` は共有アプリ設定に保存されます
 - `OpenAI Compatible` ではカスタム `Base URL` が必須です。モデルはその URL に対して `GET /v1/models` を呼び出して動的に取得されます
 - 機械翻訳プロバイダ (`DeepL`、`Google Cloud Translation`、`Caiyun`) は API キーのみで使えます。`Caiyun` は対応ターゲット言語が限られます
@@ -117,7 +117,7 @@ Linux のファイルシステム認証情報ストアは、OS レベルの暗�
 - 作者リンク
 - リポジトリリンク
 
-パッケージ済みアプリでは、`mayocream/koharu` の最新 GitHub リリースとローカル版を比較して更新状態を判定します。
+パッケージ済みアプリでは、`proxlavee/yomika` の最新 GitHub リリースとローカル版を比較して更新状態を判定します。
 
 ## 永続化の仕組み
 

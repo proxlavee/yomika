@@ -24,6 +24,8 @@ import { isTauri, openExternalUrl } from '@/lib/backend'
 
 export type UpdaterStatus = 'idle' | 'loading' | 'latest' | 'outdated' | 'error'
 
+const updaterEnabled = process.env.NEXT_PUBLIC_YOMIKA_UPDATER_ENABLED === 'true'
+
 type Phase =
   | { kind: 'hidden' }
   | { kind: 'prompt' }
@@ -67,7 +69,7 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
   }, [update])
 
   const checkForUpdates = useCallback(async (showPrompt = false) => {
-    if (!isTauri()) {
+    if (!updaterEnabled || !isTauri()) {
       setStatus('idle')
       setUpdate(null)
       return
@@ -136,6 +138,7 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
   )
 
   useEffect(() => {
+    if (!updaterEnabled) return
     void checkForUpdates(true)
   }, [checkForUpdates])
 

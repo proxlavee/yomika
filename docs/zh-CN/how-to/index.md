@@ -4,12 +4,12 @@ title: 操作指南
 
 # 操作指南
 
-操作指南聚焦于你在 Koharu 中最常需要完成的具体任务。
+操作指南聚焦于你在 Yomika 中最常需要完成的具体任务。
 
 ## 常见任务
 
-- [安装 Koharu](install-koharu.md)：发行版安装、首次启动下载与加速说明
-- [运行时与模型下载](runtime-and-model-downloads.md)：说明 Koharu 会下载什么、缓存到哪里，以及在报 bug 前如何先做连接自检
+- [安装 Yomika](install-yomika.md)：发行版安装、首次启动下载与加速说明
+- [运行时与模型下载](runtime-and-model-downloads.md)：说明 Yomika 会下载什么、缓存到哪里，以及在报 bug 前如何先做连接自检
 - [以 GUI、Headless 与 MCP 模式运行](run-gui-headless-and-mcp.md)：本地运行模式与运行时参数
 - [配置 MCP 客户端](configure-mcp-clients.md)：把 Antigravity、Claude Desktop 或 Claude Code 接到本地 MCP 端点
 - [使用 OpenAI 兼容 API](use-openai-compatible-api.md)：连接 LM Studio、OpenRouter 与其他 OpenAI 风格的接口

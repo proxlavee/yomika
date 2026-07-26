@@ -1,21 +1,21 @@
-# Contributing
+# Contributing to Yomika
 
-Thank you for your interest in contributing to Koharu!
+Thank you for improving Yomika. Start by reading [AGENTS.md](AGENTS.md), then search [existing issues](https://github.com/proxlavee/yomika/issues) before opening a duplicate.
 
-> [!IMPORTANT]
-> Please read the complete contributing guide on the [website](https://koharu.rs/contribute/introduction/).
+## Development Workflow
 
-Please check out our [good first issues](https://github.com/mayocream/koharu/contribute) or ask for guidance on [Discord](https://discord.gg/mHvHkxGnUY).
+1. Install dependencies with `bun install --frozen-lockfile`.
+2. Keep changes focused and add a regression test for behavior fixes.
+3. Run Rust formatting and the affected Cargo tests.
+4. Run `bun run format:check`, `bun run lint:ui`, and `bun run test:ui` for UI changes.
+5. Describe user-visible effects, platform limitations, and checks in the pull request.
 
-We welcome and appreciate any form of contributions.
+Use concise Conventional Commit subjects such as `fix: preserve color picker drag value` or `refactor: rename project archive format`. Do not include generated build output, credentials, downloaded models, or unrelated cleanup.
 
-## AI Usage Policy
+## Pull Requests
 
-When using AI tools (including LLMs like ChatGPT, Claude, Copilot, etc.) to contribute to Koharu:
+Link relevant issues and explain both the cause and the chosen fix. Include screenshots for visual changes and note any hardware-specific checks that could not run. Keep API, archive-format, and configuration changes explicit because they may affect existing clients or projects.
 
-- **Please disclose AI usage** to reduce maintainer fatigue
-- **You are responsible** for all AI-generated issues or PRs you submit
-- **Low-quality or unreviewed AI content will be closed immediately**
-- **Contributors who submit repeated low-quality ("slop") PRs will be banned without prior warning.** Bans may be lifted if you commit to contributing to Koharu in accordance with this policy. You may request an unban via our [Discord](https://discord.gg/mHvHkxGnUY).
+## AI-Assisted Contributions
 
-We encourage the use of AI tools to assist with development, but all contributions must be thoroughly reviewed and tested by the contributor before submission. AI-generated code should be understood, validated, and adapted to meet Koharu's standards.
+Disclose meaningful AI assistance in the pull request. Contributors remain responsible for understanding, reviewing, testing, and licensing every submitted change. Unverified generated output is not a substitute for a reproducible test or source-backed explanation.

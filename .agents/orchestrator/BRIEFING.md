@@ -1,7 +1,7 @@
 # BRIEFING — 2026-07-19T10:55:00+03:00
 
 ## Mission
-Manage the rebranding of koharu to yomika, and port fixes/features from mayocream/koharu to the proxlavee/yomika repository, while strictly adhering to safety constraints (no rm/cp/mv) and testing requirements.
+Manage the rebranding of the source project to yomika, and port fixes/features from the upstream source repository to the proxlavee/yomika repository, while strictly adhering to safety constraints (no rm/cp/mv) and testing requirements.
 
 ## 🔒 My Identity
 - Archetype: teamwork_preview_orchestrator

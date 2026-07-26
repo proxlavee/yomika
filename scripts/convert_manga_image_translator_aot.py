@@ -102,7 +102,7 @@ This repository contains a Candle-compatible `safetensors` conversion of the
 Files:
 
 - `model.safetensors`: converted floating-point checkpoint using the original tensor names
-- `config.json`: loader metadata for `koharu-ml`
+- `config.json`: loader metadata for `yomika-ml`
 
 Metadata:
 

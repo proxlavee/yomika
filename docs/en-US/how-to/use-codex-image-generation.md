@@ -4,7 +4,7 @@ title: Use Codex Image Generation
 
 # Use Codex Image Generation
 
-Koharu can use Codex for end-to-end image-to-image generation. The workflow sends a source page image and a prompt to Codex, then stores the generated image as a rendered page result.
+Yomika can use Codex for end-to-end image-to-image generation. The workflow sends a source page image and a prompt to Codex, then stores the generated image as a rendered page result.
 
 ## Requirements
 
@@ -24,7 +24,7 @@ Codex image-to-image generation is a full-page redraw workflow. It can use the s
 - preserve panel layout, speech bubbles, tone, and composition
 - produce a generated page image in one pass
 
-This is separate from Koharu's staged local pipeline, where detection, OCR, inpainting, translation, and rendering run as individual steps. The Codex workflow sends the page image to a remote service and receives a generated image result.
+This is separate from Yomika's staged local pipeline, where detection, OCR, inpainting, translation, and rendering run as individual steps. The Codex workflow sends the page image to a remote service and receives a generated image result.
 
 ## Prompting
 
@@ -42,7 +42,7 @@ For narrower edits, describe the target change and what must be preserved. The m
 
 This feature sends the source page image and prompt to the ChatGPT Codex backend. Use the local pipeline instead when you need offline processing or do not want to send page images to a remote provider.
 
-Codex image generation depends on OpenAI's upstream service. If generation fails, Koharu surfaces the upstream response text and request ID when available. Retrying can succeed if the failure is transient. Persistent failures may indicate account access, service availability, or backend support limitations for image-generation tool calls.
+Codex image generation depends on OpenAI's upstream service. If generation fails, Yomika surfaces the upstream response text and request ID when available. Retrying can succeed if the failure is transient. Persistent failures may indicate account access, service availability, or backend support limitations for image-generation tool calls.
 
 ## When to use it
 

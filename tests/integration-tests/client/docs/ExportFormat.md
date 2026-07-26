@@ -4,7 +4,7 @@
 
 | Name | Value |
 |---- | -----|
-| Khr | khr |
+| Ymk | ymk |
 | Psd | psd |
 | Rendered | rendered |
 | Inpainted | inpainted |

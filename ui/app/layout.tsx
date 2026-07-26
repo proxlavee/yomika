@@ -25,7 +25,7 @@ const notoSansTC = Noto_Sans_TC({
 })
 
 export const metadata: Metadata = {
-  title: 'Koharu',
+  title: 'Yomika',
 }
 
 function RootLayout({

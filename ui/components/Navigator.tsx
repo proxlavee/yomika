@@ -147,10 +147,14 @@ export function Navigator() {
   const delHotkeyRef = useHotkeys(
     'delete',
     () => {
+      // Text-block deletion wins when blocks are selected. The editor-wide
+      // Delete hotkey also fires for this keystroke — if both acted, the
+      // user would lose the whole page when they only meant to drop blocks.
+      if (useSelectionStore.getState().nodeIds.size !== 0) return
       handleBatchDelete()
     },
     { enabled: selectedPageIds.size !== 0 },
-    [handleDeletePages],
+    [handleBatchDelete],
   )
 
   const virtualizer = useVirtualizer({

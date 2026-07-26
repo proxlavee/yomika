@@ -19,7 +19,7 @@ title: 故障排查
 
 这通常能很快缩小问题范围。
 
-## Koharu 在首次启动时不能正常打开
+## Yomika 在首次启动时不能正常打开
 
 可能原因：
 
@@ -37,21 +37,21 @@ title: 故障排查
 
 ```bash
 # macOS / Linux
-koharu --download
-koharu --cpu
-koharu --debug
+yomika --download
+yomika --cpu
+yomika --debug
 
 # Windows
-koharu.exe --download
-koharu.exe --cpu
-koharu.exe --debug
+yomika.exe --download
+yomika.exe --cpu
+yomika.exe --debug
 ```
 
 如果 `--cpu` 可以正常工作，而普通启动不行，问题通常就在 GPU 路径而不是应用整体启动。
 
 ## 模型或运行时下载失败
 
-Koharu 首次使用时需要联网下载：
+Yomika 首次使用时需要联网下载：
 
 - `llama.cpp` 运行时包
 - 某些平台上的 GPU 运行时支持文件
@@ -74,9 +74,9 @@ Koharu 首次使用时需要联网下载：
 
 如果你想看更详细的运行时与模型下载路径说明，以及针对 Hugging Face、GitHub 和 PyPI 的浏览器与 `curl` 检查步骤，请看[运行时与模型下载](runtime-and-model-downloads.md)。
 
-## 明明有 NVIDIA GPU，但 Koharu 还是回退到 CPU
+## 明明有 NVIDIA GPU，但 Yomika 还是回退到 CPU
 
-当 Koharu 无法确认你的驱动支持 CUDA 13.0 时，这就是预期行为。
+当 Yomika 无法确认你的驱动支持 CUDA 13.0 时，这就是预期行为。
 
 当前运行时逻辑是：
 
@@ -89,10 +89,10 @@ Koharu 首次使用时需要联网下载：
 建议操作：
 
 1. 更新 NVIDIA 驱动
-2. 更新后重启 Koharu
+2. 更新后重启 Yomika
 3. 用 `--debug` 再看一次行为
 
-如果驱动太旧，或者 CUDA 检查失败，Koharu 会有意选择 CPU，而不是勉强使用一个部分可用的 CUDA 环境。
+如果驱动太旧，或者 CUDA 检查失败，Yomika 会有意选择 CPU，而不是勉强使用一个部分可用的 CUDA 环境。
 
 ## OCR、修复或导出提示缺少前置内容
 
@@ -147,7 +147,7 @@ Koharu 首次使用时需要联网下载：
 例如：
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 然后打开：
@@ -158,7 +158,7 @@ http://localhost:4000
 
 重要实现细节：
 
-- Koharu 默认绑定到 `127.0.0.1`
+- Yomika 默认绑定到 `127.0.0.1`
 
 这意味着本地 Web UI 默认只能在同一台机器上访问，除非你自己把端口暴露出去。
 
@@ -176,7 +176,7 @@ http://localhost:9999/mcp
 
 - 用了根 URL，而不是 `/mcp`
 - 忘了加 `--port`
-- Koharu 进程已经退出
+- Yomika 进程已经退出
 - 想从另一台机器访问，却没有显式暴露端口
 
 如果普通 headless Web UI 可以打开，但 MCP 不行，先核对 URL 路径。相比服务器本身挂掉，路径写错更常见。
@@ -185,7 +185,7 @@ http://localhost:9999/mcp
 
 ## 导入后看起来什么都没发生
 
-当前文档记录的导入流程是基于图像的。Koharu 支持：
+当前文档记录的导入流程是基于图像的。Yomika 支持：
 
 - `.png`
 - `.jpg`
@@ -206,9 +206,9 @@ http://localhost:9999/mcp
 
 另外还要记住：
 
-- 渲染导出文件名带 `_koharu`
+- 渲染导出文件名带 `_yomika`
 - 修复导出文件名带 `_inpainted`
-- PSD 导出文件名是 `_koharu.psd`
+- PSD 导出文件名是 `_yomika.psd`
 - 传统 PSD 导出会拒绝超过 `30000 x 30000` 的图像
 
 如果页面特别大，先缩放或拆分，再期望 PSD 正常导出。
@@ -225,7 +225,7 @@ Bun 包装脚本会尝试自动发现这两个工具，但如果其中任何一�
 建议优先使用：
 
 ```bash
-bun install
+bun install --frozen-lockfile
 bun run build
 ```
 
@@ -238,7 +238,7 @@ bun tauri build --release --no-bundle
 如果你要更底层地直接构建 Rust：
 
 ```bash
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 ```
 
 如果你当前只是想先确认应用能不能运行，不要一开始就深挖整条 CUDA 工具链，先试一次 CPU 模式通常更划算。
@@ -271,7 +271,7 @@ bun cargo build --release -p koharu --features=cuda
 
 ## 相关页面
 
-- [安装 Koharu](install-koharu.md)
+- [安装 Yomika](install-yomika.md)
 - [以 GUI、Headless 与 MCP 模式运行](run-gui-headless-and-mcp.md)
 - [配置 MCP 客户端](configure-mcp-clients.md)
 - [从源码构建](build-from-source.md)

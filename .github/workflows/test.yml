@@ -22,6 +22,7 @@ jobs:
           sudo apt install --no-install-recommends \
             libwebkit2gtk-4.1-dev \
             build-essential \
+            libclang-dev \
             curl \
             wget \
             file \
@@ -43,7 +44,7 @@ jobs:
       - uses: actions/cache@v6
         with:
           path: tests/integration-tests/.cache
-          key: ${{ runner.os }}-integration-runtime-${{ hashFiles('koharu-runtime/**/*.rs', 'koharu-llm/**/*.rs') }}
+          key: ${{ runner.os }}-integration-runtime-${{ hashFiles('crates/yomika-runtime/**/*.rs', 'crates/yomika-llm/**/*.rs') }}
           restore-keys: ${{ runner.os }}-integration-runtime-
       - name: Run workspace tests (unit + integration)
         run: |

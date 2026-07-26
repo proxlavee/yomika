@@ -4,9 +4,9 @@ title: CLI Reference
 
 # CLI Reference
 
-This page documents the command-line options exposed by Koharu's desktop binary.
+This page documents the command-line options exposed by Yomika's desktop binary.
 
-Koharu uses the same binary for:
+Yomika uses the same binary for:
 
 - desktop startup
 - headless local Web UI
@@ -17,10 +17,10 @@ Koharu uses the same binary for:
 
 ```bash
 # macOS / Linux
-koharu [OPTIONS]
+yomika [OPTIONS]
 
 # Windows
-koharu.exe [OPTIONS]
+yomika.exe [OPTIONS]
 ```
 
 ## Options
@@ -38,10 +38,10 @@ koharu.exe [OPTIONS]
 
 Some flags affect more than startup appearance:
 
-- without `--port`, Koharu chooses a random local port
-- without `--host`, Koharu binds only to `127.0.0.1` so the API is reachable from the same machine only
-- with `--headless`, Koharu skips the Tauri window but still serves the Web UI and API
-- with `--download`, Koharu exits after dependency prefetch and does not stay running
+- without `--port`, Yomika chooses a random local port
+- without `--host`, Yomika binds only to `127.0.0.1` so the API is reachable from the same machine only
+- with `--headless`, Yomika skips the Tauri window but still serves the Web UI and API
+- with `--download`, Yomika exits after dependency prefetch and does not stay running
 - with `--cpu`, both the vision stack and local LLM path avoid GPU acceleration
 
 When a fixed port is set, the main local endpoints are:
@@ -55,25 +55,25 @@ When a fixed port is set, the main local endpoints are:
 Start headless Web UI on a stable port:
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 Start with CPU-only inference:
 
 ```bash
-koharu --cpu
+yomika --cpu
 ```
 
 Download runtime packages ahead of time:
 
 ```bash
-koharu --download
+yomika --download
 ```
 
 Run a local MCP endpoint on a stable port:
 
 ```bash
-koharu --port 9999
+yomika --port 9999
 ```
 
 Then connect your MCP client to:
@@ -85,13 +85,13 @@ http://localhost:9999/mcp
 Start with explicit debug logging:
 
 ```bash
-koharu --debug
+yomika --debug
 ```
 
 Bind to all interfaces so other machines on the local network can reach the Web UI and API:
 
 ```bash
-koharu --host 0.0.0.0 --port 4000 --headless
+yomika --host 0.0.0.0 --port 4000 --headless
 ```
 
-This is the practical pattern for running Koharu in a container or VM where the desktop client lives on a different host. Anything other than `127.0.0.1` reachable from the network deliberately, so only set `--host` when you actually want non-loopback access.
+This is the practical pattern for running Yomika in a container or VM where the desktop client lives on a different host. Anything other than `127.0.0.1` reachable from the network deliberately, so only set `--host` when you actually want non-loopback access.

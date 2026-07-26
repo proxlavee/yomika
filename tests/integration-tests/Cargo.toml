@@ -1,5 +1,5 @@
 [package]
-name = "koharu-integration-tests"
+name = "yomika-integration-tests"
 version = "0.0.0"
 edition = "2024"
 publish = false
@@ -9,11 +9,11 @@ anyhow = { workspace = true }
 camino = { workspace = true }
 futures = { workspace = true }
 image = { workspace = true }
-koharu-app = { workspace = true }
-koharu-client = { path = "client" }
-koharu-core = { workspace = true }
-koharu-rpc = { workspace = true }
-koharu-runtime = { workspace = true }
+yomika-app = { workspace = true }
+yomika-client = { path = "client" }
+yomika-core = { workspace = true }
+yomika-rpc = { workspace = true }
+yomika-runtime = { workspace = true }
 postcard = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }

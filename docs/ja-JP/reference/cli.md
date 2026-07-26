@@ -4,9 +4,9 @@ title: CLI リファレンス
 
 # CLI リファレンス
 
-このページでは、Koharu のデスクトップバイナリが公開しているコマンドラインオプションを説明します。
+このページでは、Yomika のデスクトップバイナリが公開しているコマンドラインオプションを説明します。
 
-Koharu は同じバイナリで次の用途を兼ねます。
+Yomika は同じバイナリで次の用途を兼ねます。
 
 - デスクトップ起動
 - headless ローカル Web UI
@@ -17,10 +17,10 @@ Koharu は同じバイナリで次の用途を兼ねます。
 
 ```bash
 # macOS / Linux
-koharu [OPTIONS]
+yomika [OPTIONS]
 
 # Windows
-koharu.exe [OPTIONS]
+yomika.exe [OPTIONS]
 ```
 
 ## オプション
@@ -38,8 +38,8 @@ koharu.exe [OPTIONS]
 
 一部のフラグは、見た目だけでなく実際の挙動も変えます。
 
-- `--port` を指定しないと、Koharu はランダムなローカルポートを選びます
-- `--host` を指定しないと、Koharu は `127.0.0.1` のみにバインドし、API は同じマシンからのみ到達可能になります
+- `--port` を指定しないと、Yomika はランダムなローカルポートを選びます
+- `--host` を指定しないと、Yomika は `127.0.0.1` のみにバインドし、API は同じマシンからのみ到達可能になります
 - `--headless` を付けると、Tauri ウィンドウは開かれませんが Web UI と API は提供されます
 - `--download` を付けると、依存物の事前取得後に終了し、そのまま待機しません
 - `--cpu` を付けると、vision スタックとローカル LLM の両方で GPU アクセラレーションを使いません
@@ -55,25 +55,25 @@ koharu.exe [OPTIONS]
 固定ポートで headless Web UI を起動する:
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 CPU のみで起動する:
 
 ```bash
-koharu --cpu
+yomika --cpu
 ```
 
 ランタイムパッケージを事前にダウンロードする:
 
 ```bash
-koharu --download
+yomika --download
 ```
 
 固定ポートでローカル MCP エンドポイントを立ち上げる:
 
 ```bash
-koharu --port 9999
+yomika --port 9999
 ```
 
 その上で、MCP クライアントを次に接続します。
@@ -85,13 +85,13 @@ http://localhost:9999/mcp
 明示的にデバッグログ付きで起動する:
 
 ```bash
-koharu --debug
+yomika --debug
 ```
 
 ローカルネットワーク上の他のマシンからも Web UI と API に到達できるよう、すべてのインターフェイスにバインドする:
 
 ```bash
-koharu --host 0.0.0.0 --port 4000 --headless
+yomika --host 0.0.0.0 --port 4000 --headless
 ```
 
-これは、デスクトップクライアントが別ホストにある状況で、Koharu をコンテナや VM 内で動かす際の典型的なパターンです。`127.0.0.1` 以外をネットワークから到達可能にするのは意図的な操作なので、`--host` は本当に非ループバックでのアクセスが必要なときだけ指定してください。
+これは、デスクトップクライアントが別ホストにある状況で、Yomika をコンテナや VM 内で動かす際の典型的なパターンです。`127.0.0.1` 以外をネットワークから到達可能にするのは意図的な操作なので、`--host` は本当に非ループバックでのアクセスが必要なときだけ指定してください。

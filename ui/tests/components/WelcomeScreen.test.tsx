@@ -22,7 +22,7 @@ function seedSceneQuery(): void {
 vi.mock('@/lib/io/openFiles', () => ({
   openImageFiles: vi.fn().mockResolvedValue([]),
   openImageFolder: vi.fn().mockResolvedValue([]),
-  openKhrFile: vi.fn().mockResolvedValue(null),
+  openYmkFile: vi.fn().mockResolvedValue(null),
 }))
 
 function withProjects(list: Array<{ id: string; name: string }>) {
@@ -48,7 +48,7 @@ describe('WelcomeScreen', () => {
     withProjects([])
     renderWithQuery(<WelcomeScreen />)
     expect(screen.getByRole('button', { name: /welcome\.new/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /welcome\.importKhr/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /welcome\.importYmk/i })).toBeInTheDocument()
   })
 
   it('lists recent projects sorted by updatedAtMs desc', async () => {

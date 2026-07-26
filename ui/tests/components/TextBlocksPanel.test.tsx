@@ -63,7 +63,7 @@ describe('TextBlocksPanel', () => {
     server.use(
       http.get('/api/v1/scene.json', () => HttpResponse.json(sceneWithTextNodes())),
       http.get('/api/v1/config', () =>
-        HttpResponse.json({ pipeline: { translator: 'llm', renderer: 'koharu-renderer' } }),
+        HttpResponse.json({ pipeline: { translator: 'llm', renderer: 'yomika-renderer' } }),
       ),
       http.get('/api/v1/llm/current', () =>
         HttpResponse.json({ status: 'ready', target: null, error: null }),
@@ -82,7 +82,7 @@ describe('TextBlocksPanel', () => {
 
     await waitFor(() => expect(pipelineRequests).toHaveLength(1))
     expect(pipelineRequests[0]).toMatchObject({
-      steps: ['llm', 'koharu-renderer'],
+      steps: ['llm', 'yomika-renderer'],
       pages: ['p1'],
       textNodeIds: ['t2'],
       targetLanguage: 'en',

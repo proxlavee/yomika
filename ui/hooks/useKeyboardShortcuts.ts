@@ -4,28 +4,21 @@ import { useEffect, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 import {
-  applyOp,
   deleteSelectedTextNodesOnCurrentPage,
-  queueAutoRender,
   redoOp,
   selectAllTextNodesOnCurrentPage,
   undoOp,
 } from '@/lib/io/scene'
-import { ops } from '@/lib/ops'
 import { getPlatform, formatShortcut, isModifierKey } from '@/lib/shortcutUtils'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { usePreferencesStore } from '@/lib/stores/preferencesStore'
 import { useSelectionStore } from '@/lib/stores/selectionStore'
-
-import { useCurrentPage } from './useCurrentPage'
 
 export function useKeyboardShortcuts() {
   const setMode = useEditorUiStore((state) => state.setMode)
   const setBrushConfig = usePreferencesStore((state) => state.setBrushConfig)
   const shortcuts = usePreferencesStore((state) => state.shortcuts)
   const isMac = useMemo(() => getPlatform() === 'mac', [])
-  const page = useCurrentPage()
-  const clearSelection = useSelectionStore((s) => s.clear)
   const selectedIds = useSelectionStore((s) => s.nodeIds)
 
   // Optimized tool mapping - built once and updated only when shortcuts change
@@ -110,26 +103,10 @@ export function useKeyboardShortcuts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMac, setMode, TOOL_MAP, shortcuts])
 
-  const removeNodes = async (nodeIds: string[]) => {
-    if (!page) {
-      return
-    }
-
-    const batch = nodeIds.flatMap((nodeId) => {
-      const node = page.nodes[nodeId]
-      if (!node) return []
-      const idx = Object.keys(page.nodes).indexOf(nodeId)
-      return [ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx)]
-    })
-    await applyOp(ops.batch('removeNodes', batch))
-    clearSelection()
-    queueAutoRender(page.id)
-  }
-
   useHotkeys(
     'delete',
     () => {
-      if (selectedIds.size !== 0) void removeNodes([...selectedIds])
+      if (selectedIds.size !== 0) void deleteSelectedTextNodesOnCurrentPage()
     },
     { enabled: selectedIds.size !== 0 },
     [selectedIds],

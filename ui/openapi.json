@@ -94,7 +94,13 @@
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {}
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Raw binary content in the HTTP API."
+                }
+              }
             }
           }
         }
@@ -355,7 +361,13 @@
           "200": {
             "description": "",
             "content": {
-              "font/ttf": {}
+              "font/ttf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Raw binary content in the HTTP API."
+                }
+              }
             }
           }
         }
@@ -542,8 +554,27 @@
         "operationId": "create_pages",
         "requestBody": {
           "content": {
-            "multipart/form-data": {}
-          }
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/BinaryPayload"
+                    },
+                    "description": "Image files to import as pages, in upload order."
+                  },
+                  "replace": {
+                    "type": ["boolean", "null"],
+                    "description": "Whether existing pages should be removed before importing."
+                  }
+                }
+              }
+            }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -604,8 +635,26 @@
         ],
         "requestBody": {
           "content": {
-            "multipart/form-data": {}
-          }
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "format": "binary",
+                        "description": "Raw binary content in the HTTP API."
+                      }
+                    ],
+                    "description": "Image file to add to the page."
+                  }
+                }
+              }
+            }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -693,8 +742,15 @@
         ],
         "requestBody": {
           "content": {
-            "image/png": {}
-          }
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "Raw binary content in the HTTP API."
+              }
+            }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -728,7 +784,13 @@
           "200": {
             "description": "",
             "content": {
-              "image/webp": {}
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Raw binary content in the HTTP API."
+                }
+              }
             }
           }
         }
@@ -886,7 +948,13 @@
           "200": {
             "description": "Export bytes. Content-Type is `application/zip` when the format produces multiple files.",
             "content": {
-              "application/octet-stream": {}
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Raw binary content in the HTTP API."
+                }
+              }
             }
           }
         }
@@ -897,8 +965,15 @@
         "operationId": "import_project",
         "requestBody": {
           "content": {
-            "application/zip": {}
-          }
+            "application/zip": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "Raw binary content in the HTTP API."
+              }
+            }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -951,7 +1026,13 @@
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {}
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "description": "Raw binary content in the HTTP API."
+                }
+              }
             }
           }
         }
@@ -996,7 +1077,7 @@
               }
             ],
             "default": {
-              "path": "C:\\Users\\Mayo\\AppData\\Local\\Koharu"
+              "path": "<app-data>/Yomika"
             }
           },
           "http": {
@@ -1022,8 +1103,8 @@
               "detector": "pp-doclayout-v3",
               "font_detector": "yuzumarker-font-detection",
               "inpainter": "lama-manga",
-              "ocr": "paddle-ocr-vl-1.5",
-              "renderer": "koharu-renderer",
+              "ocr": "paddle-ocr-vl-1.6",
+              "renderer": "yomika-renderer",
               "segmenter": "comic-text-detector-seg",
               "translator": "llm"
             }
@@ -1200,6 +1281,11 @@
           }
         ]
       },
+      "BinaryPayload": {
+        "type": "string",
+        "format": "binary",
+        "description": "Raw binary content in the HTTP API."
+      },
       "BlobRef": {
         "type": "string",
         "description": "Hex-encoded blake3 hash of an immutable blob."
@@ -1308,7 +1394,7 @@
       },
       "ConfigPatch": {
         "type": "object",
-        "description": "Sparse patch for `koharu_app::AppConfig`. Missing fields mean \"leave\nas-is\". The `providers` field, if present, replaces the whole provider\nlist — we do not merge by id because ordering is meaningful.",
+        "description": "Sparse patch for `yomika_app::AppConfig`. Missing fields mean \"leave\nas-is\". The `providers` field, if present, replaces the whole provider\nlist — we do not merge by id because ordering is meaningful.",
         "properties": {
           "data": {
             "oneOf": [
@@ -1557,7 +1643,7 @@
       },
       "ExportFormat": {
         "type": "string",
-        "enum": ["khr", "psd", "rendered", "inpainted"]
+        "enum": ["ymk", "psd", "rendered", "inpainted"]
       },
       "ExportProjectRequest": {
         "type": "object",
@@ -2515,7 +2601,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "`.khrproj/` directory basename (no extension). Must exist under the\nmanaged projects directory."
+            "description": "`.ymkproj/` directory basename (no extension). Must exist under the\nmanaged projects directory."
           }
         }
       },
@@ -2596,11 +2682,11 @@
           },
           "ocr": {
             "type": "string",
-            "default": "paddle-ocr-vl-1.5"
+            "default": "paddle-ocr-vl-1.6"
           },
           "renderer": {
             "type": "string",
-            "default": "koharu-renderer"
+            "default": "yomika-renderer"
           },
           "segmenter": {
             "type": "string",
@@ -2799,7 +2885,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "Stable identifier — the `.khrproj` directory basename (without the\nextension). Clients address projects by this."
+            "description": "Stable identifier — the `.ymkproj` directory basename (without the\nextension). Clients address projects by this."
           },
           "name": {
             "type": "string"
@@ -2976,6 +3062,12 @@
         "type": "object",
         "required": ["steps"],
         "properties": {
+          "autoRenderEpoch": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Internal correlation used by the UI's debounced auto-render. When set,\nthe request must be a single-page, renderer-only pipeline.",
+            "minimum": 0
+          },
           "defaultFont": {
             "type": ["string", "null"]
           },

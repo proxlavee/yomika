@@ -43,11 +43,11 @@
     "runCustomAll": "Özeli Çalıştır (Tüm Sayfalar)"
   },
   "welcome": {
-    "title": "Koharu",
+    "title": "Yomika",
     "subtitle": "Manga çeviri çalışma alanı",
     "new": "Yeni proje",
     "newDescription": "Boş başlayın, sayfaları sonra içe aktarın",
-    "importKhr": ".khr arşivini içe aktar",
+    "importYmk": ".ymk arşivini içe aktar",
     "projects": "Son Kullanılanlar",
     "emptyHint": "Son projeleriniz burada görünecek",
     "delete": "Sil",
@@ -63,8 +63,8 @@
   "operations": {
     "title": "Çalışıyor",
     "inProgress": "İşlemler tamamlanırken lütfen bekleyin.",
-    "loadKhr": "Proje yükleniyor",
-    "saveKhr": "Proje kaydediliyor",
+    "loadYmk": "Proje yükleniyor",
+    "saveYmk": "Proje kaydediliyor",
     "loadModel": "LLM modeli yükleniyor",
     "processCurrent": "Geçerli görsel işleniyor",
     "processAll": "Tüm görseller işleniyor",
@@ -309,7 +309,7 @@
     "httpProxyDescription": "Runtime ve model indirmeleri için kullanılır. Değişiklikler otomatik kaydedilir.",
     "title": "Ayarlar",
     "appearance": "Görünüm",
-    "appearanceDescription": "Koharu'nun cihazınızda nasıl görüneceğini özelleştirin.",
+    "appearanceDescription": "Yomika'nun cihazınızda nasıl görüneceğini özelleştirin.",
     "theme": "Tema",
     "themeDescription": "Tercih ettiğiniz renk şemasını seçin.",
     "themeLight": "Açık",
@@ -371,7 +371,7 @@
     "apiKeySave": "Kaydet",
     "apiKeySaved": "Kaydedildi!",
     "dataPath": "Veri Yolu",
-    "dataPathDescription": "Koharu modelleri, çalışma zamanı paketlerini, sayfa bildirimlerini ve görsel verilerini bu dizinde saklar. Yolu değiştirmek uygulamanın yeniden başlatılmasını gerektirir.",
+    "dataPathDescription": "Yomika modelleri, çalışma zamanı paketlerini, sayfa bildirimlerini ve görsel verilerini bu dizinde saklar. Yolu değiştirmek uygulamanın yeniden başlatılmasını gerektirir.",
     "dataPathApply": "Uygula ve Yeniden Başlat",
     "dataPathApplying": "Uygulanıyor...",
     "dataPathDesktopOnly": "Çalışma zamanı ayarları yalnızca masaüstü uygulamasında kullanılabilir.",
@@ -408,14 +408,14 @@
   "updater": {
     "available": {
       "title": "Güncelleme mevcut",
-      "description": "Koharu <strong>{{version}}</strong> yüklenmeye hazır"
+      "description": "Yomika <strong>{{version}}</strong> yüklenmeye hazır"
     },
     "noNotes": "Sürüm notu sağlanmadı.",
     "later": "Daha sonra",
     "update": "Güncelle",
     "downloading": {
       "title": "Güncelleme indiriliyor…",
-      "subtitle": "Koharu {{version}}"
+      "subtitle": "Yomika {{version}}"
     },
     "error": {
       "title": "Güncelleme başarısız",

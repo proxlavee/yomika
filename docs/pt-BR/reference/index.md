@@ -4,7 +4,7 @@ title: Referência
 
 # Referência
 
-As páginas de referência reúnem detalhes factuais que você pode querer consultar rapidamente ao trabalhar com o Koharu.
+As páginas de referência reúnem detalhes factuais que você pode querer consultar rapidamente ao trabalhar com o Yomika.
 
 ## Referências disponíveis
 

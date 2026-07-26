@@ -13,28 +13,35 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AppEventOneOf3 {
-    #[serde(rename = "event")]
-    pub event: Event,
+    #[serde(rename = "error", skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
     #[serde(rename = "id")]
     pub id: String,
-    #[serde(rename = "kind")]
-    pub kind: String,
+    #[serde(rename = "status")]
+    pub status: models::JobStatus,
+    #[serde(rename = "event")]
+    pub event: Event,
 }
 
 impl AppEventOneOf3 {
-    pub fn new(event: Event, id: String, kind: String) -> AppEventOneOf3 {
-        AppEventOneOf3 { event, id, kind }
+    pub fn new(id: String, status: models::JobStatus, event: Event) -> AppEventOneOf3 {
+        AppEventOneOf3 {
+            error: None,
+            id,
+            status,
+            event,
+        }
     }
 }
 ///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Event {
-    #[serde(rename = "jobStarted")]
-    JobStarted,
+    #[serde(rename = "jobFinished")]
+    JobFinished,
 }
 
 impl Default for Event {
     fn default() -> Event {
-        Self::JobStarted
+        Self::JobFinished
     }
 }

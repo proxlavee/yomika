@@ -4,7 +4,7 @@ title: 设置参考
 
 # 设置参考
 
-当前 Koharu 的 Settings 页面主要包含以下 6 个区域：
+当前 Yomika 的 Settings 页面主要包含以下 6 个区域：
 
 - `Appearance`
 - `Engines`
@@ -64,7 +64,7 @@ title: 设置参考
 
 - 提供方 API key 不会写入 `config.toml`
 - 在 macOS 和 Windows 上，提供方 API key 存储在系统 keyring 中
-- 在 Linux 上，提供方 API key 存储在应用数据目录下的 Koharu 本地文件系统凭据存储中，并使用仅所有者可访问的文件权限
+- 在 Linux 上，提供方 API key 存储在应用数据目录下的 Yomika 本地文件系统凭据存储中，并使用仅所有者可访问的文件权限
 - 提供方的 `Base URL` 保存在共享应用配置中
 - `OpenAI Compatible` 需要自定义 `Base URL`；模型列表通过对该 URL 调用 `GET /v1/models` 动态发现
 - 机器翻译提供方（`DeepL`、`Google Cloud Translation`、`Caiyun`）只需要 API key；`Caiyun` 仅支持有限的目标语言
@@ -117,7 +117,7 @@ Linux 文件系统凭据存储依赖本地文件系统权限，而不是操作�
 - 作者链接
 - 仓库链接
 
-在打包应用模式下，版本检查会把本地版本与 `mayocream/koharu` 的最新 GitHub release 进行比较。
+在打包应用模式下，版本检查会把本地版本与 `proxlavee/yomika` 的最新 GitHub release 进行比较。
 
 ## 持久化模型
 

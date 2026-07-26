@@ -11,20 +11,14 @@ import {
   SquareDashedIcon,
   SquareIcon,
 } from 'lucide-react'
-import { type ComponentType, useMemo, useRef, useEffect, useState } from 'react'
+import { type ComponentType, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { FontSelect, useGoogleFontPreview } from '@/components/ui/font-select'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { VariantItem } from '@/components/ui/variant-item'
 import {
@@ -63,6 +57,9 @@ const DEFAULT_STROKE_WIDTH = 1.6
 const MIN_STROKE_WIDTH = 0.2
 const MAX_STROKE_WIDTH = 24
 const STROKE_WIDTH_STEP = 0.1
+const MIN_FONT_SIZE = 6
+const MAX_FONT_SIZE = 300
+const FONT_SIZE_COMMIT_DEBOUNCE_MS = 400
 
 const DEFAULT_FONT_FACES: FontFaceInfo[] = [
   {
@@ -160,6 +157,8 @@ export function RenderControlsPanel() {
 
   const firstNode = textNodes[0]
   const hasNodes = textNodes.length > 0
+  const selectedFontFamilies = selectedNode?.data.style?.fontFamilies
+  const firstFontFamilies = firstNode?.data.style?.fontFamilies
 
   const fontCandidates = useMemo(
     () =>
@@ -167,18 +166,18 @@ export function RenderControlsPanel() {
         [
           ...sortedFonts,
           ...(appDefaultFont ? [fallbackFontFace(appDefaultFont)] : []),
-          ...(selectedNode?.data.style?.fontFamilies?.slice(0, 1)?.map(fallbackFontFace) ?? []),
-          ...(firstNode?.data.style?.fontFamilies?.slice(0, 1)?.map(fallbackFontFace) ?? []),
+          ...(selectedFontFamilies?.slice(0, 1)?.map(fallbackFontFace) ?? []),
+          ...(firstFontFamilies?.slice(0, 1)?.map(fallbackFontFace) ?? []),
           ...DEFAULT_FONT_FACES,
         ].filter((v): v is FontFaceInfo => !!v),
       ),
-    [sortedFonts, appDefaultFont, selectedNode?.id, selectedNode?.data.style?.fontFamilies],
+    [sortedFonts, appDefaultFont, selectedFontFamilies, firstFontFamilies],
   )
 
   const currentFontCandidate =
-    selectedNode?.data.style?.fontFamilies?.[0] ??
+    selectedFontFamilies?.[0] ??
     appDefaultFont ??
-    firstNode?.data.style?.fontFamilies?.[0] ??
+    firstFontFamilies?.[0] ??
     (hasNodes ? fontCandidates[0]?.postScriptName : '')
   const currentFontFace = useMemo(() => {
     return (
@@ -313,8 +312,8 @@ export function RenderControlsPanel() {
               label,
               nodes.map((n) => buildStyleOp(n, updates)),
             )
-      await applyOp(op)
-      queueAutoRender(page.id)
+      const editEpoch = await applyOp(op)
+      queueAutoRender(page.id, editEpoch)
     })()
   }
 
@@ -327,6 +326,73 @@ export function RenderControlsPanel() {
   const applyStyleToAll = (updates: Partial<TextStyle>) => {
     applyStyleToNodes(textNodes, updates, 'Bulk style update')
   }
+
+  // ---------------------------------------------------------------------------
+  // Font-size input draft
+  //
+  // Committing every keystroke used to require a full backend round-trip per
+  // key, and the scene refetch reset the controlled input mid-typing — fast
+  // typists lost all but the last keystroke. The draft keeps typing local and
+  // commits once: on debounce, on blur, or on Enter. Escape reverts.
+  // ---------------------------------------------------------------------------
+
+  const [fontSizeDraft, setFontSizeDraft] = useState<string | null>(null)
+  const fontSizeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fontSizeDraftRef = useRef(fontSizeDraft)
+  fontSizeDraftRef.current = fontSizeDraft
+
+  const cancelFontSizeTimer = () => {
+    if (fontSizeTimer.current !== null) {
+      clearTimeout(fontSizeTimer.current)
+      fontSizeTimer.current = null
+    }
+  }
+
+  const clearFontSizeDraft = () => {
+    fontSizeDraftRef.current = null
+    setFontSizeDraft(null)
+  }
+
+  const commitFontSize = (raw: string) => {
+    cancelFontSizeTimer()
+    clearFontSizeDraft()
+    if (raw === '') {
+      applyStyleToSelected({ fontSize: null })
+      return
+    }
+    const parsed = Number.parseInt(raw, 10)
+    if (!Number.isFinite(parsed) || parsed < 1) return
+    applyStyleToSelected({ fontSize: Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, parsed)) })
+  }
+
+  const stepFontSize = (delta: -1 | 1) => {
+    const rawDraft = fontSizeDraftRef.current
+    const parsedDraft = rawDraft !== null && rawDraft !== '' ? Number.parseInt(rawDraft, 10) : NaN
+    const base = Number.isFinite(parsedDraft) ? parsedDraft : Math.round(currentFontSize ?? 16)
+    cancelFontSizeTimer()
+    clearFontSizeDraft()
+    const next = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, base + delta))
+    applyStyleToSelected({ fontSize: next })
+  }
+
+  // A selection change invalidates any in-flight draft.
+  const selectionKey = [page?.id ?? '', ...selectedNodes.map((node) => node.id).sort()].join('\0')
+  useEffect(() => {
+    if (fontSizeTimer.current !== null) {
+      clearTimeout(fontSizeTimer.current)
+      fontSizeTimer.current = null
+    }
+    fontSizeDraftRef.current = null
+    setFontSizeDraft(null)
+  }, [selectionKey])
+
+  // Drop a pending debounced commit on unmount.
+  useEffect(
+    () => () => {
+      if (fontSizeTimer.current !== null) clearTimeout(fontSizeTimer.current)
+    },
+    [],
+  )
 
   const commitCurrentFontColorIfImplicit = () => {
     const targets = selectedNodes.length > 0 ? selectedNodes : textNodes
@@ -564,12 +630,11 @@ export function RenderControlsPanel() {
             type='button'
             variant='ghost'
             size='icon-sm'
+            data-font-size-step='decrease'
             className='size-6 shrink-0 rounded-r-none border-r'
             disabled={!selectedNode}
-            onClick={() => {
-              const next = Math.max(6, Math.round((currentFontSize ?? 16) - 1))
-              applyStyleToSelected({ fontSize: next })
-            }}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => stepFontSize(-1)}
           >
             <MinusIcon className='size-3' />
           </Button>
@@ -582,27 +647,49 @@ export function RenderControlsPanel() {
             className='h-6 min-w-0 flex-1 [appearance:textfield] rounded-none border-0 px-0.5 text-center text-xs shadow-none focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
             data-testid='render-font-size'
             disabled={!selectedNode}
-            value={currentFontSize !== undefined ? Math.round(currentFontSize) : ''}
+            value={
+              fontSizeDraft ??
+              (currentFontSize !== undefined ? String(Math.round(currentFontSize)) : '')
+            }
             placeholder='auto'
             onChange={(event) => {
-              if (event.target.value === '') {
-                applyStyleToSelected({ fontSize: null })
+              const raw = event.target.value
+              fontSizeDraftRef.current = raw
+              setFontSizeDraft(raw)
+              cancelFontSizeTimer()
+              fontSizeTimer.current = setTimeout(
+                () => commitFontSize(raw),
+                FONT_SIZE_COMMIT_DEBOUNCE_MS,
+              )
+            }}
+            onBlur={(event) => {
+              const nextTarget = event.relatedTarget
+              if (
+                nextTarget instanceof HTMLElement &&
+                nextTarget.dataset.fontSizeStep !== undefined
+              ) {
+                return
               }
-              const parsed = Number.parseInt(event.target.value, 10)
-              if (!Number.isFinite(parsed) || parsed < 1) return
-              applyStyleToSelected({ fontSize: Math.min(300, parsed) })
+              if (fontSizeDraftRef.current !== null) commitFontSize(event.target.value)
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                commitFontSize((event.target as HTMLInputElement).value)
+              } else if (event.key === 'Escape') {
+                cancelFontSizeTimer()
+                clearFontSizeDraft()
+              }
             }}
           />
           <Button
             type='button'
             variant='ghost'
             size='icon-sm'
+            data-font-size-step='increase'
             className='size-6 shrink-0 rounded-l-none border-l'
             disabled={!selectedNode}
-            onClick={() => {
-              const next = Math.min(300, Math.round((currentFontSize ?? 16) + 1))
-              applyStyleToSelected({ fontSize: next })
-            }}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => stepFontSize(1)}
           >
             <PlusIcon className='size-3' />
           </Button>

@@ -4,13 +4,13 @@ title: Build a Partir do Código-Fonte
 
 # Build a Partir do Código-Fonte
 
-Se você quer compilar o Koharu localmente em vez de usar uma release pré-compilada, comece pelo wrapper Bun do repositório. Ele combina com o fluxo de build do projeto e cuida da configuração específica de plataforma que uma chamada direta ao Tauri não faria.
+Se você quer compilar o Yomika localmente em vez de usar uma release pré-compilada, comece pelo wrapper Bun do repositório. Ele combina com o fluxo de build do projeto e cuida da configuração específica de plataforma que uma chamada direta ao Tauri não faria.
 
 ## O que o build inclui
 
 Um build completo para desktop inclui:
 
-- a aplicação Rust em `koharu/`
+- a aplicação Rust em `crates/yomika/`
 - a UI embutida de `ui/`
 - o servidor HTTP, RPC e MCP local usado tanto pelos modos GUI quanto headless
 
@@ -26,6 +26,10 @@ O build desktop padrão é ciente de plataforma:
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.95 ou superior (Rust 2024 edition)
 - [Bun](https://bun.sh/) 1.0 ou superior
+- LLVM/Clang com uma biblioteca compartilhada `libclang` utilizável (exigida pelo Rust bindgen)
+
+Builds no Linux também precisam dos pacotes de sistema padrão do Tauri. No
+Debian, Ubuntu ou WSL, instale `libclang-dev` junto com esses pacotes.
 
 Para builds a partir do código-fonte no Windows, instale:
 
@@ -37,7 +41,7 @@ O helper `scripts/dev.ts` do repositório tenta descobrir `nvcc` e `cl.exe` auto
 ## Instalar dependências
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 ## Build desktop recomendado
@@ -52,8 +56,8 @@ No Windows, esse wrapper também tenta descobrir `nvcc` e `cl.exe` automaticamen
 
 Os binários principais são gerados em `target/release`:
 
-- `target/release/koharu`
-- `target/release/koharu.exe` no Windows
+- `target/release/yomika`
+- `target/release/yomika.exe` no Windows
 
 ## Build de desenvolvimento
 
@@ -85,17 +89,17 @@ Exemplos:
 
 ```bash
 # Windows / Linux
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 
 # macOS Apple Silicon
-bun cargo build --release -p koharu --features=metal
+bun cargo build --release -p yomika --features=metal
 ```
 
 Isso é útil para trabalho Rust de mais baixo nível, mas o `bun run build` continua sendo a melhor escolha para um build desktop normal porque preserva o fluxo completo de empacotamento do Tauri.
 
 ## O que acontece em runtime depois do build
 
-Buildar o app não empacota todo peso de modelo. Na primeira execução, o Koharu ainda precisa:
+Buildar o app não empacota todo peso de modelo. Na primeira execução, o Yomika ainda precisa:
 
 - inicializar as bibliotecas de runtime dentro do diretório local de dados da aplicação
 - baixar os modelos padrão de visão e OCR

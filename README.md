@@ -1,36 +1,35 @@
-<h1 align="center">Koharu</h1>
+<p align="center"><img src="yomika.png" alt="Yomika logo" width="260"></p>
+
+<h1 align="center">Yomika</h1>
 
 <p align="center">ML-powered manga translator, written in <b>Rust</b>.</p>
 
 <p align="center">
-<a href="https://github.com/mayocream/koharu/releases/latest" target="_blank"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/mayocream/koharu/total?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fmayocream%2Fkoharu%2Freleases%2Flatest"></a>
+<a href="https://github.com/proxlavee/yomika/releases" target="_blank"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/proxlavee/yomika/total?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fproxlavee%2Fyomika%2Freleases"></a>
+</p>
+
+
+<p align="center">
+<a href="docs/en-US/how-to/install-yomika.md">Getting Started</a> · <a href="docs/en-US/how-to/index.md">Docs</a> · <a href="https://github.com/proxlavee/yomika/issues">Bug reports</a> · <a href="https://github.com/proxlavee/yomika/discussions">Discussions</a>
 </p>
 
 <p align="center">
-<a href="https://trendshift.io/repositories/20649" target="_blank"><img src="https://trendshift.io/api/badge/repositories/20649" alt="mayocream%2Fkoharu | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="docs/ja-JP/index.md" target="_blank">日本語</a> | <a href="docs/zh-CN/index.md" target="_blank">简体中文</a>
 </p>
 
-<p align="center">
-<a href="https://koharu.rs/how-to/install-koharu/" target="_blank">Getting Started</a> · <a href="https://koharu.rs/how-to/" target="_blank">Docs</a> · <a href="https://github.com/mayocream/koharu/issues" target="_blank">Bug reports</a> · <a href="https://discord.gg/mHvHkxGnUY" target="_blank">Discord</a>
-</p>
+Yomika introduces a local-first workflow for manga translation, utilizing the power of ML to automate the process. It combines the capabilities of object detection, OCR, inpainting, and LLMs to create a seamless translation experience.
 
-<p align="center">
-<a href="https://koharu.rs/ja-JP/" target="_blank">日本語</a> | <a href="https://koharu.rs/zh-CN/" target="_blank">简体中文</a>
-</p>
-
-Koharu introduces a local-first workflow for manga translation, utilizing the power of ML to automate the process. It combines the capabilities of object detection, OCR, inpainting, and LLMs to create a seamless translation experience.
-
-Under the hood, Koharu uses [candle](https://github.com/huggingface/candle) and [llama.cpp](https://github.com/ggml-org/llama.cpp) for high-performance inference, with [Tauri](https://github.com/tauri-apps/tauri) for the desktop app. All components are written in Rust, ensuring safety and speed.
+Under the hood, Yomika uses [candle](https://github.com/huggingface/candle) and [llama.cpp](https://github.com/ggml-org/llama.cpp) for high-performance inference, with [Tauri](https://github.com/tauri-apps/tauri) for the desktop app. All components are written in Rust, ensuring safety and speed.
 
 > [!NOTE]
-> Koharu runs its vision models and LLMs **locally** on your machine to keep your data private and secure.
+> Yomika runs its vision models and LLMs **locally** on your machine to keep your data private and secure.
 
 ---
 
-![screenshot](docs/en-US/assets/koharu-screenshot-en.png)
+![Yomika editor](docs/en-US/assets/Yomika_Screenshot_en.png)
 
 > [!NOTE]
-> Support and discussion are available on the [Discord server](https://discord.gg/mHvHkxGnUY).
+> Support and discussion are available through [GitHub Discussions](https://github.com/proxlavee/yomika/discussions) and [GitHub Issues](https://github.com/proxlavee/yomika/issues).
 
 ## Features
 
@@ -42,7 +41,7 @@ Under the hood, Koharu uses [candle](https://github.com/huggingface/candle) and 
 - Layered PSD export with editable text
 - Local HTTP API and MCP server for automation
 
-For installation and first-run guidance, see [Install Koharu](https://koharu.rs/how-to/install-koharu/) and [Translate Your First Page](https://koharu.rs/tutorials/translate-your-first-page/).
+For installation and first-run guidance, see [Install Yomika](docs/en-US/how-to/install-yomika.md) and [Translate Your First Page](docs/en-US/tutorials/translate-your-first-page.md).
 
 ## Usage
 
@@ -68,120 +67,120 @@ History and selection:
 - <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> / <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd>: Redo
 - <kbd>Ctrl</kbd> + <kbd>A</kbd> / <kbd>Cmd</kbd> + <kbd>A</kbd>: Select all text blocks on the current page
 
-For the full list and customization details, see [Keyboard Shortcuts](https://koharu.rs/reference/keyboard-shortcuts/).
+For the full list and customization details, see [Keyboard Shortcuts](docs/en-US/reference/keyboard-shortcuts.md).
 
 ### Export
 
-Koharu can export the current page either as a flattened rendered image or as a layered Photoshop PSD. PSD export preserves helper layers and writes translated text as editable text layers, which is useful for downstream cleanup and manual refinement.
+Yomika can export the current page either as a flattened rendered image or as a layered Photoshop PSD. PSD export preserves helper layers and writes translated text as editable text layers, which is useful for downstream cleanup and manual refinement.
 
-For export behavior, PSD contents, and file naming, see [Export Pages and Manage Projects](https://koharu.rs/how-to/export-and-manage-projects/).
+For export behavior, PSD contents, and file naming, see [Export Pages and Manage Projects](docs/en-US/how-to/export-and-manage-projects.md).
 
 ### MCP Server
 
-Koharu includes a built-in MCP server for local agent integrations. By default it listens on a random local port, but you can pin it with `--port`.
+Yomika includes a built-in MCP server for local agent integrations. By default it listens on a random local port, but you can pin it with `--port`.
 
 ```bash
 # macOS / Linux
-koharu --port 9999
+yomika --port 9999
 # Windows
-koharu.exe --port 9999
+yomika.exe --port 9999
 ```
 
 Then point your client at `http://localhost:9999/mcp`.
 
-For local setup and the available tools, see [Run GUI, Headless, and MCP Modes](https://koharu.rs/how-to/run-gui-headless-and-mcp/), [Configure MCP Clients](https://koharu.rs/how-to/configure-mcp-clients/), and [MCP Tools Reference](https://koharu.rs/reference/mcp-tools/).
+For local setup and the available tools, see [Run GUI, Headless, and MCP Modes](docs/en-US/how-to/run-gui-headless-and-mcp.md), [Configure MCP Clients](docs/en-US/how-to/configure-mcp-clients.md), and [MCP Tools Reference](docs/en-US/reference/mcp-tools.md).
 
 ### Headless Mode
 
-Koharu can run without launching the desktop window.
+Yomika can run without launching the desktop window.
 
 ```bash
 # macOS / Linux
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 # Windows
-koharu.exe --port 4000 --headless
+yomika.exe --port 4000 --headless
 ```
 
 You can then connect to the web client at `http://localhost:4000`.
 
-For runtime modes, ports, and local endpoints, see [Run GUI, Headless, and MCP Modes](https://koharu.rs/how-to/run-gui-headless-and-mcp/).
+For runtime modes, ports, and local endpoints, see [Run GUI, Headless, and MCP Modes](docs/en-US/how-to/run-gui-headless-and-mcp.md).
 
 ### Runtime Configuration
 
-Koharu lets you configure the shared local data path plus HTTP connect timeout, read timeout, and retry count used by downloads and provider requests.
+Yomika lets you configure the shared local data path plus HTTP connect timeout, read timeout, and retry count used by downloads and provider requests.
 
 Those values are loaded at startup, so changing them saves the config and restarts the app.
 
 ### Google Fonts
 
-Koharu includes built-in Google Fonts support for translated text rendering, so you can use web fonts without managing font files by hand.
+Yomika includes built-in Google Fonts support for translated text rendering, so you can use web fonts without managing font files by hand.
 
 ### BYO Fonts
 
-You can also bring your own fonts for translation rendering. Koharu supports OpenType and TrueType fonts, including variable fonts. To make a font available for rendering, install it on your system before starting Koharu. The app will scan the system font directories and make them available in the font selection dropdown.
+You can also bring your own fonts for translation rendering. Yomika supports OpenType and TrueType fonts, including variable fonts. To make a font available for rendering, install it on your system before starting Yomika. The app will scan the system font directories and make them available in the font selection dropdown.
 
 ### Text Rendering
 
-Koharu includes a dedicated text renderer tuned for manga lettering, using Unicode-aware [OpenType](https://learn.microsoft.com/en-us/typography/opentype/spec/) shaping, script-aware line breaking, precise glyph metrics, and real glyph bounds instead of generic browser or OS text primitives.
+Yomika includes a dedicated text renderer tuned for manga lettering, using Unicode-aware [OpenType](https://learn.microsoft.com/en-us/typography/opentype/spec/) shaping, script-aware line breaking, precise glyph metrics, and real glyph bounds instead of generic browser or OS text primitives.
 
 It supports vertical CJK layout, right-to-left scripts, font fallback, vertical punctuation alignment, constrained-box fitting, and manga-oriented stroke and effect compositing so translated text reads naturally inside speech bubbles, captions, and other irregular page layouts.
 
 ## GPU Acceleration
 
-Koharu supports CUDA, experimental ZLUDA, Metal, and Vulkan. CPU fallback is always available when the accelerated path is unavailable or not worth the setup cost on your system.
+Yomika supports CUDA, experimental ZLUDA, Metal, and Vulkan. CPU fallback is always available when the accelerated path is unavailable or not worth the setup cost on your system.
 
 ### CUDA
 
-On Windows and Linux, Koharu ships with CUDA support so it can use NVIDIA GPUs for the full local pipeline.
+On Windows and Linux, Yomika ships with CUDA support so it can use NVIDIA GPUs for the full local pipeline.
 
-Koharu bundles CUDA Toolkit 13.0. The required DLLs are extracted to the application data directory on first run.
+Yomika bundles CUDA Toolkit 13.0. The required DLLs are extracted to the application data directory on first run.
 
 > [!NOTE]
 > Make sure you have current NVIDIA drivers installed. You can update them through [NVIDIA App](https://www.nvidia.com/en-us/software/nvidia-app/).
 
 #### Supported NVIDIA GPUs
 
-Koharu supports NVIDIA GPUs with compute capability 8.0 or higher.
+Yomika supports NVIDIA GPUs with compute capability 8.0 or higher.
 
 For GPU compatibility references, see [CUDA GPU Compute Capability](https://developer.nvidia.com/cuda-gpus).
 
 ### ZLUDA (experimental)
 
-Koharu supports experimental ZLUDA acceleration on Windows for AMD GPUs.
+Yomika supports experimental ZLUDA acceleration on Windows for AMD GPUs.
 ZLUDA is a CUDA compatibility layer that lets some CUDA workloads run on AMD GPUs.
 
 To use it, install the [AMD HIP SDK](https://www.amd.com/en/developer/resources/rocm-hub/hip-sdk.html).
 
 ### Metal
 
-Koharu supports Metal on Apple Silicon Macs. No extra runtime setup is required beyond a normal app install.
+Yomika supports Metal on Apple Silicon Macs. No extra runtime setup is required beyond a normal app install.
 
 ### Vulkan
 
-Koharu also supports Vulkan on Windows and Linux. This backend is currently used primarily for OCR and local LLM inference.
+Yomika also supports Vulkan on Windows and Linux. This backend is currently used primarily for OCR and local LLM inference.
 
 Detection and inpainting still depend on CUDA, ZLUDA, or Metal, so Vulkan is useful but not a full replacement for the main accelerated path. AMD and Intel GPUs can still benefit from it.
 
 ### CPU Fallback
 
-You can always force Koharu to use CPU for inference:
+You can always force Yomika to use CPU for inference:
 
 ```bash
 # macOS / Linux
-koharu --cpu
+yomika --cpu
 # Windows
-koharu.exe --cpu
+yomika.exe --cpu
 ```
 
-For backend selection, fallback behavior, and model runtime support, see [Acceleration and Runtime](https://koharu.rs/explanation/acceleration-and-runtime/).
+For backend selection, fallback behavior, and model runtime support, see [Acceleration and Runtime](docs/en-US/explanation/acceleration-and-runtime.md).
 
 ## ML Models
 
-Koharu uses a staged stack of vision and language models instead of trying to solve the entire page with a single network.
+Yomika uses a staged stack of vision and language models instead of trying to solve the entire page with a single network.
 
 ### Computer Vision Models
 
-Koharu uses multiple pretrained models, each tuned for a specific part of the page pipeline.
+Yomika uses multiple pretrained models, each tuned for a specific part of the page pipeline.
 
 #### Detection and Layout
 
@@ -217,13 +216,13 @@ This model helps infer source font and color characteristics for rendering.
 
 The required models are downloaded automatically on first use.
 
-Some models are consumed directly from upstream Hugging Face repos, while Rust-friendly safetensors conversions are hosted on [Hugging Face](https://huggingface.co/mayocream) when Koharu needs a converted bundle.
+Some models are consumed directly from upstream Hugging Face repos, while Rust-friendly safetensors conversions are hosted on [Hugging Face](https://huggingface.co/mayocream) when Yomika needs a converted bundle.
 
-For a closer look at the pipeline, see [Models and Providers](https://koharu.rs/explanation/models-and-providers/) and the [Technical Deep Dive](https://koharu.rs/explanation/technical-deep-dive/).
+For a closer look at the pipeline, see [Models and Providers](docs/en-US/explanation/models-and-providers.md) and the [Technical Deep Dive](docs/en-US/explanation/technical-deep-dive.md).
 
 ### Large Language Models
 
-Koharu supports both local and remote LLM backends. Local models run through [llama.cpp](https://github.com/ggml-org/llama.cpp) and are downloaded on demand. Hosted and self-hosted APIs are also supported when you want to use a provider instead of a downloaded model. When possible, Koharu also tries to preselect sensible defaults based on your system locale.
+Yomika supports both local and remote LLM backends. Local models run through [llama.cpp](https://github.com/ggml-org/llama.cpp) and are downloaded on demand. Hosted and self-hosted APIs are also supported when you want to use a provider instead of a downloaded model. When possible, Yomika also tries to preselect sensible defaults based on your system locale.
 
 #### General-Purpose Local Models
 
@@ -256,13 +255,13 @@ LLMs are downloaded on demand when you activate a model. For constrained memory 
 
 #### Cloud Providers
 
-Koharu supports hosted APIs from [OpenAI](https://platform.openai.com/), [Gemini](https://ai.google.dev/), [Claude](https://www.anthropic.com/api), and [DeepSeek](https://platform.deepseek.com/) instead of a local GGUF model.
+Yomika supports hosted APIs from [OpenAI](https://platform.openai.com/), [Gemini](https://ai.google.dev/), [Claude](https://www.anthropic.com/api), and [DeepSeek](https://platform.deepseek.com/) instead of a local GGUF model.
 
 Built-in cloud catalogs include current text-output models for OpenAI, Gemini, Claude, and DeepSeek, including GPT-5.5/5.4/5.x, Gemini 3.1/3/2.5/2.0, Claude Opus/Sonnet/Haiku 4.x, DeepSeek V4, and compatibility aliases such as `deepseek-chat` and `deepseek-reasoner`.
 
 #### Codex Image-to-Image Generation
 
-Koharu can use Codex for end-to-end image-to-image generation. This workflow sends the current source page image plus a user prompt to Codex, then stores the generated image as a rendered page result.
+Yomika can use Codex for end-to-end image-to-image generation. This workflow sends the current source page image plus a user prompt to Codex, then stores the generated image as a rendered page result.
 
 This feature requires a ChatGPT account with Codex access. Two-factor authentication must be enabled on the account before device-code login can complete successfully.
 
@@ -270,79 +269,69 @@ Codex image generation is useful when you want the model to translate visible te
 
 #### Machine Translation Providers
 
-For pure machine-translation use cases, Koharu also supports [DeepL](https://www.deepl.com/), [Google Cloud Translation](https://cloud.google.com/translate), and [Caiyun](https://fanyi.caiyunapp.com/). These providers translate without an LLM-style chat or system prompt; you provide an API key and Koharu uses the upstream translate endpoint directly.
+For pure machine-translation use cases, Yomika also supports [DeepL](https://www.deepl.com/), [Google Cloud Translation](https://cloud.google.com/translate), and [Caiyun](https://fanyi.caiyunapp.com/). These providers translate without an LLM-style chat or system prompt; you provide an API key and Yomika uses the upstream translate endpoint directly.
 
 #### OpenAI-Compatible Providers
 
-Koharu supports OpenAI-compatible endpoints such as LM Studio, OpenRouter, and other self-hosted or third-party APIs that expose `/v1/models` and `/v1/chat/completions`.
+Yomika supports OpenAI-compatible endpoints such as LM Studio, OpenRouter, and other self-hosted or third-party APIs that expose `/v1/models` and `/v1/chat/completions`.
 
 Cloud providers can be configured with API keys. OpenAI-compatible providers also need a custom base URL. API keys are stored securely in your system keychain instead of plain text config files. API keys are optional for local servers such as LM Studio, but are usually required for hosted services such as OpenRouter.
 
 Use a remote provider to avoid local model downloads, reduce VRAM or RAM requirements, or integrate with an existing hosted or self-hosted endpoint. Keep in mind that the OCR text selected for translation is sent to the provider you configured.
 
-For LM Studio, OpenRouter, and other OpenAI-style endpoints, see [Use OpenAI-Compatible APIs](https://koharu.rs/how-to/use-openai-compatible-api/). For provider configuration, see [Settings Reference](https://koharu.rs/reference/settings/).
+For LM Studio, OpenRouter, and other OpenAI-style endpoints, see [Use OpenAI-Compatible APIs](docs/en-US/how-to/use-openai-compatible-api.md). For provider configuration, see [Settings Reference](docs/en-US/reference/settings.md).
 
 ## Installation
 
-You can download the latest release of Koharu from the [releases page](https://github.com/mayocream/koharu/releases/latest).
+Build the current Yomika checkout by following [Build From Source](docs/en-US/how-to/build-from-source.md). Signed installers and prebuilt binaries will be listed on the [releases page](https://github.com/proxlavee/yomika/releases) when this repository publishes them. If something goes wrong, see [Troubleshooting](docs/en-US/how-to/troubleshooting.md).
 
-We provide prebuilt binaries for Windows, macOS, and Linux. For the standard install flow, see [Install Koharu](https://koharu.rs/how-to/install-koharu/). If something goes wrong, see [Troubleshooting](https://koharu.rs/how-to/troubleshooting/).
-
-Koharu can run offline with local models once the required runtimes, models, and fonts are already present on disk.
+Yomika can run offline with local models once the required runtimes, models, and fonts are already present on disk.
 
 ### WinGet
 
-On Windows, you can install Koharu with [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/):
-
-```bash
-winget install koharu
-```
+A Yomika WinGet package has not been verified for this repository. Use the source-build instructions until an owned package identifier is published.
 
 ### Homebrew
 
-On macOS, you can install Koharu with [Homebrew](https://brew.sh/):
-
-```bash
-brew install --cask koharu
-```
+A Yomika Homebrew cask has not been verified for this repository. Use the source-build instructions until an owned cask is published.
 
 ### Docker
 
-Koharu also publishes official Docker images for headless use. You can pull the latest image from GitHub Container Registry:
+The release workflow can publish a headless Docker image to GitHub Container Registry. After this repository publishes an image, pull it with:
 
 ```bash
-docker pull ghcr.io/mayocream/koharu:latest
+docker pull ghcr.io/proxlavee/yomika:latest
 ```
 
 Then run the container with the desired port mapping:
 
 ```bash
-docker run -p 4000:4000 --gpus all ghcr.io/mayocream/koharu:latest
+docker run -p 4000:4000 --gpus all ghcr.io/proxlavee/yomika:latest
 ```
 
 ## Troubleshooting
 
-Koharu provides a diagnostic mode that outputs detailed logs and system information to help identify issues with installation, GPU acceleration, model loading, and more. To enable it, run:
+Yomika provides a diagnostic mode that outputs detailed logs and system information to help identify issues with installation, GPU acceleration, model loading, and more. To enable it, run:
 
 ```bash
 # macOS / Linux
-koharu --debug
+yomika --debug
 # Windows
-koharu.exe --debug
+yomika.exe --debug
 ```
 
 You can also set the `RUST_LOG` environment variable to `debug` or `trace` to see more verbose logs:
 
 ```bash
 # macOS / Linux
-RUST_LOG=debug koharu
+RUST_LOG=debug yomika
 # Windows (PowerShell)
-$env:RUST_LOG="debug"; koharu.exe
+$env:RUST_LOG="debug"; yomika.exe
 ```
 
 ## Development
 
-To build Koharu from source, follow the steps below.
+To build Yomika from source, follow the steps below.
 
 ### Prerequisites
 
@@ -358,13 +347,13 @@ Optional dependencies for GPU acceleration builds:
 ### Install dependencies
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 ### Development
 
 ```bash
-bun dev
+bun run dev
 ```
 
 ### Build
@@ -375,23 +364,16 @@ bun run build
 
 The built binaries are written to `target/release`.
 
-For platform-specific build notes, see [Build From Source](https://koharu.rs/how-to/build-from-source/). For the local development workflow, see [Contributing](https://koharu.rs/contribute/introduction/).
-
-## Sponsorship
-
-If Koharu is useful in your workflow, consider sponsoring the project.
-
-- [GitHub Sponsors](https://github.com/sponsors/mayocream)
-- [Patreon](https://www.patreon.com/mayocream)
+For platform-specific build notes, see [Build From Source](docs/en-US/how-to/build-from-source.md). For the local development workflow, see [Contributing](docs/en-US/contribute/introduction.md).
 
 ## Contributors ❤️
 
-Thanks to all the contributors who have helped make Koharu better!
+Thanks to all the contributors who have helped make Yomika better!
 
-<a href="https://github.com/mayocream/koharu/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=mayocream/koharu" />
+<a href="https://github.com/proxlavee/yomika/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=proxlavee/yomika" alt="Yomika contributors" />
 </a>
 
 ## License
 
-Koharu is licensed under the [GNU General Public License v3.0](LICENSE).
+Yomika is licensed under the [GNU General Public License v3.0](LICENSE).

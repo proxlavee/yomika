@@ -4,7 +4,7 @@ title: Solução de problemas
 
 # Solução de problemas
 
-Esta página cobre os problemas mais comuns do Koharu na implementação atual: downloads na primeira execução, inicialização do runtime, fallback de GPU, acesso em headless e MCP, ordenação de estágios do pipeline e configuração para build a partir do código-fonte.
+Esta página cobre os problemas mais comuns do Yomika na implementação atual: downloads na primeira execução, inicialização do runtime, fallback de GPU, acesso em headless e MCP, ordenação de estágios do pipeline e configuração para build a partir do código-fonte.
 
 ## Antes de começar
 
@@ -19,7 +19,7 @@ Ao fazer diagnóstico de problemas, identifique primeiro qual camada está falha
 
 Isso costuma isolar o problema rapidamente.
 
-## O Koharu não inicia direito na primeira execução
+## O Yomika não inicia direito na primeira execução
 
 Causas possíveis:
 
@@ -31,27 +31,27 @@ Causas possíveis:
 Tente isto:
 
 1. espere mais na primeira inicialização, especialmente em discos ou redes mais lentos
-2. inicie o Koharu uma vez com `--download` para pré-baixar dependências de runtime sem abrir a GUI
+2. inicie o Yomika uma vez com `--download` para pré-baixar dependências de runtime sem abrir a GUI
 3. inicie uma vez com `--cpu` para verificar se o problema é relacionado à GPU
 4. inicie uma vez com `--debug` para obter logs orientados a console
 
 ```bash
 # macOS / Linux
-koharu --download
-koharu --cpu
-koharu --debug
+yomika --download
+yomika --cpu
+yomika --debug
 
 # Windows
-koharu.exe --download
-koharu.exe --cpu
-koharu.exe --debug
+yomika.exe --download
+yomika.exe --cpu
+yomika.exe --debug
 ```
 
 Se `--cpu` funciona e a inicialização normal não, o problema normalmente está no caminho de GPU e não na inicialização geral do app.
 
 ## Downloads de modelo ou runtime falham
 
-O Koharu precisa de acesso à rede na primeira vez para:
+O Yomika precisa de acesso à rede na primeira vez para:
 
 - pacotes de runtime do llama.cpp
 - arquivos de suporte de runtime de GPU quando aplicável
@@ -72,11 +72,11 @@ O que verificar:
 
 Se os downloads continuarem falhando, teste primeiro em outra rede. Essa é a forma mais rápida de separar um problema local da máquina de um problema de alcance upstream.
 
-Para uma explicação mais aprofundada dos caminhos de download de runtime e modelos do Koharu, além de verificações de navegador e `curl` para Hugging Face, GitHub e PyPI, veja [Downloads de Runtime e Modelos](runtime-and-model-downloads.md).
+Para uma explicação mais aprofundada dos caminhos de download de runtime e modelos do Yomika, além de verificações de navegador e `curl` para Hugging Face, GitHub e PyPI, veja [Downloads de Runtime e Modelos](runtime-and-model-downloads.md).
 
-## O Koharu faz fallback para CPU mesmo com uma GPU NVIDIA
+## O Yomika faz fallback para CPU mesmo com uma GPU NVIDIA
 
-Isso é esperado quando o Koharu não consegue confirmar suporte a CUDA 13.0.
+Isso é esperado quando o Yomika não consegue confirmar suporte a CUDA 13.0.
 
 O comportamento atual do runtime é:
 
@@ -89,10 +89,10 @@ O comportamento atual do runtime é:
 Tente isto:
 
 1. atualize o driver NVIDIA
-2. reinicie o Koharu depois da atualização
+2. reinicie o Yomika depois da atualização
 3. verifique o comportamento com `--debug`
 
-Se o driver for antigo ou a verificação de CUDA falhar, o Koharu deliberadamente prefere CPU a uma configuração CUDA parcialmente funcional.
+Se o driver for antigo ou a verificação de CUDA falhar, o Yomika deliberadamente prefere CPU a uma configuração CUDA parcialmente funcional.
 
 ## OCR, inpainting ou export diz que algo está faltando
 
@@ -147,7 +147,7 @@ Verifique o básico primeiro:
 Exemplo:
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 Depois abra:
@@ -158,7 +158,7 @@ http://localhost:4000
 
 Detalhe importante de implementação:
 
-- o Koharu faz bind em `127.0.0.1`
+- o Yomika faz bind em `127.0.0.1`
 
 Isso significa que a Web UI local só está disponível na mesma máquina, a menos que você exponha por conta própria através da sua configuração de rede.
 
@@ -176,7 +176,7 @@ Erros comuns:
 
 - usar a URL raiz em vez de `/mcp`
 - esquecer `--port`
-- tentar conectar depois que o processo do Koharu já encerrou
+- tentar conectar depois que o processo do Yomika já encerrou
 - tentar alcançar o serviço a partir de outra máquina sem expor explicitamente a porta
 
 Se o acesso normal à Web UI headless funciona mas o MCP não, confira primeiro a URL exata. Seleção de caminho errado é mais comum do que falha de servidor.
@@ -185,7 +185,7 @@ Se o cliente for Antigravity, Claude Desktop ou Claude Code, siga a configuraç�
 
 ## A importação parece não fazer nada
 
-O fluxo de importação atualmente documentado é baseado em imagem. O Koharu aceita:
+O fluxo de importação atualmente documentado é baseado em imagem. O Yomika aceita:
 
 - `.png`
 - `.jpg`
@@ -206,9 +206,9 @@ Use o tipo de saída que corresponde ao estado atual do pipeline:
 
 Lembre-se também:
 
-- exports renderizados usam sufixo `_koharu`
+- exports renderizados usam sufixo `_yomika`
 - exports inpainted usam sufixo `_inpainted`
-- export PSD usa `_koharu.psd`
+- export PSD usa `_yomika.psd`
 - o export em PSD clássico rejeita imagens acima de `30000 x 30000`
 
 Se a página for extremamente grande, redimensione ou divida antes de esperar que o export em PSD tenha sucesso.
@@ -225,7 +225,7 @@ O script wrapper Bun tenta descobrir os dois automaticamente, mas se qualquer um
 Use os comandos wrapper do projeto:
 
 ```bash
-bun install
+bun install --frozen-lockfile
 bun run build
 ```
 
@@ -238,7 +238,7 @@ bun tauri build --release --no-bundle
 Se quiser builds Rust de mais baixo nível, prefira:
 
 ```bash
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 ```
 
 Se você só precisa confirmar que o app funciona de alguma forma, tente primeiro uma inicialização de runtime só em CPU, em vez de debugar imediatamente o toolchain completo de CUDA.
@@ -271,7 +271,7 @@ Nesse ponto, colete:
 
 ## Páginas relacionadas
 
-- [Instalar o Koharu](install-koharu.md)
+- [Instalar o Yomika](install-yomika.md)
 - [Executar nos Modos GUI, Headless e MCP](run-gui-headless-and-mcp.md)
 - [Configurar Clientes MCP](configure-mcp-clients.md)
 - [Build a Partir do Código-Fonte](build-from-source.md)

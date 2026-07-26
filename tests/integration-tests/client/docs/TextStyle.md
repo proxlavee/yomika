@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**color** | **Vec<u32>** |  | 
+**color** | **Vec<u32>** |  |
 **effect** | Option<[**models::TextShaderEffect**](TextShaderEffect.md)> |  | [optional]
-**font_families** | **Vec<String>** |  | 
+**font_families** | **Vec<String>** |  |
 **font_size** | Option<**f32**> |  | [optional]
 **stroke** | Option<[**models::TextStrokeStyle**](TextStrokeStyle.md)> |  | [optional]
 **text_align** | Option<[**models::TextAlign**](TextAlign.md)> |  | [optional]

@@ -4,7 +4,7 @@ title: Usar Geração de Imagem com Codex
 
 # Usar Geração de Imagem com Codex
 
-O Koharu pode usar o Codex para geração image-to-image de ponta a ponta. Esse fluxo envia uma imagem de página de origem e um prompt ao Codex, depois salva a imagem gerada como resultado renderizado da página.
+O Yomika pode usar o Codex para geração image-to-image de ponta a ponta. Esse fluxo envia uma imagem de página de origem e um prompt ao Codex, depois salva a imagem gerada como resultado renderizado da página.
 
 ## Requisitos
 
@@ -24,7 +24,7 @@ A geração image-to-image do Codex é um fluxo de redesenho de página inteira.
 - preservar layout dos painéis, balões, retículas e composição
 - produzir uma imagem de página gerada em uma única passagem
 
-Isso é separado do pipeline local em etapas do Koharu, no qual detecção, OCR, inpainting, tradução e renderização rodam como passos individuais. O fluxo do Codex envia a imagem da página para um serviço remoto e recebe uma imagem gerada como resultado.
+Isso é separado do pipeline local em etapas do Yomika, no qual detecção, OCR, inpainting, tradução e renderização rodam como passos individuais. O fluxo do Codex envia a imagem da página para um serviço remoto e recebe uma imagem gerada como resultado.
 
 ## Prompt
 
@@ -42,7 +42,7 @@ Para edições mais estreitas, descreva a alteração desejada e o que precisa s
 
 Esse recurso envia a imagem da página de origem e o prompt ao backend do ChatGPT Codex. Use o pipeline local quando precisar de processamento offline ou não quiser enviar imagens de páginas para um provedor remoto.
 
-A geração de imagem do Codex depende do serviço upstream da OpenAI. Se a geração falhar, o Koharu mostra o texto de resposta upstream e o ID da requisição quando disponíveis. Tentar novamente pode resolver falhas transitórias. Falhas persistentes podem indicar limitações de acesso da conta, disponibilidade do serviço ou suporte do backend para chamadas da ferramenta de geração de imagem.
+A geração de imagem do Codex depende do serviço upstream da OpenAI. Se a geração falhar, o Yomika mostra o texto de resposta upstream e o ID da requisição quando disponíveis. Tentar novamente pode resolver falhas transitórias. Falhas persistentes podem indicar limitações de acesso da conta, disponibilidade do serviço ou suporte do backend para chamadas da ferramenta de geração de imagem.
 
 ## Quando usar
 

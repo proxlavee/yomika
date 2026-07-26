@@ -4,13 +4,13 @@ title: ソースからビルドする
 
 # ソースからビルドする
 
-ビルド済みリリースを使わずにローカルで Koharu をコンパイルしたい場合は、まずリポジトリの Bun ラッパーを使ってください。これは通常の開発フローに合わせた経路で、Tauri を直接呼ぶだけでは拾えないプラットフォーム固有のセットアップも処理します。
+ビルド済みリリースを使わずにローカルで Yomika をコンパイルしたい場合は、まずリポジトリの Bun ラッパーを使ってください。これは通常の開発フローに合わせた経路で、Tauri を直接呼ぶだけでは拾えないプラットフォーム固有のセットアップも処理します。
 
 ## ビルドに含まれるもの
 
 デスクトップ向けのフルビルドには次が含まれます。
 
-- `koharu/` の Rust アプリケーション
+- `crates/yomika/` の Rust アプリケーション
 - `ui/` の埋め込み UI
 - GUI モードと headless モードの両方で使われるローカル HTTP / RPC / MCP サーバー
 
@@ -26,6 +26,10 @@ title: ソースからビルドする
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.95 以降 (Rust 2024 edition)
 - [Bun](https://bun.sh/) 1.0 以降
+- Rust bindgen が利用できる `libclang` 共有ライブラリを含む LLVM / Clang
+
+Linux ビルドには通常の Tauri システムパッケージも必要です。Debian、Ubuntu、
+WSL では、それらと一緒に `libclang-dev` をインストールしてください。
 
 Windows でソースビルドする場合は、次も必要です。
 
@@ -37,7 +41,7 @@ Windows でソースビルドする場合は、次も必要です。
 ## 依存関係を入れる
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 ## 推奨されるデスクトップビルド
@@ -52,8 +56,8 @@ Windows では、このラッパーがビルド開始前に `nvcc` と `cl.exe` 
 
 主なバイナリは `target/release` に出力されます。
 
-- `target/release/koharu`
-- Windows では `target/release/koharu.exe`
+- `target/release/yomika`
+- Windows では `target/release/yomika.exe`
 
 ## 開発ビルド
 
@@ -85,17 +89,17 @@ Bun と Tauri のラッパーを意図的に迂回し、Rust クレートだけ�
 
 ```bash
 # Windows / Linux
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 
 # macOS Apple Silicon
-bun cargo build --release -p koharu --features=metal
+bun cargo build --release -p yomika --features=metal
 ```
 
 これは低レベルな Rust 作業には便利ですが、通常のデスクトップアプリビルドとしては、Tauri のフルフローを保てる `bun run build` のほうが適しています。
 
 ## ビルド後、実行時に何が起きるか
 
-アプリをビルドしても、すべてのモデル重みが同梱されるわけではありません。初回起動時には、Koharu はまだ次を行う必要があります。
+アプリをビルドしても、すべてのモデル重みが同梱されるわけではありません。初回起動時には、Yomika はまだ次を行う必要があります。
 
 - ローカル app-data ディレクトリにランタイムライブラリを初期化する
 - 既定の vision / OCR モデル群をダウンロードする

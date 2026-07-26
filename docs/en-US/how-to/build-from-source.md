@@ -4,13 +4,13 @@ title: Build From Source
 
 # Build From Source
 
-If you want to compile Koharu locally instead of using a prebuilt release, start with the repository's Bun wrapper. It matches the project's build flow and handles platform-specific setup that a direct Tauri invocation does not.
+If you want to compile Yomika locally instead of using a prebuilt release, start with the repository's Bun wrapper. It matches the project's build flow and handles platform-specific setup that a direct Tauri invocation does not.
 
 ## What the build includes
 
 A full desktop build includes:
 
-- the Rust application in `koharu/`
+- the Rust application in `crates/yomika/`
 - the embedded UI from `ui/`
 - the local HTTP, RPC, and MCP server used by both GUI and headless modes
 
@@ -26,6 +26,10 @@ The default desktop build is platform-aware:
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.95 or later (Rust 2024 edition)
 - [Bun](https://bun.sh/) 1.0 or later
+- LLVM/Clang with a usable `libclang` shared library (required by Rust bindgen)
+
+Linux builds also need the standard Tauri system packages. On Debian, Ubuntu,
+or WSL, install `libclang-dev` alongside those packages.
 
 For Windows source builds, install:
 
@@ -37,7 +41,7 @@ The repository's `scripts/dev.ts` helper tries to discover `nvcc` and `cl.exe` a
 ## Install dependencies
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 ## Recommended desktop build
@@ -52,8 +56,8 @@ On Windows, that wrapper also tries to discover `nvcc` and `cl.exe` automaticall
 
 The main binaries are written to `target/release`:
 
-- `target/release/koharu`
-- `target/release/koharu.exe` on Windows
+- `target/release/yomika`
+- `target/release/yomika.exe` on Windows
 
 ## Development build
 
@@ -85,17 +89,17 @@ Examples:
 
 ```bash
 # Windows / Linux
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 
 # macOS Apple Silicon
-bun cargo build --release -p koharu --features=metal
+bun cargo build --release -p yomika --features=metal
 ```
 
 This is useful for lower-level Rust work, but `bun run build` remains the better choice for a normal desktop build because it preserves the full Tauri packaging flow.
 
 ## What happens at runtime after the build
 
-Building the app does not bundle every model weight. On first launch, Koharu still needs to:
+Building the app does not bundle every model weight. On first launch, Yomika still needs to:
 
 - initialize runtime libraries under the local app data directory
 - download the default vision and OCR models

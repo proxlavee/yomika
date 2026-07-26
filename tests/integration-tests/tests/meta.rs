@@ -1,8 +1,8 @@
 //! Meta, engines, config, fonts, LLM catalog — read-mostly endpoints.
 
-use koharu_client::apis::default_api as api;
-use koharu_client::models;
-use koharu_integration_tests::TestApp;
+use yomika_client::apis::default_api as api;
+use yomika_client::models;
+use yomika_integration_tests::TestApp;
 
 #[tokio::test]
 async fn meta_returns_version_and_device() -> anyhow::Result<()> {
@@ -50,6 +50,7 @@ async fn config_patch_merges_and_persists() -> anyhow::Result<()> {
     let app = TestApp::spawn().await?;
 
     let patch = models::ConfigPatch {
+        data: None,
         http: Some(Some(Box::new(models::HttpConfigPatch {
             connect_timeout: Some(Some(42)),
             read_timeout: None,

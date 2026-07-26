@@ -14,8 +14,8 @@ use serde::{Deserialize, Serialize};
 ///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum ExportFormat {
-    #[serde(rename = "khr")]
-    Khr,
+    #[serde(rename = "ymk")]
+    Ymk,
     #[serde(rename = "psd")]
     Psd,
     #[serde(rename = "rendered")]
@@ -27,7 +27,7 @@ pub enum ExportFormat {
 impl std::fmt::Display for ExportFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Khr => write!(f, "khr"),
+            Self::Ymk => write!(f, "ymk"),
             Self::Psd => write!(f, "psd"),
             Self::Rendered => write!(f, "rendered"),
             Self::Inpainted => write!(f, "inpainted"),
@@ -37,6 +37,6 @@ impl std::fmt::Display for ExportFormat {
 
 impl Default for ExportFormat {
     fn default() -> ExportFormat {
-        Self::Khr
+        Self::Ymk
     }
 }

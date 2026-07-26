@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ProjectSummary {
-    /// Stable identifier — the `.khrproj` directory basename (without the extension). Clients address projects by this.
+    /// Stable identifier — the `.ymkproj` directory basename (without the extension). Clients address projects by this.
     #[serde(rename = "id")]
     pub id: String,
     #[serde(rename = "name")]

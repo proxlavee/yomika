@@ -4,7 +4,7 @@ title: HTTP API 参考
 
 # HTTP API 参考
 
-Koharu 在本地暴露 HTTP API：
+Yomika 在本地暴露 HTTP API：
 
 ```text
 http://127.0.0.1:<PORT>/api/v1
@@ -19,7 +19,7 @@ http://127.0.0.1:<PORT>/api/v1
 - API 与 GUI 或 headless 运行时由同一个进程提供
 - 服务器默认绑定到 `127.0.0.1`；使用 `--host` 可绑定到其他地址
 - API 与 MCP 服务器共享同一个已加载的项目、模型和管线状态
-- 没有提供 `--port` 时，Koharu 会选择一个随机本地端口
+- 没有提供 `--port` 时，Yomika 会选择一个随机本地端口
 - 在应用完成启动之前，除 `/api/v1/downloads`、`/api/v1/operations` 与 `/api/v1/events` 之外的所有路由都会返回 `503 Service Unavailable`
 
 ## 资源模型
@@ -73,12 +73,12 @@ API 是以项目为中心的。同一时间只会打开一个项目，它包含�
 | -------- | ----------------------------- | ------------------------------------------------- |
 | `GET`    | `/projects`                   | 列出受管理的项目                                  |
 | `POST`   | `/projects`                   | 创建新项目（请求体 `{ name }`）                    |
-| `POST`   | `/projects/import`            | 把一个 `.khr` 归档解压到新目录并打开                |
+| `POST`   | `/projects/import`            | 把一个 `.ymk` 归档解压到新目录并打开                |
 | `PUT`    | `/projects/current`           | 通过 `id` 打开一个受管理项目                       |
 | `DELETE` | `/projects/current`           | 关闭当前会话                                      |
 | `POST`   | `/projects/current/export`    | 导出当前项目；返回二进制字节                       |
 
-`POST /projects/current/export` 接受 `{ format, pages? }`，其中 `format` 是 `khr`、`psd`、`rendered`、`inpainted` 之一。当某种格式会产生多个文件时，响应类型是 `application/zip`。
+`POST /projects/current/export` 接受 `{ format, pages? }`，其中 `format` 是 `ymk`、`psd`、`rendered`、`inpainted` 之一。当某种格式会产生多个文件时，响应类型是 `application/zip`。
 
 ### 页面
 
@@ -100,7 +100,7 @@ API 是以项目为中心的。同一时间只会打开一个项目，它包含�
 | `GET` | `/scene.bin`       | postcard 编码的 `Snapshot { epoch, scene }`，供 Tauri 客户端使用     |
 | `GET` | `/blobs/{hash}`    | 按 Blake3 哈希返回 blob 的原始字节                                  |
 
-`/scene.bin` 会在 `x-koharu-epoch` 响应头里附带当前 epoch。
+`/scene.bin` 会在 `x-yomika-epoch` 响应头里附带当前 epoch。
 
 ### 历史（修改）
 
@@ -197,7 +197,7 @@ API key 保存在平台凭据存储中，而不是 `config.toml` 里。PATCH `ap
 
 ## 事件流
 
-Koharu 通过以下地址暴露 Server-Sent Events：
+Yomika 通过以下地址暴露 Server-Sent Events：
 
 ```text
 GET /events

@@ -4,13 +4,13 @@ title: ランタイムとモデルのダウンロード
 
 # ランタイムとモデルのダウンロード
 
-Koharu はローカルファーストですが、初回利用が完全オフラインというわけではありません。ローカルのパイプラインを動かす前に、ネイティブランタイムのファイルやモデルの重みをダウンロードする必要がある場合があります。
+Yomika はローカルファーストですが、初回利用が完全オフラインというわけではありません。ローカルのパイプラインを動かす前に、ネイティブランタイムのファイルやモデルの重みをダウンロードする必要がある場合があります。
 
-これらのダウンロードに失敗する場合は、まずネットワーク経路を確認してください。マシン、ISP、ファイアウォール、プロキシ、または地域制限で到達できないホストからは、Koharu もファイルを取得できません。
+これらのダウンロードに失敗する場合は、まずネットワーク経路を確認してください。マシン、ISP、ファイアウォール、プロキシ、または地域制限で到達できないホストからは、Yomika もファイルを取得できません。
 
-## Koharu がダウンロードするもの
+## Yomika がダウンロードするもの
 
-Koharu がダウンロードするものは、大きく 3 種類あります。
+Yomika がダウンロードするものは、大きく 3 種類あります。
 
 - `llama.cpp` のバイナリ、対応 NVIDIA 環境の CUDA 支援ファイル、対応 Windows AMD 環境の ZLUDA ファイルなどのネイティブランタイムパッケージ
 - 既定のローカルページパイプラインに必要な bootstrap モデルパッケージ
@@ -18,18 +18,18 @@ Koharu がダウンロードするものは、大きく 3 種類あります。
 
 重要な挙動は次の通りです。
 
-- `koharu --download` は bootstrap 対象のランタイムとモデルパッケージを準備して終了する
+- `yomika --download` は bootstrap 対象のランタイムとモデルパッケージを準備して終了する
 - ピッカーに表示されるすべてのオプションエンジンやローカル LLM をまとめてダウンロードするわけではない
 
 ## ファイルの保存場所
 
-Koharu はランタイムパッケージとモデルキャッシュを、設定された `Data Path` の下に保存します。既定値は、各プラットフォームのローカル app-data ディレクトリ配下の `Koharu` です。
+Yomika はランタイムパッケージとモデルキャッシュを、設定された `Data Path` の下に保存します。既定値は、各プラットフォームのローカル app-data ディレクトリ配下の `Yomika` です。
 
 代表的な例:
 
-- Windows: `%LOCALAPPDATA%\Koharu`
-- macOS: `~/Library/Application Support/Koharu`
-- Linux: `~/.local/share/Koharu`
+- Windows: `%LOCALAPPDATA%\Yomika`
+- macOS: `~/Library/Application Support/Yomika`
+- Linux: `~/.local/share/Yomika`
 
 現在の実装で重要なサブディレクトリは次の通りです。
 
@@ -48,7 +48,7 @@ Koharu はランタイムパッケージとモデルキャッシュを、設定�
 意味としては次の通りです。
 
 - `runtime/.downloads` はネイティブランタイムのダウンロードアーカイブをためる共通キャッシュ
-- `runtime/*` には Koharu が実際に読み込む展開済みライブラリが入る
+- `runtime/*` には Yomika が実際に読み込む展開済みライブラリが入る
 - `models/huggingface` は vision モデルとローカル GGUF モデルファイルに使う Hugging Face キャッシュ
 
 すべてのプラットフォームで全部のディレクトリが存在するわけではありません。たとえば `zluda/` は Windows 専用で、対応 AMD 環境でのみ意味があります。
@@ -57,11 +57,11 @@ Koharu はランタイムパッケージとモデルキャッシュを、設定�
 
 ## ランタイムのダウンロードはどう動くか
 
-Koharu の起動時、または `koharu --download` 実行時に、現在のプラットフォームと計算ポリシーに応じた bootstrap パッケージを準備します。
+Yomika の起動時、または `yomika --download` 実行時に、現在のプラットフォームと計算ポリシーに応じた bootstrap パッケージを準備します。
 
 大まかな流れは次の通りです。
 
-1. Koharu が現在のデータパス配下にランタイムとモデルのディレクトリを作る。
+1. Yomika が現在のデータパス配下にランタイムとモデルのディレクトリを作る。
 2. 各 bootstrap パッケージがすでに最新状態か確認する。
 3. ネイティブランタイムパッケージが欠けているか古い場合、アーカイブを `runtime/.downloads` にダウンロードする。
 4. 必要なファイルをランタイムごとのインストール先ディレクトリに展開し、install marker を書く。
@@ -81,7 +81,7 @@ Koharu の起動時、または `koharu --download` 実行時に、現在のプ�
 
 大まかな流れは次の通りです。
 
-1. Koharu が特定の `repo/file` の組を要求する。
+1. Yomika が特定の `repo/file` の組を要求する。
 2. まずローカルの Hugging Face キャッシュを確認する。
 3. すでにキャッシュ済みなら、そのまま再利用する。
 4. まだ無ければ、そのファイルだけをダウンロードして Hugging Face キャッシュレイアウトに保存する。
@@ -91,15 +91,15 @@ Koharu の起動時、または `koharu --download` 実行時に、現在のプ�
 
 ## Hugging Face とは何か
 
-[Hugging Face](https://huggingface.co/) はモデルホスティングのプラットフォームです。Koharu では、多くのモデルファイルの置き場所として使われています。
+[Hugging Face](https://huggingface.co/) はモデルホスティングのプラットフォームです。Yomika では、多くのモデルファイルの置き場所として使われています。
 
-Hugging Face 自体が Koharu の推論を実行しているわけではありません。Koharu は Hugging Face からモデルファイルをダウンロードしてローカルにキャッシュし、その後はローカルのランタイムスタック上で自分のマシンで実行します。
+Hugging Face 自体が Yomika の推論を実行しているわけではありません。Yomika は Hugging Face からモデルファイルをダウンロードしてローカルにキャッシュし、その後はローカルのランタイムスタック上で自分のマシンで実行します。
 
-ネットワーク上で Hugging Face がブロックされている場合、アプリ内のどのボタンを押しても Koharu はそのモデルファイルを取得できません。
+ネットワーク上で Hugging Face がブロックされている場合、アプリ内のどのボタンを押しても Yomika はそのモデルファイルを取得できません。
 
 ## ここでいう「インターネット接続」とは何か
 
-Koharu にとって「ネットにつながっている」とは、「Wi-Fi アイコンがつながっている」「ブラウザで Google が開く」だけでは不十分です。
+Yomika にとって「ネットにつながっている」とは、「Wi-Fi アイコンがつながっている」「ブラウザで Google が開く」だけでは不十分です。
 
 実際に重要なのは次の点です。
 
@@ -110,9 +110,9 @@ Koharu にとって「ネットにつながっている」とは、「Wi-Fi ア�
 
 無関係なサイトが開けることは、`huggingface.co`、`github.com`、`pypi.org` に現在のネットワークから到達できる証明にはなりません。
 
-## まず Koharu の外で接続を確認する
+## まず Yomika の外で接続を確認する
 
-これらの確認が Koharu の外で失敗するなら、先にネットワーク経路を直してください。それは Koharu のバグではありません。
+これらの確認が Yomika の外で失敗するなら、先にネットワーク経路を直してください。それは Yomika のバグではありません。
 
 ### ブラウザでの確認
 
@@ -123,7 +123,7 @@ Koharu にとって「ネットにつながっている」とは、「Wi-Fi ア�
 - `https://github.com`
 - `https://pypi.org`
 
-ブラウザで開けないなら、Koharu からも取得できません。
+ブラウザで開けないなら、Yomika からも取得できません。
 
 ### macOS / Linux での確認
 
@@ -163,26 +163,26 @@ curl.exe -L --max-time 20 -o NUL -w "%{http_code}\n" `
 
 - `huggingface.co` だけが timeout、reset、または読み込み完了しないが、無関係な他サイトは開く
 - 上の直接ファイル確認で `200` が返らない
-- 同じ失敗がブラウザ、`curl`、Koharu のすべてで再現する
+- 同じ失敗がブラウザ、`curl`、Yomika のすべてで再現する
 - モバイル hotspot など別ネットワークでは動くのに、普段のネットワークでは失敗する
 - GitHub や PyPI は使えるが、Hugging Face だけ使えない
 
 ネットワークを変えると解決するなら、原因はネットワーク経路です。
 
-同じマシン上で Koharu の外から見ても Hugging Face が使えないなら、Koharu のバグ報告より先にそちらを解決してください。
+同じマシン上で Yomika の外から見ても Hugging Face が使えないなら、Yomika のバグ報告より先にそちらを解決してください。
 
-## 外部確認が通った後に Koharu で試す
+## 外部確認が通った後に Yomika で試す
 
-ブラウザと `curl` の確認が通ったら、Koharu 自体をテストしてください。
+ブラウザと `curl` の確認が通ったら、Yomika 自体をテストしてください。
 
 ```bash
 # macOS / Linux
-koharu --download --debug
-koharu --cpu --download --debug
+yomika --download --debug
+yomika --cpu --download --debug
 
 # Windows
-koharu.exe --download --debug
-koharu.exe --cpu --download --debug
+yomika.exe --download --debug
+yomika.exe --cpu --download --debug
 ```
 
 両方のコマンドが有用な理由:
@@ -197,12 +197,12 @@ koharu.exe --cpu --download --debug
 まず次を確認してください。
 
 - 同じマシンのブラウザで Hugging Face、GitHub、PyPI を開けるか
-- 上の `curl` 確認が Koharu の外で成功するか
+- 上の `curl` 確認が Yomika の外で成功するか
 - 別ネットワークに変えると挙動が変わるか
 - `--cpu --download` と `--download` で挙動に違いがあるか
 - 現在の `Data Path` はどこか
-- Koharu が出した正確なエラーテキストは何か
+- Yomika が出した正確なエラーテキストは何か
 
-Koharu の外でホストに到達できないなら、先にネットワーク、ファイアウォール、プロキシ、VPN、または ISP 側の問題として対処してください。
+Yomika の外でホストに到達できないなら、先にネットワーク、ファイアウォール、プロキシ、VPN、または ISP 側の問題として対処してください。
 
-外部確認が通っているのに Koharu だけ失敗する場合は、そのときに上の情報を添えて Koharu のバグを報告してください。
+外部確認が通っているのに Yomika だけ失敗する場合は、そのときに上の情報を添えて Yomika のバグを報告してください。

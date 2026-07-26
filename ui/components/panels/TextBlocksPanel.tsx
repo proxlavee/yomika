@@ -3,7 +3,6 @@
 import { Languages, LoaderCircleIcon, Trash2Icon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect } from 'react'
-import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -69,21 +68,21 @@ export function TextBlocksPanel() {
   const accordionValue = selectedIndex >= 0 ? selectedIndex.toString() : ''
 
   const patchText = async (nodeId: string, patch: TextDataPatch) => {
-    await applyOp(
+    const editEpoch = await applyOp(
       ops.updateNode(page.id, nodeId, {
         data: { text: patch } as never,
       }),
     )
-    queueAutoRender(page.id)
+    queueAutoRender(page.id, editEpoch)
   }
 
   const removeNode = async (nodeId: string) => {
     const node = page.nodes[nodeId]
     if (!node) return
     const idx = Object.keys(page.nodes).indexOf(nodeId)
-    await applyOp(ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx))
+    const editEpoch = await applyOp(ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx))
     clearSelection()
-    queueAutoRender(page.id)
+    queueAutoRender(page.id, editEpoch)
   }
 
   const removeNodes = async (nodeIds: string[]) => {
@@ -93,16 +92,16 @@ export function TextBlocksPanel() {
       const idx = Object.keys(page.nodes).indexOf(nodeId)
       return [ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx)]
     })
-    await applyOp(ops.batch('removeNodes', batch))
+    const editEpoch = await applyOp(ops.batch('removeNodes', batch))
     clearSelection()
-    queueAutoRender(page.id)
+    queueAutoRender(page.id, editEpoch)
   }
 
   const generate = async (nodeId: string) => {
     if (!page) return
     const cfg = await getConfig()
     const translator = cfg.pipeline?.translator || 'llm'
-    const renderer = cfg.pipeline?.renderer || 'koharu-renderer'
+    const renderer = cfg.pipeline?.renderer || 'yomika-renderer'
     const editor = useEditorUiStore.getState()
     const prefs = usePreferencesStore.getState()
     // Keep rendering page-scoped, but constrain translation to the clicked block.

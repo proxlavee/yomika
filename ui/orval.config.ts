@@ -1,7 +1,7 @@
 import { defineConfig } from 'orval'
 
 export default defineConfig({
-  koharu: {
+  yomika: {
     input: './openapi.json',
     output: {
       target: './lib/api',
@@ -9,8 +9,18 @@ export default defineConfig({
       client: 'react-query',
       mode: 'tags-split',
       baseUrl: '/api/v1',
-      mock: true,
+      mock: {
+        generators: [{ type: 'msw' }],
+      },
       override: {
+        mock: {
+          properties: {
+            'login.status': 'pending',
+          },
+          schemas: {
+            TextStyle: { properties: { textAlign: 'left' } },
+          },
+        },
         fetch: {
           includeHttpResponseReturnType: false,
         },
@@ -27,9 +37,9 @@ export default defineConfig({
           },
         },
         query: {
-          options: {
-            gcTime: 5 * 60 * 1000,
-            retry: 1,
+          queryOptions: {
+            path: './lib/api/queryDefaults.ts',
+            name: 'withQueryDefaults',
           },
         },
       },

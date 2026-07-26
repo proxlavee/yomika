@@ -13,6 +13,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ExportProjectRequest {
+    /// Optional global font override (from UI preferences).
+    #[serde(
+        rename = "defaultFont",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub default_font: Option<Option<String>>,
     #[serde(rename = "format")]
     pub format: models::ExportFormat,
     /// Optional subset of pages; defaults to every page.
@@ -28,6 +36,7 @@ pub struct ExportProjectRequest {
 impl ExportProjectRequest {
     pub fn new(format: models::ExportFormat) -> ExportProjectRequest {
         ExportProjectRequest {
+            default_font: None,
             format,
             pages: None,
         }

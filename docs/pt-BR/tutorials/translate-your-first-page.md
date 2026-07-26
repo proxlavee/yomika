@@ -4,27 +4,27 @@ title: Traduza sua primeira página
 
 # Traduza sua primeira página
 
-Este tutorial percorre o fluxo padrão do Koharu para uma única página de mangá: importar, detectar, reconhecer, traduzir, revisar e exportar.
+Este tutorial percorre o fluxo padrão do Yomika para uma única página de mangá: importar, detectar, reconhecer, traduzir, revisar e exportar.
 
 ## Antes de começar
 
-- Instale o Koharu a partir da release mais recente no GitHub
+- Instale o Yomika a partir da release mais recente no GitHub
 - Comece com uma imagem de página nítida em `.png`, `.jpg`, `.jpeg` ou `.webp`
 - Confirme que você tem VRAM ou RAM local suficiente para o modelo de sua preferência, ou planeje usar um provedor remoto
 
-Se você ainda não instalou o Koharu, comece por [Instalar o Koharu](../how-to/install-koharu.md).
+Se você ainda não instalou o Yomika, comece por [Instalar o Yomika](../how-to/install-yomika.md).
 
-## 1. Abra o Koharu
+## 1. Abra o Yomika
 
 Abra o aplicativo desktop normalmente.
 
-Na primeira execução, o Koharu pode levar algum tempo inicializando os pacotes de runtime locais e baixando o stack de visão padrão. Isso é esperado e geralmente acontece apenas uma vez por máquina ou por atualização de runtime.
+Na primeira execução, o Yomika pode levar algum tempo inicializando os pacotes de runtime locais e baixando o stack de visão padrão. Isso é esperado e geralmente acontece apenas uma vez por máquina ou por atualização de runtime.
 
 ## 2. Importe uma página
 
 Carregue a imagem da sua página no app.
 
-No momento, o fluxo de importação documentado é baseado em imagem, e não em arquivo de projeto. Se você importar uma pasta em vez de um único arquivo, o Koharu filtra recursivamente para manter apenas os arquivos de imagem suportados.
+No momento, o fluxo de importação documentado é baseado em imagem, e não em arquivo de projeto. Se você importar uma pasta em vez de um único arquivo, o Yomika filtra recursivamente para manter apenas os arquivos de imagem suportados.
 
 Na primeira tentativa, use uma página limpa para que seja fácil avaliar:
 
@@ -35,14 +35,14 @@ Na primeira tentativa, use uma página limpa para que seja fácil avaliar:
 
 ## 3. Detecte o texto e rode o OCR
 
-Use o pipeline de visão embutido do Koharu para:
+Use o pipeline de visão embutido do Yomika para:
 
 - detectar regiões de layout com aparência de texto
 - construir uma máscara de segmentação para a limpeza
 - estimar dicas de fonte e cor
 - reconhecer o texto de origem com OCR
 
-Por baixo dos panos, o Koharu não apenas roda OCR na página inteira. Ele primeiro cria blocos de texto, recorta essas regiões e então executa o OCR nas áreas recortadas.
+Por baixo dos panos, o Yomika não apenas roda OCR na página inteira. Ele primeiro cria blocos de texto, recorta essas regiões e então executa o OCR nas áreas recortadas.
 
 Depois da detecção e do OCR, revise a página antes de traduzir. Procure por:
 
@@ -60,7 +60,7 @@ Escolha entre:
 - um modelo GGUF local se você quiser que tudo permaneça na sua máquina
 - um provedor remoto se quiser evitar o download de modelos locais ou inferência local pesada
 
-O Koharu pode usar OpenAI, Gemini, Claude, DeepSeek e endpoints compatíveis com OpenAI, como LM Studio ou OpenRouter.
+O Yomika pode usar OpenAI, Gemini, Claude, DeepSeek e endpoints compatíveis com OpenAI, como LM Studio ou OpenRouter.
 
 Se você quiser configurar o LM Studio, o OpenRouter ou outro endpoint no estilo OpenAI, siga [Use APIs compatíveis com OpenAI](../how-to/use-openai-compatible-api.md).
 
@@ -68,19 +68,19 @@ Na prática:
 
 - modelos locais são melhores quando privacidade e uso offline importam mais
 - modelos remotos são mais fáceis quando sua máquina tem pouca memória
-- ao usar um provedor remoto, o Koharu envia o texto do OCR para tradução, em vez da imagem inteira da página
+- ao usar um provedor remoto, o Yomika envia o texto do OCR para tradução, em vez da imagem inteira da página
 
 ## 5. Traduza e revise
 
 Rode a tradução na página e então inspecione o resultado com atenção.
 
-O Koharu ajuda com o layout do texto e com a renderização vertical de CJK, mas a página final ainda se beneficia de uma revisão manual. Foque em:
+O Yomika ajuda com o layout do texto e com a renderização vertical de CJK, mas a página final ainda se beneficia de uma revisão manual. Foque em:
 
 - nomes e terminologia
 - tom de voz e estilo dos personagens
 - quebras de linha e ajuste aos balões
 - escolha de fonte e legibilidade do contorno
-  A escolha padrão de contorno do Koharu agora seleciona automaticamente um traço preto ou branco para garantir contraste, mas você ainda pode sobrescrever isso manualmente quando a página exigir algo diferente.
+  A escolha padrão de contorno do Yomika agora seleciona automaticamente um traço preto ou branco para garantir contraste, mas você ainda pode sobrescrever isso manualmente quando a página exigir algo diferente.
 - blocos cujo OCR de origem pareceu incerto
 
 Se uma tradução estiver correta na leitura, mas ainda parecer apertada, ajuste o bloco de texto ou a estilização antes de exportar.
@@ -108,7 +108,7 @@ Os ajustes mais comuns são:
 - trocar para um modelo de tradução mais forte
 - exportar em PSD e finalizar a página com uma limpeza manual do letreiramento
 
-O Koharu funciona melhor quando você trata o pipeline como uma primeira passagem rápida e depois aplica revisão manual onde a página precisar.
+O Yomika funciona melhor quando você trata o pipeline como uma primeira passagem rápida e depois aplica revisão manual onde a página precisar.
 
 ## Próximos passos
 

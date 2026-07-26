@@ -14,7 +14,7 @@ import {
   invalidateCurrentLlm,
   switchProject,
   updateConfig,
-  uploadKhrArchive,
+  uploadYmkArchive,
   uploadPages,
 } from '@/lib/io/scene'
 import { ops } from '@/lib/ops'
@@ -155,7 +155,7 @@ describe('pages + archive uploads', () => {
     expect(isInvalidated(getGetSceneJsonQueryKey())).toBe(true)
   })
 
-  it('uploadKhrArchive sends bytes with application/zip', async () => {
+  it('uploadYmkArchive sends bytes with application/zip', async () => {
     const seen: { contentType: string | null } = { contentType: null }
     server.use(
       http.post('/api/v1/projects/import', ({ request }) => {
@@ -169,10 +169,10 @@ describe('pages + archive uploads', () => {
       }),
     )
 
-    const archive = new File([new Uint8Array([5, 6, 7])], 'p.khr', {
+    const archive = new File([new Uint8Array([5, 6, 7])], 'p.ymk', {
       type: 'application/zip',
     })
-    const summary = await uploadKhrArchive(archive)
+    const summary = await uploadYmkArchive(archive)
 
     expect(seen.contentType).toBe('application/zip')
     expect(summary.id).toBe('imported')
@@ -227,7 +227,7 @@ describe('export', () => {
         HttpResponse.json({ message: 'no project open' }, { status: 400 }),
       ),
     )
-    await expect(exportProject({ format: 'khr' })).rejects.toMatchObject({
+    await expect(exportProject({ format: 'ymk' })).rejects.toMatchObject({
       status: 400,
       message: 'no project open',
     })

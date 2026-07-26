@@ -2,15 +2,15 @@
 title: はじめに
 ---
 
-# Koharu へのコントリビュート
+# Yomika へのコントリビュート
 
-Koharu に興味を持っていただきありがとうございます。Koharu はローカルファーストで動く、Rust 製の ML パワードな漫画翻訳ツールです。あなたの協力を歓迎します。
+Yomika に興味を持っていただきありがとうございます。Yomika はローカルファーストで動く、Rust 製の ML パワードな漫画翻訳ツールです。あなたの協力を歓迎します。
 
 ## クイックスタート
 
-一番早いのは [good first issues](https://github.com/mayocream/koharu/contribute) から選ぶ方法です。新しいコントリビューター向けに厳選したタスクを置いています。
+一番早いのは [good first issues](https://github.com/proxlavee/yomika/contribute) から選ぶ方法です。新しいコントリビューター向けに厳選したタスクを置いています。
 
-相談したいときは [Discord](https://discord.gg/mHvHkxGnUY) に来てください。メンテナーとコミュニティが対応します。
+相談したいときは [GitHub Discussions](https://github.com/proxlavee/yomika/discussions) または関連する Issue を利用してください。
 
 ## コントリビュートの方法
 
@@ -37,7 +37,7 @@ Koharu に興味を持っていただきありがとうございます。Koharu 
 ### テスト
 
 - ワークスペース各クレートの Rust ユニットテスト
-- `tests/` 配下の Playwright E2E カバレッジの拡張
+- `ui/tests/` の Vitest テストと `tests/integration-tests/` の Rust 統合テストの拡充
 - OCR / 検出用の実在漫画ページの提供
 
 ### インフラ
@@ -48,25 +48,26 @@ Koharu に興味を持っていただきありがとうございます。Koharu 
 
 ## コードベースの構造
 
-Koharu は Rust ワークスペースに Tauri シェルと Next.js UI を組み合わせた構成です。
+Yomika は Rust ワークスペースに Tauri シェルと Next.js UI を組み合わせた構成です。
 
-- **`koharu/`** — Tauri のデスクトップシェル
-- **`koharu-app/`** — アプリ側バックエンドとパイプラインのオーケストレーション
-- **`koharu-core/`** — 共有型、イベント、ユーティリティ
-- **`koharu-ml/`** — 検出、OCR、インペイント、フォント解析
-- **`koharu-llm/`** — llama.cpp バインディングと LLM プロバイダ
-- **`koharu-renderer/`** — テキストシェーピングとレンダリング
-- **`koharu-psd/`** — レイヤー付き PSD エクスポート
-- **`koharu-rpc/`** — HTTP API と MCP サーバ
-- **`koharu-runtime/`** — ランタイムとモデルダウンロードの管理
+- **`crates/yomika/`** — Tauri のデスクトップシェル
+- **`crates/yomika-app/`** — アプリ側バックエンドとパイプラインのオーケストレーション
+- **`crates/yomika-core/`** — 共有型、イベント、ユーティリティ
+- **`crates/yomika-ml/`** — 検出、OCR、インペイント、フォント解析
+- **`crates/yomika-llm/`** — llama.cpp バインディングと LLM プロバイダ
+- **`crates/yomika-renderer/`** — テキストシェーピングとレンダリング
+- **`crates/yomika-psd/`** — レイヤー付き PSD エクスポート
+- **`crates/yomika-rpc/`** — HTTP API と MCP サーバ
+- **`crates/yomika-runtime/`** — ランタイムとモデルダウンロードの管理
 - **`ui/`** — Next.js 製 Web UI
-- **`tests/`** — Playwright による E2E テスト
+- **`tests/integration-tests/`** — Rust の HTTP・アプリ統合テスト
+- **`ui/tests/`** — Vitest による UI・フロントエンド単体テスト
 - **`docs/`** — ドキュメントサイト (English, 日本語, 简体中文, Português)
 
 ## はじめてのコントリビューション
 
-1. **Issue を眺める** — [`good first issue`](https://github.com/mayocream/koharu/labels/good%20first%20issue) から始めます。
-2. **遠慮なく質問する** — Discord でも GitHub でも構いません。
+1. **Issue を眺める** — [`good first issue`](https://github.com/proxlavee/yomika/labels/good%20first%20issue) から始めます。
+2. **遠慮なく質問する** — 関連する Issue または GitHub Discussions を利用してください。
 3. **小さく始める** — ドキュメントの修正や絞った範囲のバグ修正がいちばん通しやすいです。
 4. **コードを読む** — 編集しているファイルの既存パターンに合わせます。
 
@@ -74,26 +75,25 @@ Koharu は Rust ワークスペースに Tauri シェルと Next.js UI を組み
 
 ### コミュニケーション
 
-- **[GitHub Discussions](https://github.com/mayocream/koharu/discussions)** — 設計に関する議論や質問
-- **[Discord](https://discord.gg/mHvHkxGnUY)** — メンテナーやコミュニティとのリアルタイムチャット
-- **[GitHub Issues](https://github.com/mayocream/koharu/issues)** — バグ報告と機能要望
+- **[GitHub Discussions](https://github.com/proxlavee/yomika/discussions)** — 設計に関する議論や質問
+- **[GitHub Issues](https://github.com/proxlavee/yomika/issues)** — バグ報告と機能要望
 
 ### AI 利用ポリシー
 
-Koharu へのコントリビュートに AI ツール (ChatGPT、Claude、Copilot などの LLM) を使う場合:
+Yomika へのコントリビュートに AI ツール (ChatGPT、Claude、Copilot などの LLM) を使う場合:
 
 - **AI の利用を明示してください** — メンテナーの負担を減らすためです
 - **あなたが責任を負います** — 自分が提出した Issue や PR の中身はすべて自分の責任です
 - **品質の低い未レビューの AI 生成物はその場でクローズします**
-- **低品質 (“slop”) な PR を繰り返すコントリビューターは警告なしで BAN されます。** このポリシーに従うと約束するなら BAN は解除されます。解除は [Discord](https://discord.gg/mHvHkxGnUY) から申請してください。
+- **低品質または未確認の投稿はクローズされる場合があります。** 投稿するすべての変更を理解し、検証する責任はコントリビューターにあります。
 
-開発補助として AI を使うのは歓迎しますが、提出前にコントリビューター本人が十分にレビューしてテストしてください。AI が生成したコードは理解し、検証し、Koharu の水準に合わせて調整したうえで提出してください。
+開発補助として AI を使うのは歓迎しますが、提出前にコントリビューター本人が十分にレビューしてテストしてください。AI が生成したコードは理解し、検証し、Yomika の水準に合わせて調整したうえで提出してください。
 
 ## 次のステップ
 
 始める準備ができたら:
 
 - **ローカル環境をセットアップする** — [Getting Started](development.md)
-- **Issue を選ぶ** — [good first issues](https://github.com/mayocream/koharu/contribute)
-- **コミュニティに参加する** — [Discord](https://discord.gg/mHvHkxGnUY)
-- **パイプラインを学ぶ** — [Koharu の仕組み](../explanation/how-koharu-works.md) と [テクニカル詳細](../explanation/technical-deep-dive.md)
+- **Issue を選ぶ** — [good first issues](https://github.com/proxlavee/yomika/contribute)
+- **アイデアを相談する** — [GitHub Discussions](https://github.com/proxlavee/yomika/discussions) を開始する
+- **パイプラインを学ぶ** — [Yomika の仕組み](../explanation/how-yomika-works.md) と [テクニカル詳細](../explanation/technical-deep-dive.md)

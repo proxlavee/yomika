@@ -4,7 +4,7 @@ title: Referência da API HTTP
 
 # Referência da API HTTP
 
-O Koharu expõe uma API HTTP local em:
+O Yomika expõe uma API HTTP local em:
 
 ```text
 http://127.0.0.1:<PORT>/api/v1
@@ -19,7 +19,7 @@ Comportamento atual importante:
 - a API é servida pelo mesmo processo da GUI ou do runtime headless
 - o servidor faz bind em `127.0.0.1` por padrão; use `--host` para fazer bind em outro lugar
 - a API e o servidor MCP compartilham o mesmo projeto carregado, modelos e estado do pipeline
-- quando nenhum `--port` é fornecido, o Koharu escolhe uma porta local aleatória
+- quando nenhum `--port` é fornecido, o Yomika escolhe uma porta local aleatória
 - tudo, exceto `/api/v1/downloads`, `/api/v1/operations` e `/api/v1/events`, retorna `503 Service Unavailable` até o app terminar a inicialização
 
 ## Modelo de recursos
@@ -73,12 +73,12 @@ Todo projeto vive sob o diretório gerenciado `{data.path}/projects/`; clientes 
 | -------- | --------------------------------- | ------------------------------------------------------------------- |
 | `GET`    | `/projects`                       | lista os projetos gerenciados                                       |
 | `POST`   | `/projects`                       | cria um novo projeto (body `{ name }`)                              |
-| `POST`   | `/projects/import`                | extrai um arquivo `.khr` em um diretório novo e o abre              |
+| `POST`   | `/projects/import`                | extrai um arquivo `.ymk` em um diretório novo e o abre              |
 | `PUT`    | `/projects/current`               | abre um projeto gerenciado por `id`                                 |
 | `DELETE` | `/projects/current`               | fecha a sessão atual                                                |
 | `POST`   | `/projects/current/export`        | exporta o projeto atual; retorna bytes binários                     |
 
-`POST /projects/current/export` aceita `{ format, pages? }` onde `format` é um de `khr`, `psd`, `rendered`, `inpainted`. Quando o formato produz múltiplos arquivos, a response é `application/zip`.
+`POST /projects/current/export` aceita `{ format, pages? }` onde `format` é um de `ymk`, `psd`, `rendered`, `inpainted`. Quando o formato produz múltiplos arquivos, a response é `application/zip`.
 
 ### Páginas
 
@@ -100,7 +100,7 @@ Todo projeto vive sob o diretório gerenciado `{data.path}/projects/`; clientes 
 | `GET`  | `/scene.bin`        | `Snapshot { epoch, scene }` codificado em postcard para o cliente Tauri |
 | `GET`  | `/blobs/{hash}`     | bytes brutos do blob por hash Blake3                                    |
 
-`/scene.bin` inclui o epoch atual no header de response `x-koharu-epoch`.
+`/scene.bin` inclui o epoch atual no header de response `x-yomika-epoch`.
 
 ### Histórico (mutações)
 
@@ -197,7 +197,7 @@ As chaves de API ficam armazenadas no credential store da plataforma, não em `c
 
 ## Stream de eventos
 
-O Koharu expõe um stream de Server-Sent Events em:
+O Yomika expõe um stream de Server-Sent Events em:
 
 ```text
 GET /events

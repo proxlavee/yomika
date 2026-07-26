@@ -4,30 +4,30 @@ title: OpenAI 互換 API を使う
 
 # OpenAI 互換 API を使う
 
-Koharu は、OpenAI Chat Completions の形に従う API を使って翻訳できます。LM Studio のようなローカルサーバーも、OpenRouter のようなホスト型ルーターも対象です。
+Yomika は、OpenAI Chat Completions の形に従う API を使って翻訳できます。LM Studio のようなローカルサーバーも、OpenRouter のようなホスト型ルーターも対象です。
 
-このページで扱うのは、Koharu に現在実装されている `OpenAI Compatible` プロバイダです。これは、Koharu に組み込まれている OpenAI、Gemini、Claude、DeepSeek、DeepL、Google Cloud Translation、Caiyun の各プロバイダ (それぞれ独立した設定エントリを持ちます) とは別物です。
+このページで扱うのは、Yomika に現在実装されている `OpenAI Compatible` プロバイダです。これは、Yomika に組み込まれている OpenAI、Gemini、Claude、DeepSeek、DeepL、Google Cloud Translation、Caiyun の各プロバイダ (それぞれ独立した設定エントリを持ちます) とは別物です。
 
-## 互換エンドポイントに対して Koharu が期待しているもの
+## 互換エンドポイントに対して Yomika が期待しているもの
 
-現在の実装で Koharu が想定しているのは次の通りです。
+現在の実装で Yomika が想定しているのは次の通りです。
 
 - 通常 `/v1` で終わる API ルートを指す base URL
-- 利用可能なモデルを返す `GET /v1/models` (Koharu はこれを使って動的 discovery を行います)
+- 利用可能なモデルを返す `GET /v1/models` (Yomika はこれを使って動的 discovery を行います)
 - 翻訳用の `POST /v1/chat/completions`
 - `choices[0].message.content` を含むレスポンス
 - API キーが指定されている場合の bearer token 認証
 
 実装上、いくつか重要な点があります。
 
-- Koharu は base URL 末尾の空白と末尾スラッシュを削ってから `/models` や `/chat/completions` を付けます
+- Yomika は base URL 末尾の空白と末尾スラッシュを削ってから `/models` や `/chat/completions` を付けます
 - API キーが空なら、空の `Authorization` ヘッダは送らず完全に省略します
 - discovery で得られたモデルが LLM ピッカーを満たすので、別途「モデル名」を入力する欄はありません
 - `GET /v1/models` が失敗すると、**Settings > API Keys** のプロバイダのステータスドットが赤くなり、原因のエラーが表示されます
 
 つまり、ここでいう OpenAI-compatible とは「OpenAI 系ツールで何となく動く」という意味ではなく、「OpenAI API の形に互換である」という意味です。
 
-## Koharu のどこで設定するか
+## Yomika のどこで設定するか
 
 **Settings** を開き、**API Keys** に切り替え、`OpenAI Compatible` プロバイダのアコーディオンを展開します。
 
@@ -49,11 +49,11 @@ Koharu は、OpenAI Chat Completions の形に従う API を使って翻訳で�
 同じマシン上でローカルモデルサーバーを使いたい場合は LM Studio を使います。
 
 1. LM Studio のローカルサーバーを起動します。
-2. Koharu で **Settings > API Keys** を開き、`OpenAI Compatible` を展開します。
+2. Yomika で **Settings > API Keys** を開き、`OpenAI Compatible` を展開します。
 3. `Base URL` に `http://127.0.0.1:1234/v1` を設定します。
 4. LM Studio の前段に認証を置いていない限り、`API Key` は空のままで構いません。
 5. プロバイダのステータスドットが緑になるまで待ちます。
-6. Koharu の LLM ピッカーを開き、LM Studio で読み込んだモデルに対応するエントリを選びます。
+6. Yomika の LLM ピッカーを開き、LM Studio で読み込んだモデルに対応するエントリを選びます。
 
 LM Studio の公式ドキュメントでも、同じ OpenAI 互換ベースパスとポート `1234` が使われています。手動でモデル一覧を確認することもできます。
 
@@ -71,17 +71,17 @@ curl http://127.0.0.1:1234/v1/models
 ホスト型のマルチモデル OpenAI 互換 API を使いたい場合は OpenRouter を使います。
 
 1. OpenRouter で API キーを作成します。
-2. Koharu で **Settings > API Keys** を開き、`OpenAI Compatible` を展開します。
+2. Yomika で **Settings > API Keys** を開き、`OpenAI Compatible` を展開します。
 3. `Base URL` に `https://openrouter.ai/api/v1` を設定します。
 4. OpenRouter の API キーを `API Key` に貼り付けて保存します。
 5. プロバイダのステータスドットが緑になるまで待ちます。
-6. Koharu の LLM ピッカーから、OpenRouter 由来のモデルを選びます。
+6. Yomika の LLM ピッカーから、OpenRouter 由来のモデルを選びます。
 
 重要な点:
 
 - OpenRouter のモデル ID は組織プレフィックス込み (`openai/gpt-4o-mini`、`anthropic/claude-haiku-4-5` など) です
-- Koharu は現在、標準的な bearer 認証と通常の OpenAI 形式 chat-completions リクエストボディを送ります
-- OpenRouter は `HTTP-Referer` や `X-OpenRouter-Title` のような追加ヘッダにも対応していますが、Koharu には現時点でそれらを設定する UI はありません
+- Yomika は現在、標準的な bearer 認証と通常の OpenAI 形式 chat-completions リクエストボディを送ります
+- OpenRouter は `HTTP-Referer` や `X-OpenRouter-Title` のような追加ヘッダにも対応していますが、Yomika には現時点でそれらを設定する UI はありません
 
 公式参照:
 
@@ -98,13 +98,13 @@ curl http://127.0.0.1:1234/v1/models
 - `POST /v1/chat/completions` をサポートしていること
 - サーバーが bearer 認証を要求するなら API キーを設定すること
 
-もしサーバーが新しい `Responses` API だけ、あるいは独自スキーマだけを実装している場合、現在の `OpenAI Compatible` 統合ではアダプタや proxy がない限り動きません。Koharu は今のところ `chat/completions` を話す前提だからです。
+もしサーバーが新しい `Responses` API だけ、あるいは独自スキーマだけを実装している場合、現在の `OpenAI Compatible` 統合ではアダプタや proxy がない限り動きません。Yomika は今のところ `chat/completions` を話す前提だからです。
 
 ## エンドポイントを切り替える
 
 `OpenAI Compatible` プロバイダは 1 つしかないため、設定できる base URL も同時には 1 つです。自宅で LM Studio、外出先で OpenRouter といった具合に使い分けるなら、コンテキストに応じて base URL (とキー) を書き換えます。
 
-OpenAI 互換サーバーと、Koharu の組み込みプロバイダ (`OpenAI`、`Claude`、`Gemini`、`DeepSeek`) を常に両方使いたい場合は、それぞれを別個に設定してください。両者は LLM ピッカー上で共存し、ワンクリックで切り替えられます。
+OpenAI 互換サーバーと、Yomika の組み込みプロバイダ (`OpenAI`、`Claude`、`Gemini`、`DeepSeek`) を常に両方使いたい場合は、それぞれを別個に設定してください。両者は LLM ピッカー上で共存し、ワンクリックで切り替えられます。
 
 ## よくある間違い
 

@@ -13,7 +13,7 @@ import { server } from '../msw/server'
 vi.mock('@/lib/io/openFiles', () => ({
   openImageFiles: vi.fn().mockResolvedValue([]),
   openImageFolder: vi.fn().mockResolvedValue([]),
-  openKhrFile: vi.fn().mockResolvedValue(null),
+  openYmkFile: vi.fn().mockResolvedValue(null),
 }))
 
 beforeEach(() => {

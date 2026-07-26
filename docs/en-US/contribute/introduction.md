@@ -2,15 +2,15 @@
 title: Introduction
 ---
 
-# Contributing to Koharu
+# Contributing to Yomika
 
-Thank you for your interest in contributing to Koharu. We are building a local-first, ML-powered manga translator in Rust, and we would love your help.
+Thank you for your interest in contributing to Yomika. We are building a local-first, ML-powered manga translator in Rust, and we would love your help.
 
 ## Quick Start
 
-The fastest way to get started is through our [good first issues](https://github.com/mayocream/koharu/contribute). These are carefully selected tasks that are a good fit for new contributors.
+The fastest way to get started is through our [good first issues](https://github.com/proxlavee/yomika/contribute). These are carefully selected tasks that are a good fit for new contributors.
 
-Need guidance? Join our [Discord](https://discord.gg/mHvHkxGnUY) where maintainers and the community are happy to help.
+Need guidance? Open a [GitHub Discussion](https://github.com/proxlavee/yomika/discussions) or ask on the relevant issue.
 
 ## Ways to Contribute
 
@@ -37,7 +37,7 @@ We welcome and appreciate any form of contribution.
 ### Testing
 
 - Add Rust unit tests for the workspace crates
-- Expand Playwright end-to-end coverage in `tests/`
+- Add Vitest coverage under `ui/tests/` and Rust integration tests under `tests/integration-tests/`
 - Contribute real-world manga fixtures for OCR and detection
 
 ### Infrastructure
@@ -48,25 +48,26 @@ We welcome and appreciate any form of contribution.
 
 ## Understanding the Codebase
 
-Koharu is organized as a Rust workspace with a Tauri shell and a Next.js UI:
+Yomika is organized as a Rust workspace with a Tauri shell and a Next.js UI:
 
-- **`koharu/`** — Tauri desktop shell
-- **`koharu-app/`** — application backend and pipeline orchestration
-- **`koharu-core/`** — shared types, events, and utilities
-- **`koharu-ml/`** — detection, OCR, inpainting, and font analysis
-- **`koharu-llm/`** — llama.cpp bindings and LLM providers
-- **`koharu-renderer/`** — text shaping and rendering
-- **`koharu-psd/`** — layered PSD export
-- **`koharu-rpc/`** — HTTP API and MCP server
-- **`koharu-runtime/`** — runtime and model download management
+- **`crates/yomika/`** — Tauri desktop shell
+- **`crates/yomika-app/`** — application backend and pipeline orchestration
+- **`crates/yomika-core/`** — shared types, events, and utilities
+- **`crates/yomika-ml/`** — detection, OCR, inpainting, and font analysis
+- **`crates/yomika-llm/`** — llama.cpp bindings and LLM providers
+- **`crates/yomika-renderer/`** — text shaping and rendering
+- **`crates/yomika-psd/`** — layered PSD export
+- **`crates/yomika-rpc/`** — HTTP API and MCP server
+- **`crates/yomika-runtime/`** — runtime and model download management
 - **`ui/`** — Next.js web UI
-- **`tests/`** — Playwright end-to-end tests
+- **`tests/integration-tests/`** — Rust HTTP and application integration tests
+- **`ui/tests/`** — Vitest UI and frontend unit tests
 - **`docs/`** — documentation site (English, 日本語, 简体中文, Português)
 
 ## Your First Contribution
 
-1. **Browse issues.** Look at [`good first issue`](https://github.com/mayocream/koharu/labels/good%20first%20issue).
-2. **Ask questions.** Do not hesitate to ask for clarification on Discord or GitHub.
+1. **Browse issues.** Look at [`good first issue`](https://github.com/proxlavee/yomika/labels/good%20first%20issue).
+2. **Ask questions.** Ask for clarification in the issue or in GitHub Discussions.
 3. **Start small.** Docs tweaks and focused bug fixes are the easiest to land.
 4. **Read the code.** Follow the patterns already in the file you are editing.
 
@@ -74,26 +75,25 @@ Koharu is organized as a Rust workspace with a Tauri shell and a Next.js UI:
 
 ### Communication Channels
 
-- **[GitHub Discussions](https://github.com/mayocream/koharu/discussions)** — design discussions and open questions
-- **[Discord](https://discord.gg/mHvHkxGnUY)** — real-time chat with maintainers and the community
-- **[GitHub Issues](https://github.com/mayocream/koharu/issues)** — bug reports and feature requests
+- **[GitHub Discussions](https://github.com/proxlavee/yomika/discussions)** — design discussions and open questions
+- **[GitHub Issues](https://github.com/proxlavee/yomika/issues)** — bug reports and feature requests
 
 ### AI Usage Policy
 
-When using AI tools (including LLMs like ChatGPT, Claude, Copilot, etc.) to contribute to Koharu:
+When using AI tools (including LLMs like ChatGPT, Claude, Copilot, etc.) to contribute to Yomika:
 
 - **Please disclose AI usage** to reduce maintainer fatigue
 - **You are responsible** for all AI-generated issues or PRs you submit
 - **Low-quality or unreviewed AI content will be closed immediately**
-- **Contributors who submit repeated low-quality ("slop") PRs will be banned without prior warning.** Bans may be lifted if you commit to contributing to Koharu in accordance with this policy. You may request an unban via our [Discord](https://discord.gg/mHvHkxGnUY).
+- **Low-quality or unreviewed submissions may be closed.** Contributors remain responsible for understanding and validating every change they submit.
 
-We encourage the use of AI tools to assist with development, but all contributions must be thoroughly reviewed and tested by the contributor before submission. AI-generated code should be understood, validated, and adapted to meet Koharu's standards.
+We encourage the use of AI tools to assist with development, but all contributions must be thoroughly reviewed and tested by the contributor before submission. AI-generated code should be understood, validated, and adapted to meet Yomika's standards.
 
 ## Next Steps
 
 Ready to contribute? Good places to start:
 
 - **Set up locally** — see [Getting Started](development.md)
-- **Find an issue** — browse [good first issues](https://github.com/mayocream/koharu/contribute)
-- **Join the community** — say hi on [Discord](https://discord.gg/mHvHkxGnUY)
-- **Learn the pipeline** — read [How Koharu Works](../explanation/how-koharu-works.md) and the [Technical Deep Dive](../explanation/technical-deep-dive.md)
+- **Find an issue** — browse [good first issues](https://github.com/proxlavee/yomika/contribute)
+- **Discuss an idea** — start a [GitHub Discussion](https://github.com/proxlavee/yomika/discussions)
+- **Learn the pipeline** — read [How Yomika Works](../explanation/how-yomika-works.md) and the [Technical Deep Dive](../explanation/technical-deep-dive.md)

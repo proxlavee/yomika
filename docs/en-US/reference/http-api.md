@@ -4,7 +4,7 @@ title: HTTP API Reference
 
 # HTTP API Reference
 
-Koharu exposes a local HTTP API under:
+Yomika exposes a local HTTP API under:
 
 ```text
 http://127.0.0.1:<PORT>/api/v1
@@ -19,7 +19,7 @@ Important current behavior:
 - the API is served by the same process as the GUI or headless runtime
 - the server binds to `127.0.0.1` by default; use `--host` to bind elsewhere
 - the API and MCP server share the same loaded project, models, and pipeline state
-- when no `--port` is provided, Koharu chooses a random local port
+- when no `--port` is provided, Yomika chooses a random local port
 - everything except `/api/v1/downloads`, `/api/v1/operations`, and `/api/v1/events` returns `503 Service Unavailable` until the app finishes bootstrapping
 
 ## Resource model
@@ -73,12 +73,12 @@ Every project lives under the managed `{data.path}/projects/` directory; clients
 | -------- | --------------------------------- | --------------------------------------------------------- |
 | `GET`    | `/projects`                       | list managed projects                                     |
 | `POST`   | `/projects`                       | create a new project (body `{ name }`)                    |
-| `POST`   | `/projects/import`                | extract a `.khr` archive into a fresh dir and open it     |
+| `POST`   | `/projects/import`                | extract a `.ymk` archive into a fresh dir and open it     |
 | `PUT`    | `/projects/current`               | open a managed project by `id`                            |
 | `DELETE` | `/projects/current`               | close the current session                                 |
 | `POST`   | `/projects/current/export`        | export the current project; returns binary bytes          |
 
-`POST /projects/current/export` accepts `{ format, pages? }` where `format` is one of `khr`, `psd`, `rendered`, `inpainted`. When the format produces multiple files, the response is `application/zip`.
+`POST /projects/current/export` accepts `{ format, pages? }` where `format` is one of `ymk`, `psd`, `rendered`, `inpainted`. When the format produces multiple files, the response is `application/zip`.
 
 ### Pages
 
@@ -100,7 +100,7 @@ Every project lives under the managed `{data.path}/projects/` directory; clients
 | `GET`  | `/scene.bin`        | postcard-encoded `Snapshot { epoch, scene }` for Tauri client |
 | `GET`  | `/blobs/{hash}`     | raw blob bytes by Blake3 hash                                 |
 
-`/scene.bin` includes the current epoch in the `x-koharu-epoch` response header.
+`/scene.bin` includes the current epoch in the `x-yomika-epoch` response header.
 
 ### History (mutations)
 
@@ -197,7 +197,7 @@ API keys are stored in the platform credential store, not in `config.toml`. PATC
 
 ## Events stream
 
-Koharu exposes a Server-Sent Events stream at:
+Yomika exposes a Server-Sent Events stream at:
 
 ```text
 GET /events

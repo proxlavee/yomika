@@ -16,11 +16,11 @@ use std::time::Duration;
 
 use anyhow::{Result, anyhow};
 use futures::StreamExt;
-use koharu_core::{AppEvent, JobFinishedEvent, JobStatus};
-use koharu_integration_tests::TestApp;
 use reqwest::multipart::{Form, Part};
 use serde_json::Value;
 use tokio::time::timeout;
+use yomika_core::{AppEvent, JobFinishedEvent, JobStatus};
+use yomika_integration_tests::TestApp;
 
 // ---------------------------------------------------------------------------
 // Tiny SSE parser
@@ -281,10 +281,10 @@ async fn pipeline_run_surfaces_job_lifecycle_events() -> Result<()> {
     let mut stream = open_stream(&app, None).await?;
     let _ = recv_frame(&mut stream, Duration::from_secs(2)).await?; // snapshot
 
-    // Kick a pipeline. We don't need a real model: `koharu-renderer` is
+    // Kick a pipeline. We don't need a real model: `yomika-renderer` is
     // cheap and requires no pages, so the run reaches JobFinished quickly.
     let form = serde_json::json!({
-        "steps": ["koharu-renderer"],
+        "steps": ["yomika-renderer"],
         "pages": [],
     });
     app.client_config

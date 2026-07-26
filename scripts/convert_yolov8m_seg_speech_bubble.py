@@ -96,7 +96,7 @@ This repository contains a Candle-compatible `safetensors` conversion of
 Files:
 
 - `model.safetensors`: converted floating-point checkpoint with the original Ultralytics tensor names
-- `config.json`: Candle loader metadata for `koharu-ml`
+- `config.json`: Candle loader metadata for `yomika-ml`
 - `config.yaml`: original upstream Ultralytics config
 
 Model metadata:

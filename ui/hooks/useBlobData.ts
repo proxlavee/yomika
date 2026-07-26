@@ -3,22 +3,18 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { getBlob } from '@/lib/api/default/default'
-import { convertToBlob } from '@/lib/io/blobConvert'
+import { prepareDisplayBlob } from '@/lib/io/blobConvert'
 
 const blobQueryOptions = (hash: string) => ({
   queryKey: ['blob', hash] as const,
-  queryFn: async () => {
-    const blob = await getBlob(hash)
-    const buf = await (blob as Blob).arrayBuffer()
-    return new Uint8Array(buf)
-  },
+  queryFn: async () => (await getBlob(hash)) as Blob,
   staleTime: Infinity,
-  gcTime: 10 * 60 * 1000,
+  gcTime: 30 * 1000,
   structuralSharing: false as const,
 })
 
-/** Fetch blob bytes by hash. Keeps previous data as placeholder while loading. */
-export function useBlobData(hash: string | undefined): Uint8Array | undefined {
+/** Fetch a native browser blob by hash without materializing a typed array. */
+export function useBlobData(hash: string | undefined): Blob | undefined {
   const { data } = useQuery({
     ...blobQueryOptions(hash ?? ''),
     enabled: !!hash,
@@ -31,26 +27,18 @@ const blobImageQueryOptions = (hash: string) => ({
   queryKey: ['blobImage', hash] as const,
   queryFn: async () => {
     const response = await getBlob(hash)
-    const buf = await (response as Blob).arrayBuffer()
-    const bytes = new Uint8Array(buf)
-    const blob = await convertToBlob(bytes)
-    const url = URL.createObjectURL(blob)
-    await new Promise<void>((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => resolve()
-      img.onerror = () => reject(new Error('Failed to preload sprite'))
-      img.src = url
-    })
-    return url
+    return prepareDisplayBlob(response as Blob)
   },
   staleTime: Infinity,
-  gcTime: 10 * 60 * 1000,
+  // Display blobs can be tens of megabytes. Keep a short back-navigation
+  // window without retaining every page visited during a long editing run.
+  gcTime: 30 * 1000,
   structuralSharing: false as const,
 })
 
 /**
- * Fetch blob, convert to displayable format, and preload — returns a
- * ready-to-paint object URL. Keeps the previous URL while a new one loads.
+ * Fetch a display image as a native Blob. The rendering component owns the
+ * object URL so it can revoke it when the image leaves the DOM.
  */
 export function useBlobImage(hash: string | undefined) {
   return useQuery({

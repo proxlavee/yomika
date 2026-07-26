@@ -3,10 +3,10 @@
 import type { CSSProperties } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { cancelObjectUrlRevoke, convertToBlob, revokeObjectUrlLater } from '@/lib/io/blobConvert'
+import { cancelObjectUrlRevoke, revokeObjectUrlLater } from '@/lib/io/blobConvert'
 
 type ImageProps = {
-  data?: Uint8Array
+  blob?: Blob
   visible?: boolean
   opacity?: number
   transition?: boolean
@@ -17,69 +17,81 @@ const FADE_DURATION_MS = 180
 
 // Cross-fade between successive image buffers to avoid UI flicker when
 // swapping inpaint results.
-export function Image({
-  data,
+export function Image({ transition = true, ...props }: ImageProps) {
+  return transition ? <CrossfadeImage {...props} /> : <PlainImage {...props} />
+}
+
+type ImageVariantProps = Omit<ImageProps, 'transition'>
+
+function PlainImage({
+  blob,
   visible = true,
   opacity = 1,
-  transition = true,
   dataKey,
   style,
   alt = '',
   ...props
-}: ImageProps) {
-  const dataDep = dataKey ?? data
+}: ImageVariantProps) {
+  const dataDep = dataKey ?? blob
 
   // Simple path without transitions (used for static base image to avoid extra paints)
   const [plainSrc, setPlainSrc] = useState<string | null>(null)
   const plainSrcRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!transition) {
-      if (!dataDep || !data) {
-        revokeObjectUrlLater(plainSrcRef.current)
-        plainSrcRef.current = null
-        setPlainSrc(null)
-        return
-      }
-      let cancelled = false
-      convertToBlob(data).then((blob) => {
-        if (cancelled) return
-        const prev = plainSrcRef.current
-        const url = URL.createObjectURL(blob)
-        cancelObjectUrlRevoke(url)
-        plainSrcRef.current = url
-        setPlainSrc(url)
-        revokeObjectUrlLater(prev)
-      })
-      return () => {
-        cancelled = true
-      }
+    if (!dataDep || !blob) {
+      revokeObjectUrlLater(plainSrcRef.current)
+      plainSrcRef.current = null
+      setPlainSrc(null)
+      return
     }
-    setPlainSrc(null)
-    return
-  }, [data, dataDep, transition])
 
-  if (!transition) {
-    if (!visible || !plainSrc) return null
-    return (
-      <img
-        {...props}
-        alt={alt}
-        src={plainSrc}
-        draggable={false}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          userSelect: 'none',
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-          ...style,
-          opacity,
-        }}
-      />
-    )
-  }
+    const prev = plainSrcRef.current
+    const url = URL.createObjectURL(blob)
+    cancelObjectUrlRevoke(url)
+    plainSrcRef.current = url
+    setPlainSrc(url)
+    revokeObjectUrlLater(prev)
+  }, [blob, dataDep])
+
+  useEffect(
+    () => () => {
+      revokeObjectUrlLater(plainSrcRef.current)
+    },
+    [],
+  )
+
+  if (!visible || !plainSrc) return null
+  return (
+    <img
+      {...props}
+      alt={alt}
+      src={plainSrc}
+      draggable={false}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        userSelect: 'none',
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+        ...style,
+        opacity,
+      }}
+    />
+  )
+}
+
+function CrossfadeImage({
+  blob,
+  visible = true,
+  opacity = 1,
+  dataKey,
+  style,
+  alt = '',
+  ...props
+}: ImageVariantProps) {
+  const dataDep = dataKey ?? blob
 
   const [currentSrc, setCurrentSrc] = useState<string | null>(null)
   const [nextSrc, setNextSrc] = useState<string | null>(null)
@@ -123,7 +135,7 @@ export function Image({
   }, [cleanupUrl])
 
   useEffect(() => {
-    if (!dataDep || !data) {
+    if (!dataDep || !blob) {
       cleanupUrl(currentSrcRef.current)
       cleanupUrl(nextSrcRef.current)
       currentSrcRef.current = null
@@ -136,46 +148,49 @@ export function Image({
 
     let cancelled = false
 
-    convertToBlob(data).then((blob) => {
-      if (cancelled) return
-      const objectUrl = URL.createObjectURL(blob)
-      cancelObjectUrlRevoke(objectUrl)
+    const objectUrl = URL.createObjectURL(blob)
+    cancelObjectUrlRevoke(objectUrl)
 
-      const preload = new window.Image()
-      preload.onload = () => {
-        if (cancelled) {
-          cleanupUrl(objectUrl)
-          return
-        }
-
-        // First image, render immediately
-        if (!currentSrcRef.current) {
-          currentSrcRef.current = objectUrl
-          setCurrentSrc(objectUrl)
-          return
-        }
-
-        // Subsequent images: queue and cross-fade
-        setNextSrc((prev) => {
-          if (prev && prev !== currentSrcRef.current) {
-            cleanupUrl(prev)
-          }
-          return objectUrl
-        })
-
-        setCrossfade(false)
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => setCrossfade(true))
-        })
+    const preload = new window.Image()
+    preload.onload = () => {
+      if (cancelled) {
+        cleanupUrl(objectUrl)
+        return
       }
 
-      preload.src = objectUrl
-    })
+      // First image, render immediately
+      if (!currentSrcRef.current) {
+        currentSrcRef.current = objectUrl
+        setCurrentSrc(objectUrl)
+        return
+      }
+
+      // Subsequent images: queue and cross-fade
+      setNextSrc((prev) => {
+        if (prev && prev !== currentSrcRef.current) {
+          cleanupUrl(prev)
+        }
+        return objectUrl
+      })
+
+      setCrossfade(false)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCrossfade(true))
+      })
+    }
+    preload.onerror = () => {
+      cleanupUrl(objectUrl)
+    }
+
+    preload.src = objectUrl
 
     return () => {
       cancelled = true
+      preload.onload = null
+      preload.onerror = null
+      cleanupUrl(objectUrl)
     }
-  }, [data, dataDep, cleanupUrl])
+  }, [blob, dataDep, cleanupUrl])
 
   useEffect(() => {
     if (!nextSrc || !crossfade) return

@@ -4,7 +4,7 @@ title: HTTP API リファレンス
 
 # HTTP API リファレンス
 
-Koharu は次のローカル HTTP API を公開しています。
+Yomika は次のローカル HTTP API を公開しています。
 
 ```text
 http://127.0.0.1:<PORT>/api/v1
@@ -19,7 +19,7 @@ http://127.0.0.1:<PORT>/api/v1
 - API は GUI または headless ランタイムと同じプロセスで提供される
 - サーバーは既定で `127.0.0.1` にバインドされる。別ホストに公開したい場合は `--host` を使う
 - API と MCP サーバーは同じ読み込み済みプロジェクト、モデル、パイプライン状態を共有する
-- `--port` を指定しない場合、Koharu はランダムなローカルポートを選ぶ
+- `--port` を指定しない場合、Yomika はランダムなローカルポートを選ぶ
 - `/api/v1/downloads`、`/api/v1/operations`、`/api/v1/events` を除く全エンドポイントは、アプリのブートストラップが完了するまで `503 Service Unavailable` を返す
 
 ## リソースモデル
@@ -73,12 +73,12 @@ API はプロジェクト中心です。一度に開けるプロジェクトは 
 | -------- | --------------------------------- | ----------------------------------------------------------------- |
 | `GET`    | `/projects`                       | 管理されているプロジェクトを一覧する                              |
 | `POST`   | `/projects`                       | 新しいプロジェクトを作成する (body `{ name }`)                    |
-| `POST`   | `/projects/import`                | `.khr` アーカイブを新しいディレクトリへ展開して開く               |
+| `POST`   | `/projects/import`                | `.ymk` アーカイブを新しいディレクトリへ展開して開く               |
 | `PUT`    | `/projects/current`               | `id` で管理対象プロジェクトを開く                                 |
 | `DELETE` | `/projects/current`               | 現在のセッションを閉じる                                          |
 | `POST`   | `/projects/current/export`        | 現在のプロジェクトを書き出す。バイナリを返す                      |
 
-`POST /projects/current/export` は `{ format, pages? }` を受け付け、`format` は `khr`、`psd`、`rendered`、`inpainted` のいずれかです。複数ファイルを生成する形式の場合、レスポンスは `application/zip` になります。
+`POST /projects/current/export` は `{ format, pages? }` を受け付け、`format` は `ymk`、`psd`、`rendered`、`inpainted` のいずれかです。複数ファイルを生成する形式の場合、レスポンスは `application/zip` になります。
 
 ### Pages
 
@@ -100,7 +100,7 @@ API はプロジェクト中心です。一度に開けるプロジェクトは 
 | `GET`  | `/scene.bin`        | Tauri クライアント用に postcard エンコードされた `Snapshot { epoch, scene }` |
 | `GET`  | `/blobs/{hash}`     | Blake3 ハッシュで指定した blob の生バイト                              |
 
-`/scene.bin` は現在の epoch をレスポンスヘッダ `x-koharu-epoch` に含めて返します。
+`/scene.bin` は現在の epoch をレスポンスヘッダ `x-yomika-epoch` に含めて返します。
 
 ### History (mutations)
 
@@ -197,7 +197,7 @@ API キーはプラットフォームの credential store に保存され、`con
 
 ## Events stream
 
-Koharu は次の URL で Server-Sent Events を公開しています。
+Yomika は次の URL で Server-Sent Events を公開しています。
 
 ```text
 GET /events

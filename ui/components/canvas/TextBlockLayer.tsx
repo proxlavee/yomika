@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 
 import { useBlobImage } from '@/hooks/useBlobData'
 import { useCurrentPage, useTextNodes, type TextNodeEntry } from '@/hooks/useCurrentPage'
+import { useObjectUrl } from '@/hooks/useObjectUrl'
 import type { NodeDataPatch, Transform } from '@/lib/api/schemas'
 import { applyOp, queueAutoRender } from '@/lib/io/scene'
 import { ops } from '@/lib/ops'
@@ -37,8 +38,8 @@ export function TextBlockLayer({ showSprites, scale, style }: TextBlockLayerProp
         lockLayoutBox: true,
       },
     }
-    await applyOp(ops.updateNode(page.id, id, { transform: t, data }))
-    queueAutoRender(page.id)
+    const editEpoch = await applyOp(ops.updateNode(page.id, id, { transform: t, data }))
+    queueAutoRender(page.id, editEpoch)
   }
 
   return (
@@ -246,7 +247,8 @@ function TextBlockItem({
 
 function BlockSprite({ node, scale }: { node: TextNodeEntry; scale: number }) {
   const sprite = (node.data.sprite as string | null | undefined) ?? undefined
-  const { data: src } = useBlobImage(sprite)
+  const { data: blob } = useBlobImage(sprite)
+  const src = useObjectUrl(blob)
   if (!src) return null
   const spriteT = node.data.spriteTransform
   const x = (spriteT?.x ?? node.transform.x) * scale

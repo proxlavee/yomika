@@ -43,11 +43,11 @@
     "runCustomAll": "執行自訂 (所有頁面)"
   },
   "welcome": {
-    "title": "Koharu",
+    "title": "Yomika",
     "subtitle": "漫畫翻譯工作區",
     "new": "新建專案",
     "newDescription": "從空白開始，稍後匯入頁面",
-    "importKhr": "匯入 .khr 壓縮檔",
+    "importYmk": "匯入 .ymk 壓縮檔",
     "projects": "最近使用",
     "emptyHint": "您的最近專案將顯示在這裡",
     "delete": "刪除",
@@ -63,8 +63,8 @@
   "operations": {
     "title": "處理中",
     "inProgress": "請稍候，正在處理。",
-    "loadKhr": "正在載入專案",
-    "saveKhr": "正在儲存專案",
+    "loadYmk": "正在載入專案",
+    "saveYmk": "正在儲存專案",
     "loadModel": "正在載入 LLM 模型",
     "processCurrent": "正在處理目前圖片",
     "processAll": "正在批次處理所有圖片",
@@ -309,7 +309,7 @@
     "httpProxyDescription": "用於執行階段與模型下載。更改會自動儲存。",
     "title": "設定",
     "appearance": "外觀",
-    "appearanceDescription": "自訂 Koharu 在您裝置上的外觀。",
+    "appearanceDescription": "自訂 Yomika 在您裝置上的外觀。",
     "theme": "主題",
     "themeDescription": "選擇您偏好的配色方案。",
     "themeLight": "淺色",
@@ -371,7 +371,7 @@
     "apiKeySave": "儲存",
     "apiKeySaved": "已儲存！",
     "dataPath": "資料路徑",
-    "dataPathDescription": "Koharu 將模型、執行階段套件、頁面清單和影像資料儲存在此目錄下。變更路徑需要重新啟動應用程式。",
+    "dataPathDescription": "Yomika 將模型、執行階段套件、頁面清單和影像資料儲存在此目錄下。變更路徑需要重新啟動應用程式。",
     "dataPathApply": "套用並重新啟動",
     "dataPathApplying": "正在套用...",
     "dataPathDesktopOnly": "執行階段設定僅在桌面應用程式中可用。",
@@ -408,14 +408,14 @@
   "updater": {
     "available": {
       "title": "有可用更新",
-      "description": "Koharu <strong>{{version}}</strong> 已準備好安裝"
+      "description": "Yomika <strong>{{version}}</strong> 已準備好安裝"
     },
     "noNotes": "未提供發行說明。",
     "later": "稍後",
     "update": "更新",
     "downloading": {
       "title": "正在下載更新…",
-      "subtitle": "Koharu {{version}}"
+      "subtitle": "Yomika {{version}}"
     },
     "error": {
       "title": "更新失敗",

@@ -4,7 +4,7 @@ title: Referência de configurações
 
 # Referência de configurações
 
-A tela de configurações do Koharu atualmente expõe seis áreas principais:
+A tela de configurações do Yomika atualmente expõe seis áreas principais:
 
 - `Appearance`
 - `Engines`
@@ -21,7 +21,7 @@ A aba `Appearance` atualmente inclui:
 
 - tema: `Light`, `Dark` ou `System`
 - idioma da UI a partir da lista de traduções embutidas
-- `Rendering Font`, que é usada quando o Koharu renderiza o texto traduzido na página
+- `Rendering Font`, que é usada quando o Yomika renderiza o texto traduzido na página
 
 Alterações de tema, idioma e fonte de renderização aplicam-se imediatamente no frontend.
 
@@ -64,7 +64,7 @@ Comportamento atual:
 
 - as chaves de API dos provedores não são escritas em `config.toml`
 - no macOS e no Windows, as chaves de API dos provedores são armazenadas pelo keyring do sistema
-- no Linux, as chaves de API dos provedores são armazenadas no armazenamento local de credenciais do Koharu sob o diretório de dados do app com permissões somente para o usuário dono
+- no Linux, as chaves de API dos provedores são armazenadas no armazenamento local de credenciais do Yomika sob o diretório de dados do app com permissões somente para o usuário dono
 - as base URLs dos provedores são armazenadas na config do app
 - `OpenAI Compatible` requer uma `Base URL` customizada; os modelos são descobertos dinamicamente chamando `GET /v1/models` contra essa URL
 - provedores de tradução automática (`DeepL`, `Google Cloud Translation`, `Caiyun`) precisam apenas de uma chave de API; o `Caiyun` suporta um conjunto limitado de idiomas de destino
@@ -101,9 +101,9 @@ A aba `Runtime` agrupa configurações que exigem reinicialização e afetam o r
 
 Comportamento atual:
 
-- `Data Path` controla onde o Koharu armazena pacotes de runtime, modelos baixados, manifests de página e blobs de imagem
-- `HTTP Connect Timeout` define quanto tempo o Koharu aguarda ao estabelecer conexões HTTP
-- `HTTP Read Timeout` define quanto tempo o Koharu aguarda ao ler responses HTTP
+- `Data Path` controla onde o Yomika armazena pacotes de runtime, modelos baixados, manifests de página e blobs de imagem
+- `HTTP Connect Timeout` define quanto tempo o Yomika aguarda ao estabelecer conexões HTTP
+- `HTTP Read Timeout` define quanto tempo o Yomika aguarda ao ler responses HTTP
 - `HTTP Max Retries` controla as retentativas automáticas para falhas transitórias de HTTP
 - esses valores HTTP são usados pelo client HTTP compartilhado do runtime para downloads e requests baseados em provedores
 - aplicar as alterações salva a config e reinicia o app desktop porque o client de runtime é construído na inicialização
@@ -117,7 +117,7 @@ A aba `About` atualmente mostra:
 - o link do autor
 - o link do repositório
 
-No modo de app empacotado, a verificação de versão compara a versão local do app com o último release no GitHub em `mayocream/koharu`.
+No modo de app empacotado, a verificação de versão compara a versão local do app com o último release no GitHub em `proxlavee/yomika`.
 
 ## Modelo de persistência
 

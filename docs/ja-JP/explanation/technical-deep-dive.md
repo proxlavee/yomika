@@ -4,7 +4,7 @@ title: 技術的な詳細解説
 
 # 技術的な詳細解説
 
-このページでは、Koharu の漫画翻訳パイプラインを技術面から説明します。各モデルが何をしているのか、各段階がどうつながるのか、そしてなぜテキストと吹き出しの検出、segmentation mask、OCR、inpainting、翻訳を分けて扱うのかをまとめます。
+このページでは、Yomika の漫画翻訳パイプラインを技術面から説明します。各モデルが何をしているのか、各段階がどうつながるのか、そしてなぜテキストと吹き出しの検出、segmentation mask、OCR、inpainting、翻訳を分けて扱うのかをまとめます。
 
 ## 実装ベースで見たページパイプライン
 
@@ -36,7 +36,7 @@ flowchart TD
 
 ## モデル種別の一覧
 
-| コンポーネント | 既定モデル | モデル種別 | Koharu での主な役割 |
+| コンポーネント | 既定モデル | モデル種別 | Yomika での主な役割 |
 | --- | --- | --- | --- |
 | テキスト / 吹き出し検出 | [comic-text-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector) | object detector | テキストブロックと吹き出し領域を見つける |
 | Segmentation | [comic-text-detector](https://github.com/dmMaze/comic-text-detector) | text segmentation network | クリーンアップ用の dense text mask を作る |
@@ -64,7 +64,7 @@ flowchart TD
 - 縦書き日本語と横書きラテン文字が同じページに混在する
 - 読み取るべき領域の形と、消すべきピクセルの形が一致しないことがある
 
-Koharu は検出結果から `TextBlock` を作り、それを OCR や後段のレンダリングの基盤にします。吹き出し領域は別のジオメトリとして保持し、UI や後段処理で参照できるようにしています。
+Yomika は検出結果から `TextBlock` を作り、それを OCR や後段のレンダリングの基盤にします。吹き出し領域は別のジオメトリとして保持し、UI や後段処理で参照できるようにしています。
 
 現在の既定 detect 段階では、次のように動きます。
 
@@ -77,7 +77,7 @@ Koharu は検出結果から `TextBlock` を作り、それを OCR や後段の�
 
 ## segmentation mask とは何か
 
-segmentation mask は、各ピクセルが対象クラスに属するかどうかを表す、画像サイズのマップです。Koharu の場合、対象クラスは実質的に「あとでクリーンアップ時に除去すべきテキスト前景」です。
+segmentation mask は、各ピクセルが対象クラスに属するかどうかを表す、画像サイズのマップです。Yomika の場合、対象クラスは実質的に「あとでクリーンアップ時に除去すべきテキスト前景」です。
 
 これは bounding box とは異なります。
 
@@ -95,14 +95,14 @@ flowchart LR
     C --> E[Erase exact text pixels]
 ```
 
-Koharu では、segmentation 経路は検出と意図的に分離されています。
+Yomika では、segmentation 経路は検出と意図的に分離されています。
 
 - `comic-text-detector` がグレースケールの確率マップを出す
-- Koharu がそれを threshold と dilation で軽く後処理する
+- Yomika がそれを threshold と dilation で軽く後処理する
 - 結果が `doc.segment` になる
 - `aot-inpainting` が `doc.segment` を消去・補完用の mask として使う
 
-この後処理が必要なのは、生の segmentation 確率がソフトでノイジーだからです。Koharu は予測を 2 値化し、最終 mask を dilation して、文字の縁や輪郭が残って halo になるのを減らします。
+この後処理が必要なのは、生の segmentation 確率がソフトでノイジーだからです。Yomika は予測を 2 値化し、最終 mask を dilation して、文字の縁や輪郭が残って halo になるのを減らします。
 
 ## Vision モデルは理論上どう動くのか
 
@@ -113,17 +113,17 @@ Koharu では、segmentation 経路は検出と意図的に分離されていま
 - `TextBlock` にしたいテキスト領域
 - エディタや後段ツールで使いたい吹き出し領域
 
-Koharu の Candle 版は、この検出結果をドキュメント構造へ変換し、OCR の前に text block を漫画向けの読み順へ並べます。概念的には OCR というよりページ object detection に近い処理です。
+Yomika の Candle 版は、この検出結果をドキュメント構造へ変換し、OCR の前に text block を漫画向けの読み順へ並べます。概念的には OCR というよりページ object detection に近い処理です。
 
 ### Segmentation: ピクセル密度の高いテキスト予測
 
-Koharu の `comic-text-detector` 経路は segmentation-first な設計です。Rust 版では次を読み込みます。
+Yomika の `comic-text-detector` 経路は segmentation-first な設計です。Rust 版では次を読み込みます。
 
 - YOLOv5 系のバックボーン
 - mask 予測用の U-Net デコーダ
 - フル検出モード向けのオプション DBNet head
 
-既定のページパイプラインでは segmentation-only 経路を使います。Koharu はすでに `comic-text-bubble-detector` から text block を得ているからです。つまり Koharu は次の組み合わせを取っています。
+既定のページパイプラインでは segmentation-only 経路を使います。Yomika はすでに `comic-text-bubble-detector` から text block を得ているからです。つまり Yomika は次の組み合わせを取っています。
 
 - ページ全体の領域検出が得意なモデル
 - ピクセル単位のテキスト前景抽出が得意なモデル
@@ -143,7 +143,7 @@ Koharu の `comic-text-detector` 経路は segmentation-first な設計です。
 2. `OCR:` のようなテキストプロンプトがタスク条件を与える
 3. decoder が自己回帰的に認識済みテキスト token を出力する
 
-Koharu の実装もかなりこの形に近いです。
+Yomika の実装もかなりこの形に近いです。
 
 - `PaddleOCR-VL-1.5.gguf` と別の multimodal projector を読み込む
 - llama.cpp の multimodal 経路で画像を注入する
@@ -152,7 +152,7 @@ Koharu の実装もかなりこの形に近いです。
 
 ### Inpainting: なぜ既定が AOT なのか
 
-既定の inpainter は [manga-image-translator](https://github.com/zyddnys/manga-image-translator) 由来の AOT モデルで、Koharu では `aot-inpainting` として公開しています。これは gated convolution と複数の dilation rate を持つ文脈混合ブロックを中心にした masked-image inpainting network です。
+既定の inpainter は [manga-image-translator](https://github.com/zyddnys/manga-image-translator) 由来の AOT モデルで、Yomika では `aot-inpainting` として公開しています。これは gated convolution と複数の dilation rate を持つ文脈混合ブロックを中心にした masked-image inpainting network です。
 
 直感的には、次のことが重要です。
 
@@ -160,7 +160,7 @@ Koharu の実装もかなりこの形に近いです。
 - モデルには局所的なエッジ情報と、吹き出しや背景全体からの広めの文脈が必要
 - 複数 dilation のブロックを繰り返すのは、その文脈を混ぜる実用的な方法
 
-Koharu の Candle 版は upstream の推論形にかなり忠実です。
+Yomika の Candle 版は upstream の推論形にかなり忠実です。
 
 1. 大きなページを設定された max side まで縮小する
 2. 作業画像を multiple-of-8 にそろえる
@@ -173,7 +173,7 @@ Koharu の Candle 版は upstream の推論形にかなり忠実です。
 
 ## ローカル LLM とモデル種別
 
-Koharu のローカル翻訳経路は、`llama.cpp` 経由で GGUF モデルを使います。実際には、多くが量子化済みの decoder-only transformer です。
+Yomika のローカル翻訳経路は、`llama.cpp` 経由で GGUF モデルを使います。実際には、多くが量子化済みの decoder-only transformer です。
 
 理論としては、現代的な LLM 推論と同じです。
 
@@ -181,9 +181,9 @@ Koharu のローカル翻訳経路は、`llama.cpp` 経由で GGUF モデルを�
 - 増えていく token 列に対して masked self-attention を実行する
 - 出力が終わるまで次 token を繰り返し予測する
 
-リモートのテキスト生成プロバイダを使う場合でも、Koharu は画像理解段階をローカルで行います。リモート側が必要とするのは OCR テキストだけです。
+リモートのテキスト生成プロバイダを使う場合でも、Yomika は画像理解段階をローカルで行います。リモート側が必要とするのは OCR テキストだけです。
 
-## Koharu 固有の実装メモ
+## Yomika 固有の実装メモ
 
 高レベルの説明だけでは見落としやすい点を挙げると、次の通りです。
 
@@ -222,4 +222,4 @@ Koharu のローカル翻訳経路は、`llama.cpp` 経由で GGUF モデルを�
 - [Object detection](https://en.wikipedia.org/wiki/Object_detection)
 - [Inpainting](https://en.wikipedia.org/wiki/Inpainting)
 
-これらの Wikipedia リンクは背景知識向けです。Koharu 固有の挙動や実際のモデル構成については、公式 model card とソースツリーを優先してください。
+これらの Wikipedia リンクは背景知識向けです。Yomika 固有の挙動や実際のモデル構成については、公式 model card とソースツリーを優先してください。

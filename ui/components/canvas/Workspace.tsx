@@ -26,7 +26,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu'
-import { useBlobData } from '@/hooks/useBlobData'
+import { useBlobData, useBlobImage } from '@/hooks/useBlobData'
 import { useBlockContextMenu } from '@/hooks/useBlockContextMenu'
 import { useBlockDrafting, type BlockDraft } from '@/hooks/useBlockDrafting'
 import { useBrushCursor } from '@/hooks/useBrushCursor'
@@ -38,7 +38,7 @@ import { useMaskDrawing } from '@/hooks/useMaskDrawing'
 import { usePointerToDocument } from '@/hooks/usePointerToDocument'
 import { useRenderBrushDrawing } from '@/hooks/useRenderBrushDrawing'
 import type { Node, Transform } from '@/lib/api/schemas'
-import { applyOp } from '@/lib/io/scene'
+import { applyOp, queueAutoRender } from '@/lib/io/scene'
 import { ops } from '@/lib/ops'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { useSelectionStore } from '@/lib/stores/selectionStore'
@@ -67,6 +67,9 @@ export function Workspace() {
   const autoFitEnabled = useEditorUiStore((s) => s.autoFitEnabled)
 
   const page = useCurrentPage()
+  const pageId = page?.id
+  const pageWidth = page?.width
+  const pageHeight = page?.height
   const clearSelection = useSelectionStore((s) => s.clear)
 
   // Derive role-keyed blob hashes off the active page.
@@ -76,15 +79,17 @@ export function Workspace() {
   const brushLayerHash = useMemo(() => (page ? findMaskBlob(page, 'brushInpaint') : null), [page])
   const renderedHash = useMemo(() => (page ? findImageBlob(page, 'rendered') : null), [page])
 
-  const imageData = useBlobData(imageHash ?? undefined)
+  const { data: imageBlob } = useBlobImage(imageHash ?? undefined)
   const segmentData = useBlobData(segmentHash ?? undefined)
-  const inpaintedData = useBlobData(inpaintedHash ?? undefined)
+  const { data: inpaintedBlob } = useBlobImage(inpaintedHash ?? undefined)
   const brushLayerData = useBlobData(brushLayerHash ?? undefined)
-  const renderedData = useBlobData(renderedHash ?? undefined)
+  const { data: renderedBlob } = useBlobImage(renderedHash ?? undefined)
 
   useEffect(() => {
-    if (page) setCanvasDocumentSize(page.width, page.height)
-  }, [page?.width, page?.height])
+    if (pageWidth !== undefined && pageHeight !== undefined) {
+      setCanvasDocumentSize(pageWidth, pageHeight)
+    }
+  }, [pageWidth, pageHeight])
 
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLDivElement | null>(null)
@@ -128,7 +133,9 @@ export function Workspace() {
       const node = page.nodes[nodeId]
       if (!node) return
       const idx = Object.keys(page.nodes).indexOf(nodeId)
-      await applyOp(ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx))
+      const editEpoch = await applyOp(ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx))
+      useSelectionStore.getState().clear()
+      queueAutoRender(page.id, editEpoch)
     },
     [page],
   )
@@ -181,8 +188,8 @@ export function Workspace() {
   const brushBindings = brushDrawing.bind()
 
   useEffect(() => {
-    if (page && autoFitEnabled) fitCanvasToViewport()
-  }, [page?.id, autoFitEnabled])
+    if (pageId && autoFitEnabled) fitCanvasToViewport()
+  }, [pageId, autoFitEnabled])
 
   const { contextMenuNodeId, handleContextMenu, handleDeleteBlock, clearContextMenu } =
     useBlockContextMenu({
@@ -266,10 +273,10 @@ export function Workspace() {
 
   const canvasDimensions = useMemo(
     () =>
-      page
-        ? { width: page.width * scaleRatio, height: page.height * scaleRatio }
+      pageWidth !== undefined && pageHeight !== undefined
+        ? { width: pageWidth * scaleRatio, height: pageHeight * scaleRatio }
         : { width: 0, height: 0 },
-    [page?.width, page?.height, scaleRatio],
+    [pageWidth, pageHeight, scaleRatio],
   )
 
   return (
@@ -316,7 +323,7 @@ export function Workspace() {
                       />
                       <div className='absolute inset-0'>
                         <Image
-                          data={imageData}
+                          blob={imageBlob}
                           dataKey={imageHash ?? undefined}
                           transition={false}
                         />
@@ -334,10 +341,10 @@ export function Workspace() {
                           }}
                           {...maskBindings}
                         />
-                        {inpaintedData && (
+                        {inpaintedBlob && (
                           <Image
                             data-testid='workspace-inpainted-image'
-                            data={inpaintedData}
+                            blob={inpaintedBlob}
                             visible={showInpaintedImage}
                             transition={true}
                           />
@@ -377,10 +384,10 @@ export function Workspace() {
                             style={{ zIndex: 30 }}
                           />
                         )}
-                        {renderedData && showRenderedImage && (
+                        {renderedBlob && showRenderedImage && (
                           <Image
                             data-testid='workspace-rendered-image'
-                            data={renderedData}
+                            blob={renderedBlob}
                             transition={true}
                             style={{ zIndex: 40 }}
                           />

@@ -3,22 +3,15 @@
 
 use std::io::Cursor;
 
-use koharu_client::apis::default_api as api;
-use koharu_client::models;
-use koharu_core::{ImageRole, JobStatus, NodeKind, PageId};
-use koharu_integration_tests::TestApp;
 use reqwest::multipart::{Form, Part};
 use tokio::time::{Duration, Instant, sleep};
+use yomika_client::apis::default_api as api;
+use yomika_client::models;
+use yomika_core::{ImageRole, JobStatus, NodeKind, PageId};
+use yomika_integration_tests::TestApp;
 
 fn empty_pipeline_request(steps: Vec<String>) -> models::StartPipelineRequest {
-    models::StartPipelineRequest {
-        steps,
-        pages: None,
-        region: None,
-        target_language: None,
-        system_prompt: None,
-        default_font: None,
-    }
+    models::StartPipelineRequest::new(steps)
 }
 
 async fn import_pages(app: &TestApp, files: Vec<(&str, Vec<u8>)>) -> anyhow::Result<Vec<String>> {
@@ -51,7 +44,7 @@ async fn import_pages(app: &TestApp, files: Vec<(&str, Vec<u8>)>) -> anyhow::Res
 async fn wait_for_job(
     app: &TestApp,
     operation_id: &str,
-) -> anyhow::Result<koharu_core::JobSummary> {
+) -> anyhow::Result<yomika_core::JobSummary> {
     let deadline = Instant::now() + Duration::from_secs(10);
     loop {
         if let Some(job) = app.app.jobs.get(operation_id) {
@@ -73,7 +66,7 @@ async fn pipeline_without_project_errors() -> anyhow::Result<()> {
     let app = TestApp::spawn().await?;
     let err = api::start_pipeline(
         &app.client_config,
-        empty_pipeline_request(vec!["koharu-renderer".into()]),
+        empty_pipeline_request(vec!["yomika-renderer".into()]),
     )
     .await;
     assert!(err.is_err(), "should 400 with no project open");
@@ -140,12 +133,8 @@ async fn renderer_pipeline_creates_final_render_for_pages_without_text_blocks() 
     let resp = api::start_pipeline(
         &app.client_config,
         models::StartPipelineRequest {
-            steps: vec!["koharu-renderer".into()],
             pages: Some(Some(pages)),
-            region: None,
-            target_language: None,
-            system_prompt: None,
-            default_font: None,
+            ..models::StartPipelineRequest::new(vec!["yomika-renderer".into()])
         },
     )
     .await?;
@@ -178,10 +167,9 @@ async fn renderer_pipeline_creates_final_render_for_pages_without_text_blocks() 
         .client_config
         .client
         .post(format!("{}/projects/current/export", app.base_url))
-        .json(&models::ExportProjectRequest {
-            format: models::ExportFormat::Rendered,
-            pages: None,
-        })
+        .json(&models::ExportProjectRequest::new(
+            models::ExportFormat::Rendered,
+        ))
         .send()
         .await?
         .error_for_status()?;

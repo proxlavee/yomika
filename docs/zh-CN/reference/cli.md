@@ -4,9 +4,9 @@ title: CLI 参考
 
 # CLI 参考
 
-本页介绍 Koharu 桌面二进制暴露的命令行参数。
+本页介绍 Yomika 桌面二进制暴露的命令行参数。
 
-Koharu 使用同一个二进制来支持：
+Yomika 使用同一个二进制来支持：
 
 - 桌面启动
 - 本地 Headless Web UI
@@ -17,10 +17,10 @@ Koharu 使用同一个二进制来支持：
 
 ```bash
 # macOS / Linux
-koharu [OPTIONS]
+yomika [OPTIONS]
 
 # Windows
-koharu.exe [OPTIONS]
+yomika.exe [OPTIONS]
 ```
 
 ## 参数
@@ -38,8 +38,8 @@ koharu.exe [OPTIONS]
 
 有些参数影响的不只是启动外观：
 
-- 不传 `--port` 时，Koharu 会选择一个随机本地端口
-- 不传 `--host` 时，Koharu 仅绑定 `127.0.0.1`，所以 API 只能从同一台机器访问
+- 不传 `--port` 时，Yomika 会选择一个随机本地端口
+- 不传 `--host` 时，Yomika 仅绑定 `127.0.0.1`，所以 API 只能从同一台机器访问
 - 使用 `--headless` 时，不打开 Tauri 窗口，但仍然提供 Web UI 与 API
 - 使用 `--download` 时，预取完依赖后即退出，不会继续常驻
 - 使用 `--cpu` 时，视觉栈和本地 LLM 都不会使用 GPU 加速
@@ -55,25 +55,25 @@ koharu.exe [OPTIONS]
 在固定端口启动 Headless Web UI：
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 使用纯 CPU 推理：
 
 ```bash
-koharu --cpu
+yomika --cpu
 ```
 
 提前下载运行时包：
 
 ```bash
-koharu --download
+yomika --download
 ```
 
 在固定端口启动本地 MCP 端点：
 
 ```bash
-koharu --port 9999
+yomika --port 9999
 ```
 
 然后让 MCP 客户端连接：
@@ -85,13 +85,13 @@ http://localhost:9999/mcp
 显式启用调试日志：
 
 ```bash
-koharu --debug
+yomika --debug
 ```
 
 绑定到所有网络接口，让局域网内的其他机器也能访问 Web UI 与 API：
 
 ```bash
-koharu --host 0.0.0.0 --port 4000 --headless
+yomika --host 0.0.0.0 --port 4000 --headless
 ```
 
-这是在容器或虚拟机中运行 Koharu、且桌面客户端位于另一台主机时的常见模式。任何不同于 `127.0.0.1` 的地址都会刻意暴露给网络，因此只有当你确实需要非环回访问时，才设置 `--host`。
+这是在容器或虚拟机中运行 Yomika、且桌面客户端位于另一台主机时的常见模式。任何不同于 `127.0.0.1` 的地址都会刻意暴露给网络，因此只有当你确实需要非环回访问时，才设置 `--host`。

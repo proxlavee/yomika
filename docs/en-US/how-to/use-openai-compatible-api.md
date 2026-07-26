@@ -4,30 +4,30 @@ title: Use OpenAI-Compatible APIs
 
 # Use OpenAI-Compatible APIs
 
-Koharu can translate through APIs that follow the OpenAI Chat Completions shape. That includes local servers such as LM Studio and hosted routers such as OpenRouter.
+Yomika can translate through APIs that follow the OpenAI Chat Completions shape. That includes local servers such as LM Studio and hosted routers such as OpenRouter.
 
-This page covers Koharu's current `OpenAI Compatible` provider. It is separate from Koharu's built-in OpenAI, Gemini, Claude, DeepSeek, DeepL, Google Cloud Translation, and Caiyun providers, each of which has its own dedicated configuration entry.
+This page covers Yomika's current `OpenAI Compatible` provider. It is separate from Yomika's built-in OpenAI, Gemini, Claude, DeepSeek, DeepL, Google Cloud Translation, and Caiyun providers, each of which has its own dedicated configuration entry.
 
-## What Koharu expects from a compatible endpoint
+## What Yomika expects from a compatible endpoint
 
-In the current implementation, Koharu expects:
+In the current implementation, Yomika expects:
 
 - a base URL that points at the API root, usually ending in `/v1`
-- `GET /v1/models` to list available models (Koharu uses this for dynamic discovery)
+- `GET /v1/models` to list available models (Yomika uses this for dynamic discovery)
 - `POST /v1/chat/completions` for translation
 - a response that includes `choices[0].message.content`
 - bearer-token authentication when an API key is provided
 
 Some implementation details matter:
 
-- Koharu trims whitespace and a trailing slash from the base URL before appending `/models` or `/chat/completions`
+- Yomika trims whitespace and a trailing slash from the base URL before appending `/models` or `/chat/completions`
 - an empty API key is omitted entirely instead of sending an empty `Authorization` header
 - discovered models populate the LLM picker — there is no separate "model name" field to fill in
 - if `GET /v1/models` fails, the provider's status dot turns red in **Settings > API Keys** with the underlying error
 
 So "OpenAI-compatible" here means OpenAI API-compatible, not just "works with OpenAI-adjacent tooling."
 
-## Where to configure it in Koharu
+## Where to configure it in Yomika
 
 Open **Settings**, switch to **API Keys**, and expand the `OpenAI Compatible` provider entry.
 
@@ -42,18 +42,18 @@ The status dot reflects discovery state:
 
 - amber — base URL not yet set
 - red — discovery failed (look at the error text under the dot)
-- green — Koharu reached `/v1/models` and got a usable response
+- green — Yomika reached `/v1/models` and got a usable response
 
 ## LM Studio
 
 Use LM Studio when you want a local model server on the same machine.
 
 1. Start LM Studio's local server.
-2. In Koharu, open **Settings > API Keys** and expand `OpenAI Compatible`.
+2. In Yomika, open **Settings > API Keys** and expand `OpenAI Compatible`.
 3. Set `Base URL` to `http://127.0.0.1:1234/v1`.
 4. Leave `API Key` empty unless you put auth in front of LM Studio.
 5. Wait for the provider's status dot to turn green.
-6. Open Koharu's LLM picker and select the LM Studio-backed model entry that matches the model you loaded in LM Studio.
+6. Open Yomika's LLM picker and select the LM Studio-backed model entry that matches the model you loaded in LM Studio.
 
 LM Studio's official docs use the same OpenAI-compatible base path on port `1234`. You can also list models manually:
 
@@ -71,17 +71,17 @@ Official references:
 Use OpenRouter for a hosted multi-model OpenAI-compatible API.
 
 1. Create an API key in OpenRouter.
-2. In Koharu, open **Settings > API Keys** and expand `OpenAI Compatible`.
+2. In Yomika, open **Settings > API Keys** and expand `OpenAI Compatible`.
 3. Set `Base URL` to `https://openrouter.ai/api/v1`.
 4. Paste your OpenRouter API key into `API Key` and save.
 5. Wait for the provider's status dot to turn green.
-6. Pick the OpenRouter-backed model you want from Koharu's LLM picker.
+6. Pick the OpenRouter-backed model you want from Yomika's LLM picker.
 
 Important details:
 
 - OpenRouter model IDs include the organization prefix (`openai/gpt-4o-mini`, `anthropic/claude-haiku-4-5`, etc.)
-- Koharu currently sends standard bearer auth and a normal OpenAI-style chat-completions request body
-- OpenRouter supports extra headers such as `HTTP-Referer` and `X-OpenRouter-Title`, but Koharu does not currently expose fields for those optional headers
+- Yomika currently sends standard bearer auth and a normal OpenAI-style chat-completions request body
+- OpenRouter supports extra headers such as `HTTP-Referer` and `X-OpenRouter-Title`, but Yomika does not currently expose fields for those optional headers
 
 Official references:
 
@@ -98,13 +98,13 @@ For other self-hosted or routed APIs, use the same checklist:
 - make sure it supports `POST /v1/chat/completions`
 - provide an API key if the server requires bearer authentication
 
-If the server only implements the newer `Responses` API or some custom schema, Koharu's current `OpenAI Compatible` integration will not work without an adapter or proxy because Koharu currently talks to `chat/completions`.
+If the server only implements the newer `Responses` API or some custom schema, Yomika's current `OpenAI Compatible` integration will not work without an adapter or proxy because Yomika currently talks to `chat/completions`.
 
 ## Switching between endpoints
 
 Because there is one `OpenAI Compatible` provider, only one base URL is configured at a time. To rotate between LM Studio at home and OpenRouter on the road, update the base URL (and key, if any) when you switch contexts.
 
-If you regularly want both an OpenAI-compatible server *and* one of Koharu's first-class providers (`OpenAI`, `Claude`, `Gemini`, `DeepSeek`), configure each one separately — they coexist in the LLM picker and you can switch with one click.
+If you regularly want both an OpenAI-compatible server *and* one of Yomika's first-class providers (`OpenAI`, `Claude`, `Gemini`, `DeepSeek`), configure each one separately — they coexist in the LLM picker and you can switch with one click.
 
 ## Common mistakes
 

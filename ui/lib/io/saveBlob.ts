@@ -19,7 +19,7 @@ import { isTauri } from '@/lib/backend'
 
 export async function saveBlob(blob: Blob, defaultName: string): Promise<boolean> {
   // Zip detection must come from the actual content type — a single-file
-  // export (PNG/PSD/khr) whose filename happens to end in `.zip` would
+  // export (PNG/PSD/ymk) whose filename happens to end in `.zip` would
   // otherwise be fed to `unzipSync` and throw.
   const isZip = blob.type === 'application/zip'
 

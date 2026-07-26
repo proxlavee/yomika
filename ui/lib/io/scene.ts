@@ -64,14 +64,24 @@ const enqueueHistoryMutation = (run: () => Promise<void>): Promise<void> => {
   return next
 }
 
-export async function applyOp(op: Op): Promise<void> {
+export async function applyOp(op: Op): Promise<number> {
+  let appliedEpoch: number | null | undefined
   await enqueueHistoryMutation(async () => {
-    await applyCommand(op)
+    const result = await applyCommand(op)
+    appliedEpoch = result.epoch
     await invalidateScene()
   })
+  if (typeof appliedEpoch !== 'number') {
+    throw new Error('History apply completed without an epoch')
+  }
+  return appliedEpoch
 }
 
 export async function undoOp(): Promise<void> {
+  // A debounced auto-render scheduled by the edit being undone must not fire
+  // after the undo — it would land a stale render op on top of the undo
+  // stack, forcing a second, seemingly no-op Ctrl+Z.
+  cancelPendingAutoRender()
   await enqueueHistoryMutation(async () => {
     await undo()
     await invalidateScene()
@@ -79,6 +89,7 @@ export async function undoOp(): Promise<void> {
 }
 
 export async function redoOp(): Promise<void> {
+  cancelPendingAutoRender()
   await enqueueHistoryMutation(async () => {
     await redo()
     await invalidateScene()
@@ -92,7 +103,7 @@ export async function reorderPageTextNodes(pageId: string, order: ReadingOrder):
 
 // Auto-render ---------------------------------------------------------------
 //
-// `queueAutoRender(pageId)` schedules a debounced renderer-pipeline invocation
+// `queueAutoRender(pageId, editEpoch)` schedules a debounced renderer invocation
 // so a text-block edit (move/resize/translation/color/etc.) produces an
 // updated rendered image without the user running Render manually.
 //
@@ -102,27 +113,47 @@ export async function reorderPageTextNodes(pageId: string, order: ReadingOrder):
 const AUTO_RENDER_DEBOUNCE_MS = 500
 
 let autoRenderTimer: ReturnType<typeof setTimeout> | null = null
-let autoRenderPendingPageId: string | null = null
+let autoRenderPending: { pageId: string; editEpoch: number } | null = null
+let autoRenderGeneration = 0
 
-export function queueAutoRender(pageId: string): void {
-  autoRenderPendingPageId = pageId
-  if (autoRenderTimer) clearTimeout(autoRenderTimer)
+/** Drop any scheduled auto-render without running it. */
+export function cancelPendingAutoRender(): void {
+  autoRenderGeneration += 1
+  if (autoRenderTimer !== null) {
+    clearTimeout(autoRenderTimer)
+    autoRenderTimer = null
+  }
+  autoRenderPending = null
+}
+
+export function queueAutoRender(pageId: string, editEpoch: number): void {
+  const generation = ++autoRenderGeneration
+  autoRenderPending = { pageId, editEpoch }
+  if (autoRenderTimer !== null) clearTimeout(autoRenderTimer)
   autoRenderTimer = setTimeout(() => {
     autoRenderTimer = null
-    const id = autoRenderPendingPageId
-    autoRenderPendingPageId = null
-    if (!id) return
-    void runAutoRender(id)
+    const pending = autoRenderPending
+    autoRenderPending = null
+    if (!pending) return
+    void runAutoRender(pending.pageId, pending.editEpoch, generation)
   }, AUTO_RENDER_DEBOUNCE_MS)
 }
 
-async function runAutoRender(pageId: string): Promise<void> {
+async function runAutoRender(pageId: string, editEpoch: number, generation: number): Promise<void> {
   try {
     const cfg = await getConfig()
+    // Undo/redo or a newer edit may have invalidated this render while the
+    // config request was in flight. Do not start a stale pipeline afterward.
+    if (generation !== autoRenderGeneration) return
     const renderer = cfg.pipeline?.renderer
     if (!renderer) return
     const defaultFont = usePreferencesStore.getState().defaultFont
-    await startPipeline({ steps: [renderer], pages: [pageId], defaultFont })
+    await startPipeline({
+      steps: [renderer],
+      pages: [pageId],
+      defaultFont,
+      autoRenderEpoch: editEpoch,
+    })
   } catch (err) {
     // Auto-render failures shouldn't disturb the editing flow; users can
     // always run Render manually from the toolbar / menu.
@@ -156,15 +187,18 @@ export async function deleteSelectedTextNodesOnCurrentPage(): Promise<void> {
   const page = snap?.scene?.pages?.[pageId]
   if (!page) return
   const nodeIds = useSelectionStore.getState().nodeIds
-  const batch = [
-    ...nodeIds.keys().flatMap((nodeId) => {
-      const node = page.nodes[nodeId]
-      if (!node) return []
-      const idx = Object.keys(page.nodes).indexOf(nodeId)
-      return [ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx)]
-    }),
-  ]
-  await applyOp(ops.batch('removeNodes', batch))
+  const nodeOrder = Object.keys(page.nodes)
+  const batch: Op[] = []
+  for (const nodeId of nodeIds) {
+    const node = page.nodes[nodeId]
+    if (!node) continue
+    const idx = nodeOrder.indexOf(nodeId)
+    batch.push(ops.removeNode(page.id, nodeId, node, idx < 0 ? 0 : idx))
+  }
+  if (batch.length === 0) return
+  const editEpoch = await applyOp(ops.batch('removeNodes', batch))
+  useSelectionStore.getState().clear()
+  queueAutoRender(page.id, editEpoch)
 }
 
 // Project lifecycle ----------------------------------------------------------
@@ -188,10 +222,7 @@ export async function closeProject(): Promise<void> {
 // Pages import ---------------------------------------------------------------
 
 export async function uploadPages(files: File[], replace: boolean): Promise<string[]> {
-  const form = new FormData()
-  for (const file of files) form.append('file', file, file.name)
-  form.append('replace', replace ? 'true' : 'false')
-  const res = await createPages({ body: form })
+  const res = await createPages({ file: files, replace })
   await invalidateScene()
   return res.pages
 }
@@ -207,12 +238,8 @@ export async function uploadPagesByPaths(paths: string[], replace: boolean): Pro
   return res.pages
 }
 
-export async function uploadKhrArchive(file: File): Promise<ProjectSummary> {
-  const bytes = await file.arrayBuffer()
-  const summary = await importProject({
-    body: bytes,
-    headers: { 'Content-Type': 'application/zip' },
-  })
+export async function uploadYmkArchive(file: File): Promise<ProjectSummary> {
+  const summary = await importProject(file)
   await invalidateScene()
   return summary
 }

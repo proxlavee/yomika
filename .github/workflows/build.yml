@@ -27,6 +27,7 @@ jobs:
           sudo apt install --no-install-recommends \
             libwebkit2gtk-4.1-dev \
             build-essential \
+            libclang-dev \
             curl \
             wget \
             file \
@@ -55,7 +56,7 @@ jobs:
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-      - run: bun install
+      - run: bun install --frozen-lockfile
       - uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/ui/.next/cache
@@ -66,7 +67,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: koharu-${{ matrix.os }}
+          name: yomika-${{ matrix.os }}
           path: |
-            target/release/koharu*
+            target/release/yomika*
           retention-days: 3

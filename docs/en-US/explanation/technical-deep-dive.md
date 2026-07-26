@@ -4,7 +4,7 @@ title: Technical Deep Dive
 
 # Technical Deep Dive
 
-This page covers the technical structure of Koharu's manga pipeline: what each model does, how the stages fit together, and why text and bubble detection, segmentation masks, OCR, inpainting, and translation are handled separately.
+This page covers the technical structure of Yomika's manga pipeline: what each model does, how the stages fit together, and why text and bubble detection, segmentation masks, OCR, inpainting, and translation are handled separately.
 
 ## The page pipeline in implementation terms
 
@@ -36,7 +36,7 @@ That design is deliberate. A manga translation tool needs both page structure an
 
 ## Model types at a glance
 
-| Component | Default model | Model type | Main job in Koharu |
+| Component | Default model | Model type | Main job in Yomika |
 | --- | --- | --- | --- |
 | Text and bubble detection | [comic-text-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector) | object detector | find text blocks and speech bubble regions |
 | Segmentation | [comic-text-detector](https://github.com/dmMaze/comic-text-detector) | text segmentation network | produce a dense text mask for cleanup |
@@ -64,7 +64,7 @@ This matters because manga pages are visually dense:
 - vertical Japanese and horizontal Latin text can coexist on the same page
 - the region that should be read is not always the same shape as the pixels that should be erased
 
-Koharu first converts detector output into `TextBlock` records, then uses those blocks to drive OCR and later rendering. Bubble regions are kept as separate geometry so the UI and downstream tooling can still reason about the speech-balloon area.
+Yomika first converts detector output into `TextBlock` records, then uses those blocks to drive OCR and later rendering. Bubble regions are kept as separate geometry so the UI and downstream tooling can still reason about the speech-balloon area.
 
 In the current implementation, the default detect stage:
 
@@ -77,7 +77,7 @@ If you prefer a document-layout-style detector, `PP-DocLayoutV3` is still availa
 
 ## What a segmentation mask is
 
-A segmentation mask is an image-sized map in which each pixel indicates whether it belongs to a target class. In Koharu's case, that class is effectively "text foreground that should later be removed during cleanup".
+A segmentation mask is an image-sized map in which each pixel indicates whether it belongs to a target class. In Yomika's case, that class is effectively "text foreground that should later be removed during cleanup".
 
 This is different from a bounding box:
 
@@ -95,14 +95,14 @@ flowchart LR
     C --> E[Erase exact text pixels]
 ```
 
-In Koharu, the segmentation path is intentionally separate from layout:
+In Yomika, the segmentation path is intentionally separate from layout:
 
 - `comic-text-detector` produces a grayscale probability map
-- Koharu thresholds and dilates that map with lightweight post-processing
+- Yomika thresholds and dilates that map with lightweight post-processing
 - the resulting binary mask becomes `doc.segment`
 - `aot-inpainting` then uses `doc.segment` as the erase and fill mask for inpainting
 
-The cleanup step still matters because raw segmentation probabilities are usually soft and noisy. Koharu thresholds the prediction and dilates the final binary mask so cleanup covers text edges and outlines instead of leaving halos behind.
+The cleanup step still matters because raw segmentation probabilities are usually soft and noisy. Yomika thresholds the prediction and dilates the final binary mask so cleanup covers text edges and outlines instead of leaving halos behind.
 
 ## How the vision models work in theory
 
@@ -113,17 +113,17 @@ The cleanup step still matters because raw segmentation probabilities are usuall
 - text-like regions that should become `TextBlock`s
 - speech-bubble regions that should stay available to the editor and downstream tooling
 
-Koharu's Candle port maps those detections into document data structures and then sorts the text blocks into manga reading order before OCR. Conceptually, this is closer to page-level object detection than to OCR itself.
+Yomika's Candle port maps those detections into document data structures and then sorts the text blocks into manga reading order before OCR. Conceptually, this is closer to page-level object detection than to OCR itself.
 
 ### Segmentation: dense per-pixel text prediction
 
-Koharu's `comic-text-detector` path is segmentation-first. The Rust port loads:
+Yomika's `comic-text-detector` path is segmentation-first. The Rust port loads:
 
 - a YOLOv5-style backbone
 - a U-Net decoder for mask prediction
 - an optional DBNet head for full detection mode
 
-The default page pipeline uses the segmentation-only path because Koharu already gets text blocks from `comic-text-bubble-detector`. That means Koharu combines:
+The default page pipeline uses the segmentation-only path because Yomika already gets text blocks from `comic-text-bubble-detector`. That means Yomika combines:
 
 - one model that is good at page-level region detection
 - one model that is good at pixel-level text foreground
@@ -137,24 +137,24 @@ That is a much better fit for cleanup than relying on boxes alone.
 - a NaViT-style dynamic-resolution visual encoder
 - the ERNIE-4.5-0.3B language model
 
-In Koharu, OCR is treated as a multimodal sequence-generation problem:
+In Yomika, OCR is treated as a multimodal sequence-generation problem:
 
 1. the image crop is encoded into visual tokens
 2. a text prompt such as `OCR:` conditions the task
 3. the decoder autoregressively emits the recognized text tokens
 
-Koharu's implementation follows that pattern closely:
+Yomika's implementation follows that pattern closely:
 
 - it loads `PaddleOCR-VL-1.5.gguf` and a separate multimodal projector
 - it injects the image through the llama.cpp multimodal path
 - it prompts with `OCR:`
 - it greedily decodes text for each crop
 
-So OCR in Koharu is not a classic CTC-only recognizer. It is a compact document-oriented VLM used for a tightly scoped OCR task.
+So OCR in Yomika is not a classic CTC-only recognizer. It is a compact document-oriented VLM used for a tightly scoped OCR task.
 
 ### Inpainting: why the default is now AOT
 
-The default inpainter is the AOT model from [manga-image-translator](https://github.com/zyddnys/manga-image-translator), exposed in Koharu as `aot-inpainting`. It is a masked-image inpainting network built around gated convolutions and repeated context-mixing blocks with multiple dilation rates.
+The default inpainter is the AOT model from [manga-image-translator](https://github.com/zyddnys/manga-image-translator), exposed in Yomika as `aot-inpainting`. It is a masked-image inpainting network built around gated convolutions and repeated context-mixing blocks with multiple dilation rates.
 
 The practical intuition is:
 
@@ -162,7 +162,7 @@ The practical intuition is:
 - the model needs both local edge detail and wider context from the bubble or background
 - repeated multi-dilation blocks are a practical way to mix that context without changing the rest of the pipeline contract
 
-Koharu's Candle port follows the upstream inference shape closely:
+Yomika's Candle port follows the upstream inference shape closely:
 
 1. resize large pages down to a configurable max side
 2. pad the working image to a multiple-of-8 shape
@@ -175,7 +175,7 @@ Koharu's Candle port follows the upstream inference shape closely:
 
 ## Local LLMs and model type
 
-Koharu's local translation path uses GGUF models through `llama.cpp`. In practice, these are usually quantized decoder-only transformers.
+Yomika's local translation path uses GGUF models through `llama.cpp`. In practice, these are usually quantized decoder-only transformers.
 
 The theory is standard modern LLM inference:
 
@@ -189,9 +189,9 @@ The practical trade-off is also familiar:
 - smaller quantized models use less VRAM and RAM
 - remote providers trade local privacy for easier access to larger hosted models
 
-Koharu keeps the image understanding steps local even when you choose a remote text-generation provider. The remote side only needs the OCR text.
+Yomika keeps the image understanding steps local even when you choose a remote text-generation provider. The remote side only needs the OCR text.
 
-## Koharu-specific implementation notes
+## Yomika-specific implementation notes
 
 Some details are easy to miss if you only read the high-level docs:
 
@@ -230,4 +230,4 @@ These pages are useful if you want the general theory and overview diagrams befo
 - [Object detection](https://en.wikipedia.org/wiki/Object_detection)
 - [Inpainting](https://en.wikipedia.org/wiki/Inpainting)
 
-Those Wikipedia links are background references. For Koharu-specific behavior and actual model choices, prefer the official model cards and the source tree.
+Those Wikipedia links are background references. For Yomika-specific behavior and actual model choices, prefer the official model cards and the source tree.

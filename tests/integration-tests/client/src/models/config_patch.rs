@@ -11,9 +11,16 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
-/// ConfigPatch : Sparse patch for `koharu_app::AppConfig`. Missing fields mean \"leave as-is\". The `providers` field, if present, replaces the whole provider list — we do not merge by id because ordering is meaningful.
+/// ConfigPatch : Sparse patch for `yomika_app::AppConfig`. Missing fields mean \"leave as-is\". The `providers` field, if present, replaces the whole provider list — we do not merge by id because ordering is meaningful.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ConfigPatch {
+    #[serde(
+        rename = "data",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub data: Option<Option<Box<models::DataConfigPatch>>>,
     #[serde(
         rename = "http",
         default,
@@ -39,9 +46,10 @@ pub struct ConfigPatch {
 }
 
 impl ConfigPatch {
-    /// Sparse patch for `koharu_app::AppConfig`. Missing fields mean \"leave as-is\". The `providers` field, if present, replaces the whole provider list — we do not merge by id because ordering is meaningful.
+    /// Sparse patch for `yomika_app::AppConfig`. Missing fields mean \"leave as-is\". The `providers` field, if present, replaces the whole provider list — we do not merge by id because ordering is meaningful.
     pub fn new() -> ConfigPatch {
         ConfigPatch {
+            data: None,
             http: None,
             pipeline: None,
             providers: None,

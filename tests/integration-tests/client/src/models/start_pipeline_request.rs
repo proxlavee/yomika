@@ -13,6 +13,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct StartPipelineRequest {
+    /// Internal correlation used by the UI's debounced auto-render. When set, the request must be a single-page, renderer-only pipeline.
+    #[serde(
+        rename = "autoRenderEpoch",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub auto_render_epoch: Option<Option<u64>>,
     #[serde(
         rename = "defaultFont",
         default,
@@ -28,6 +36,13 @@ pub struct StartPipelineRequest {
         skip_serializing_if = "Option::is_none"
     )]
     pub pages: Option<Option<Vec<uuid::Uuid>>>,
+    #[serde(
+        rename = "readingOrder",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub reading_order: Option<Option<models::ReadingOrder>>,
     /// Optional bounding-box hint for inpainter engines (repair-brush).
     #[serde(
         rename = "region",
@@ -53,17 +68,28 @@ pub struct StartPipelineRequest {
         skip_serializing_if = "Option::is_none"
     )]
     pub target_language: Option<Option<String>>,
+    /// Optional text-node ids for engines that can operate on individual blocks.
+    #[serde(
+        rename = "textNodeIds",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub text_node_ids: Option<Option<Vec<uuid::Uuid>>>,
 }
 
 impl StartPipelineRequest {
     pub fn new(steps: Vec<String>) -> StartPipelineRequest {
         StartPipelineRequest {
+            auto_render_epoch: None,
             default_font: None,
             pages: None,
+            reading_order: None,
             region: None,
             steps,
             system_prompt: None,
             target_language: None,
+            text_node_ids: None,
         }
     }
 }

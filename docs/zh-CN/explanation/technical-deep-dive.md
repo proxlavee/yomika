@@ -4,7 +4,7 @@ title: 技术深潜
 
 # 技术深潜
 
-本页解释 Koharu 漫画处理管线的技术侧面：每个模型做什么、各阶段如何拼在一起，以及为什么漫画翻译必须把文本与气泡检测、分割掩码、OCR、修复和翻译拆开处理。
+本页解释 Yomika 漫画处理管线的技术侧面：每个模型做什么、各阶段如何拼在一起，以及为什么漫画翻译必须把文本与气泡检测、分割掩码、OCR、修复和翻译拆开处理。
 
 ## 从实现角度看页面管线
 
@@ -26,7 +26,7 @@ flowchart TD
     K --> L[渲染页面 / PSD]
 ```
 
-从公开 API 看，Koharu 的主要流程是 `Detect -> OCR -> Inpaint -> LLM Generate -> Render`，但 detect 阶段本身已经同时做了三类工作：
+从公开 API 看，Yomika 的主要流程是 `Detect -> OCR -> Inpaint -> LLM Generate -> Render`，但 detect 阶段本身已经同时做了三类工作：
 
 - 文本和气泡检测
 - 文本前景分割
@@ -36,7 +36,7 @@ flowchart TD
 
 ## 模型类型总览
 
-| 组件 | 默认模型 | 模型类型 | 在 Koharu 中的主要任务 |
+| 组件 | 默认模型 | 模型类型 | 在 Yomika 中的主要任务 |
 | --- | --- | --- | --- |
 | 文本 / 气泡检测 | [comic-text-bubble-detector](https://huggingface.co/ogkalu/comic-text-and-bubble-detector) | object detector | 找出文本块和气泡区域 |
 | 分割 | [comic-text-detector](https://github.com/dmMaze/comic-text-detector) | 文本分割网络 | 生成用于清理的高密度文本掩码 |
@@ -64,7 +64,7 @@ flowchart TD
 - 竖排日文和横排拉丁文本会同时存在
 - 应该“读”的区域，与应该“擦掉”的像素，形状往往并不一样
 
-Koharu 先根据检测结果创建 `TextBlock`，再用这些块驱动 OCR 和后续渲染。气泡区域会单独保留下来，供 UI 和后续工具继续使用。
+Yomika 先根据检测结果创建 `TextBlock`，再用这些块驱动 OCR 和后续渲染。气泡区域会单独保留下来，供 UI 和后续工具继续使用。
 
 在当前默认实现里，detect 阶段会：
 
@@ -77,7 +77,7 @@ Koharu 先根据检测结果创建 `TextBlock`，再用这些块驱动 OCR 和�
 
 ## 什么是分割掩码
 
-分割掩码是一张与输入图像同尺寸的图，其中每个像素都表示它是否属于目标类别。在 Koharu 的场景里，目标类别基本就是“之后应当在清理阶段去除的文本前景”。
+分割掩码是一张与输入图像同尺寸的图，其中每个像素都表示它是否属于目标类别。在 Yomika 的场景里，目标类别基本就是“之后应当在清理阶段去除的文本前景”。
 
 这和边界框不同：
 
@@ -95,14 +95,14 @@ flowchart LR
     C --> E[擦除精确文本像素]
 ```
 
-在 Koharu 中，分割路径有意和检测路径分开：
+在 Yomika 中，分割路径有意和检测路径分开：
 
 - `comic-text-detector` 生成灰度概率图
-- Koharu 对它做阈值化和膨胀等轻量后处理
+- Yomika 对它做阈值化和膨胀等轻量后处理
 - 结果保存到 `doc.segment`
 - `aot-inpainting` 再把 `doc.segment` 作为擦除与填补掩码
 
-这个后处理步骤仍然重要，因为原始分割概率通常是软的、带噪声的。Koharu 会先二值化，再对最终掩码做膨胀，尽量覆盖文字边缘和描边，减少残影。
+这个后处理步骤仍然重要，因为原始分割概率通常是软的、带噪声的。Yomika 会先二值化，再对最终掩码做膨胀，尽量覆盖文字边缘和描边，减少残影。
 
 ## 这些视觉模型在理论上如何工作
 
@@ -113,17 +113,17 @@ flowchart LR
 - 应该转换成 `TextBlock` 的文本区域
 - 应该继续保留给编辑器和后续工具使用的气泡区域
 
-Koharu 的 Candle 端口会把这些检测结果映射到文档结构里，并在 OCR 前按漫画阅读顺序排序文本块。从概念上说，这更接近页面目标检测，而不是 OCR 本身。
+Yomika 的 Candle 端口会把这些检测结果映射到文档结构里，并在 OCR 前按漫画阅读顺序排序文本块。从概念上说，这更接近页面目标检测，而不是 OCR 本身。
 
 ### 分割：密集逐像素文本预测
 
-Koharu 的 `comic-text-detector` 路径本质上是以分割为核心的设计。Rust 端口会加载：
+Yomika 的 `comic-text-detector` 路径本质上是以分割为核心的设计。Rust 端口会加载：
 
 - 类 YOLOv5 的骨干网络
 - 用于掩码预测的 U-Net 解码器
 - 可选的 DBNet 检测头
 
-默认页面管线使用“仅分割”路径，因为 Koharu 已经从 `comic-text-bubble-detector` 获得了 text block。也就是说，Koharu 组合了：
+默认页面管线使用“仅分割”路径，因为 Yomika 已经从 `comic-text-bubble-detector` 获得了 text block。也就是说，Yomika 组合了：
 
 - 一个擅长页面级区域检测的模型
 - 一个擅长像素级文本前景抽取的模型
@@ -143,7 +143,7 @@ Koharu 的 `comic-text-detector` 路径本质上是以分割为核心的设计�
 2. 再用诸如 `OCR:` 的文本提示指定任务
 3. 最后由解码器自回归地产生识别文本
 
-Koharu 的实现非常接近这种模式：
+Yomika 的实现非常接近这种模式：
 
 - 加载 `PaddleOCR-VL-1.5.gguf` 和单独的多模态 projector
 - 通过 `llama.cpp` 的多模态路径送入图像
@@ -152,7 +152,7 @@ Koharu 的实现非常接近这种模式：
 
 ### 修复：为什么默认改成了 AOT
 
-默认修复器是来自 [manga-image-translator](https://github.com/zyddnys/manga-image-translator) 的 AOT 模型，在 Koharu 中叫 `aot-inpainting`。它是一种 masked-image inpainting network，核心是 gated convolution 和带有多个 dilation rate 的上下文混合块。
+默认修复器是来自 [manga-image-translator](https://github.com/zyddnys/manga-image-translator) 的 AOT 模型，在 Yomika 中叫 `aot-inpainting`。它是一种 masked-image inpainting network，核心是 gated convolution 和带有多个 dilation rate 的上下文混合块。
 
 直觉上，关键点在于：
 
@@ -160,7 +160,7 @@ Koharu 的实现非常接近这种模式：
 - 模型既要看到局部边缘细节，也要借用更大范围的气泡或背景上下文
 - 多膨胀率上下文块是一种务实的上下文混合方式
 
-Koharu 的 Candle 端口基本遵循上游推理流程：
+Yomika 的 Candle 端口基本遵循上游推理流程：
 
 1. 把过大的页面缩到设定的 max side
 2. 把工作图像补齐到 multiple-of-8
@@ -173,7 +173,7 @@ Koharu 的 Candle 端口基本遵循上游推理流程：
 
 ## 本地 LLM 与模型类型
 
-Koharu 的本地翻译路径通过 `llama.cpp` 使用 GGUF 模型。实际中，它们通常是量化后的 decoder-only transformer。
+Yomika 的本地翻译路径通过 `llama.cpp` 使用 GGUF 模型。实际中，它们通常是量化后的 decoder-only transformer。
 
 理论上流程非常标准：
 
@@ -181,9 +181,9 @@ Koharu 的本地翻译路径通过 `llama.cpp` 使用 GGUF 模型。实际中，
 - 在不断增长的 token 序列上执行 masked self-attention
 - 反复预测下一个 token，直到完成输出
 
-即使你使用远程文本生成提供商，Koharu 也会把图像理解步骤留在本地。远端拿到的只是 OCR 文本。
+即使你使用远程文本生成提供商，Yomika 也会把图像理解步骤留在本地。远端拿到的只是 OCR 文本。
 
-## Koharu 实现中特别值得注意的点
+## Yomika 实现中特别值得注意的点
 
 如果你只看高层文档，下面这些实现细节很容易被忽略：
 
@@ -222,4 +222,4 @@ Koharu 的本地翻译路径通过 `llama.cpp` 使用 GGUF 模型。实际中，
 - [Object detection](https://en.wikipedia.org/wiki/Object_detection)
 - [Inpainting](https://en.wikipedia.org/wiki/Inpainting)
 
-这些 Wikipedia 链接更适合做背景补充。想理解 Koharu 真实行为与实际模型选型，还是应以官方模型卡和源码实现为准。
+这些 Wikipedia 链接更适合做背景补充。想理解 Yomika 真实行为与实际模型选型，还是应以官方模型卡和源码实现为准。

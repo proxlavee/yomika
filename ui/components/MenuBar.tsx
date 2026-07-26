@@ -62,12 +62,6 @@ type MenuItem = {
   testId?: string
 }
 
-type MenuSection = {
-  label: string
-  items: MenuItem[]
-  triggerTestId?: string
-}
-
 export function MenuBar() {
   const { t } = useTranslation()
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -174,10 +168,9 @@ export function MenuBar() {
   ]
 
   const helpMenuItems: MenuItem[] = [
-    { label: t('menu.discord'), onSelect: () => openExternalUrl('https://discord.gg/mHvHkxGnUY') },
     {
       label: t('menu.github'),
-      onSelect: () => openExternalUrl('https://github.com/mayocream/koharu'),
+      onSelect: () => openExternalUrl('https://github.com/proxlavee/yomika'),
     },
   ]
 
@@ -188,7 +181,7 @@ export function MenuBar() {
     <div className='flex h-8 items-center border-b border-border bg-background text-[13px] text-foreground'>
       {isNativeMacOS && <MacOSControls />}
       <div className='flex h-full items-center pl-2 select-none'>
-        <Image src='/icon.png' alt='Koharu' width={18} height={18} draggable={false} />
+        <Image src='/icon.png' alt='Yomika' width={18} height={18} draggable={false} />
       </div>
       <Menubar className='h-auto gap-1 border-none bg-transparent p-0 px-1.5 shadow-none'>
         <MenubarMenu>
@@ -220,7 +213,7 @@ export function MenuBar() {
               data-testid='menu-file-save-as'
               className='text-[13px]'
               disabled={!hasScene}
-              onSelect={() => void exportCurrentProjectAs('khr')}
+              onSelect={() => void exportCurrentProjectAs('ymk')}
             >
               {t('menu.saveAs')}
             </MenubarItem>

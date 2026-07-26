@@ -9,9 +9,9 @@ import { renderWithQuery } from '../helpers'
 describe('AppInitializationSkeleton', () => {
   beforeEach(() => useDownloadsStore.getState().clear())
 
-  it('renders the Koharu title and initializing copy', () => {
+  it('renders the Yomika title and initializing copy', () => {
     renderWithQuery(<AppInitializationSkeleton />)
-    expect(screen.getByRole('heading', { name: 'Koharu' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Yomika' })).toBeInTheDocument()
     expect(screen.getByText('common.initializing')).toBeInTheDocument()
   })
 

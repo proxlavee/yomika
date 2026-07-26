@@ -4,7 +4,7 @@ title: トラブルシューティング
 
 # トラブルシューティング
 
-このページでは、現在の実装に基づいて起こりやすい Koharu の問題を扱います。主な対象は、初回ダウンロード、ランタイム初期化、GPU フォールバック、headless / MCP アクセス、パイプライン段階の順序、ソースビルド周りです。
+このページでは、現在の実装に基づいて起こりやすい Yomika の問題を扱います。主な対象は、初回ダウンロード、ランタイム初期化、GPU フォールバック、headless / MCP アクセス、パイプライン段階の順序、ソースビルド周りです。
 
 ## 最初に切り分けること
 
@@ -19,7 +19,7 @@ title: トラブルシューティング
 
 ここが分かるだけで、かなり問題を狭められます。
 
-## 初回起動で Koharu がきれいに起動しない
+## 初回起動で Yomika がきれいに起動しない
 
 考えられる原因:
 
@@ -37,21 +37,21 @@ title: トラブルシューティング
 
 ```bash
 # macOS / Linux
-koharu --download
-koharu --cpu
-koharu --debug
+yomika --download
+yomika --cpu
+yomika --debug
 
 # Windows
-koharu.exe --download
-koharu.exe --cpu
-koharu.exe --debug
+yomika.exe --download
+yomika.exe --cpu
+yomika.exe --debug
 ```
 
 `--cpu` では動き、通常起動では動かない場合、問題は一般的な起動経路ではなく GPU 経路にあることが多いです。
 
 ## モデルやランタイムのダウンロードに失敗する
 
-Koharu は初回利用時に、次のためのネットワークアクセスを必要とします。
+Yomika は初回利用時に、次のためのネットワークアクセスを必要とします。
 
 - llama.cpp のランタイムパッケージ
 - 必要に応じた GPU ランタイム支援ファイル
@@ -72,11 +72,11 @@ Koharu は初回利用時に、次のためのネットワークアクセスを�
 
 失敗が続く場合は、まず別ネットワークで試してください。そうすると、マシン固有の問題か upstream への到達性の問題かを早く分けられます。
 
-Koharu のランタイムとモデルのダウンロード経路、Hugging Face / GitHub / PyPI を確認するブラウザや `curl` の手順については、[ランタイムとモデルのダウンロード](runtime-and-model-downloads.md) を参照してください。
+Yomika のランタイムとモデルのダウンロード経路、Hugging Face / GitHub / PyPI を確認するブラウザや `curl` の手順については、[ランタイムとモデルのダウンロード](runtime-and-model-downloads.md) を参照してください。
 
 ## NVIDIA GPU があるのに CPU にフォールバックする
 
-Koharu が CUDA 13.0 対応を確認できない場合、これは想定された挙動です。
+Yomika が CUDA 13.0 対応を確認できない場合、これは想定された挙動です。
 
 現在のランタイム挙動は次の通りです。
 
@@ -89,10 +89,10 @@ Koharu が CUDA 13.0 対応を確認できない場合、これは想定され�
 試すこと:
 
 1. NVIDIA ドライバを更新する
-2. 更新後に Koharu を再起動する
+2. 更新後に Yomika を再起動する
 3. `--debug` で挙動を確認する
 
-ドライバが古い、または CUDA チェックに失敗する場合、Koharu は中途半端な CUDA 構成より CPU を優先します。
+ドライバが古い、または CUDA チェックに失敗する場合、Yomika は中途半端な CUDA 構成より CPU を優先します。
 
 ## OCR、inpainting、export で何かが足りないと言われる
 
@@ -147,7 +147,7 @@ rendered layer や inpainted layer がないせいで export が失敗してい�
 例:
 
 ```bash
-koharu --port 4000 --headless
+yomika --port 4000 --headless
 ```
 
 その後、次を開きます。
@@ -158,7 +158,7 @@ http://localhost:4000
 
 重要な実装上の点:
 
-- Koharu は `127.0.0.1` にバインドされます
+- Yomika は `127.0.0.1` にバインドされます
 
 つまり、ローカル Web UI は、自分でネットワーク公開しない限り同じマシンからしか見えません。
 
@@ -176,7 +176,7 @@ http://localhost:9999/mcp
 
 - `/mcp` ではなくルート URL を使う
 - `--port` を付け忘れる
-- Koharu プロセスがすでに終了したあとに接続しようとする
+- Yomika プロセスがすでに終了したあとに接続しようとする
 - ポートを明示的に公開せず、別マシンから到達できると思う
 
 通常の headless Web UI アクセスは動くのに MCP だけ動かない場合、まず URL のパスが正しいかを確認してください。サーバー障害より単純なパス間違いのほうが多いです。
@@ -185,7 +185,7 @@ Antigravity、Claude Desktop、Claude Code を使う場合は、[MCP クライ�
 
 ## 読み込みしても何も起きないように見える
 
-現在文書化されている読み込みフローは画像ベースです。Koharu が受け付けるのは次の形式です。
+現在文書化されている読み込みフローは画像ベースです。Yomika が受け付けるのは次の形式です。
 
 - `.png`
 - `.jpg`
@@ -206,9 +206,9 @@ Antigravity、Claude Desktop、Claude Code を使う場合は、[MCP クライ�
 
 加えて、次も覚えておいてください。
 
-- rendered export には `_koharu` サフィックスが付く
+- rendered export には `_yomika` サフィックスが付く
 - inpainted export には `_inpainted` サフィックスが付く
-- PSD export は `_koharu.psd` を使う
+- PSD export は `_yomika.psd` を使う
 - 従来 PSD export は `30000 x 30000` を超える画像を拒否する
 
 極端に大きなページなら、PSD export を期待する前にリサイズまたは分割してください。
@@ -225,7 +225,7 @@ Bun ラッパースクリプトは両方の自動検出を試みますが、ど�
 プロジェクト推奨のラッパーコマンドを使ってください。
 
 ```bash
-bun install
+bun install --frozen-lockfile
 bun run build
 ```
 
@@ -238,7 +238,7 @@ bun tauri build --release --no-bundle
 より低レベルな Rust ビルドには次を使います。
 
 ```bash
-bun cargo build --release -p koharu --features=cuda
+bun cargo build --release -p yomika --features=cuda
 ```
 
 まずアプリが動くかどうかだけ確認したいなら、CUDA ツールチェーン全体を追う前に CPU-only 起動を試すほうが早いことがあります。
@@ -271,7 +271,7 @@ bun cargo build --release -p koharu --features=cuda
 
 ## 関連ページ
 
-- [Koharu をインストールする](install-koharu.md)
+- [Yomika をインストールする](install-yomika.md)
 - [GUI / Headless / MCP モードを使う](run-gui-headless-and-mcp.md)
 - [MCP クライアントを設定する](configure-mcp-clients.md)
 - [ソースからビルドする](build-from-source.md)

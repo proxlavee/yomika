@@ -7,8 +7,8 @@ title: Primeiros Passos
 ## Clonar o Repositório
 
 ```bash
-git clone https://github.com/mayocream/koharu.git
-cd koharu
+git clone https://github.com/proxlavee/yomika.git
+cd yomika
 ```
 
 ## Pré-requisitos
@@ -34,10 +34,10 @@ cd koharu
 ## Instalar Dependências
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
-A toolchain Rust é resolvida automaticamente a partir do `rust-toolchain.toml` no primeiro build.
+Confirme a toolchain necessária com `rustc --version`; este repositório não fixa um arquivo de toolchain separado.
 
 ## Executar Localmente
 
@@ -53,7 +53,7 @@ Isso inicia o app Tauri em modo dev contra a UI empacotada.
 bun run build
 ```
 
-Os binários ficam em `target/release-with-debug/` ou `target/release/` dependendo do profile.
+`bun run build` grava o binário de release em `target/release/`; `bun run dev` usa `target/release-with-debug/`.
 
 ## Comandos do Dia a Dia
 
@@ -81,14 +81,14 @@ bun run test:ui
 
 ## Trabalho com ML
 
-Ao iterar em `koharu-ml` ou `koharu-llm`, habilite o backend que bate com a sua máquina:
+Ao iterar em `yomika-ml` ou `yomika-llm`, habilite o backend que bate com a sua máquina:
 
 ```bash
 # Windows / Linux com NVIDIA
-bun cargo test -p koharu-ml --features=cuda
+bun cargo test -p yomika-ml --features=cuda
 
 # macOS (Apple Silicon)
-bun cargo test -p koharu-ml --features=metal
+bun cargo test -p yomika-ml --features=metal
 ```
 
 Detalhes da seleção de backend estão em [Aceleração e Runtime](../explanation/acceleration-and-runtime.md).

@@ -25,23 +25,23 @@
 'area: tauri':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu/**
+          - crates/yomika/**
 
 'area: app':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu-app/**
+          - crates/yomika-app/**
 
 'area: core':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu-core/**
-          - koharu-runtime/**
+          - crates/yomika-core/**
+          - crates/yomika-runtime/**
 
 'area: rpc':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu-rpc/**
+          - crates/yomika-rpc/**
           - ui/lib/api/**
           - ui/openapi.json
           - ui/orval.config.ts
@@ -49,19 +49,19 @@
 'area: llm':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu-llm/**
+          - crates/yomika-llm/**
 
 'area: ml':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu-ml/**
+          - crates/yomika-ml/**
           - models/**
 
 'area: renderer':
   - changed-files:
       - any-glob-to-any-file:
-          - koharu-psd/**
-          - koharu-renderer/**
+          - crates/yomika-psd/**
+          - crates/yomika-renderer/**
 
 dependencies:
   - changed-files:

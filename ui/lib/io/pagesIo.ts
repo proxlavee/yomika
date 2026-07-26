@@ -2,9 +2,9 @@
 
 import { getGetSceneJsonQueryKey } from '@/lib/api/default/default'
 import type { SceneSnapshot } from '@/lib/api/schemas'
-import { openImageFiles, openImageFolder, openKhrFile } from '@/lib/io/openFiles'
+import { openImageFiles, openImageFolder, openYmkFile } from '@/lib/io/openFiles'
 import { saveBlob } from '@/lib/io/saveBlob'
-import { exportProject, uploadKhrArchive, uploadPages, uploadPagesByPaths } from '@/lib/io/scene'
+import { exportProject, uploadYmkArchive, uploadPages, uploadPagesByPaths } from '@/lib/io/scene'
 import { queryClient } from '@/lib/queryClient'
 import { usePreferencesStore } from '@/lib/stores/preferencesStore'
 
@@ -29,22 +29,22 @@ export async function importPages(
 }
 
 /**
- * Import a `.khr` archive. Works on both desktop and web: the archive file
- * is picked via the cross-platform `openKhrFile`, and the destination is
+ * Import a `.ymk` archive. Works on both desktop and web: the archive file
+ * is picked via the cross-platform `openYmkFile`, and the destination is
  * allocated server-side so the client never needs to touch the filesystem.
  */
-export async function importKhrFile(): Promise<void> {
-  const file = await openKhrFile()
+export async function importYmkFile(): Promise<void> {
+  const file = await openYmkFile()
   if (!file) return
-  await uploadKhrArchive(file)
+  await uploadYmkArchive(file)
 }
 
 // ---------------------------------------------------------------------------
 // Export (server returns bytes; saveBlob dispatches Tauri-dialog / web-FS)
 // ---------------------------------------------------------------------------
 
-const exportExtension: Record<'khr' | 'psd' | 'rendered' | 'inpainted', string> = {
-  khr: 'khr',
+const exportExtension: Record<'ymk' | 'psd' | 'rendered' | 'inpainted', string> = {
+  ymk: 'ymk',
   psd: 'zip',
   rendered: 'zip',
   inpainted: 'zip',
@@ -56,7 +56,7 @@ function sanitiseBaseName(name: string | undefined | null): string {
     .trim()
     .replace(/[\\/:*?"<>|]+/g, '_')
     .replace(/\s+/g, ' ')
-  return cleaned.length > 0 ? cleaned : 'koharu-export'
+  return cleaned.length > 0 ? cleaned : 'yomika-export'
 }
 
 /** Read the current project name from React Query's cached scene snapshot. */
@@ -66,7 +66,7 @@ function currentProjectName(): string | undefined {
 }
 
 export async function exportCurrentProjectAs(
-  format: 'khr' | 'psd' | 'rendered' | 'inpainted',
+  format: 'ymk' | 'psd' | 'rendered' | 'inpainted',
   pages?: string[],
 ): Promise<void> {
   try {

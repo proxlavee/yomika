@@ -11,7 +11,7 @@ import { server } from '../../msw/server'
 vi.mock('@/lib/io/openFiles', () => ({
   openImageFiles: vi.fn(),
   openImageFolder: vi.fn(),
-  openKhrFile: vi.fn(),
+  openYmkFile: vi.fn(),
 }))
 vi.mock('@/lib/io/saveBlob', async () => {
   // Keep the real `filenameFromContentDisposition` so the export flow can
@@ -24,8 +24,8 @@ vi.mock('@/lib/io/saveBlob', async () => {
   }
 })
 
-import { openImageFiles, openImageFolder, openKhrFile } from '@/lib/io/openFiles'
-import { exportCurrentProjectAs, importKhrFile, importPages } from '@/lib/io/pagesIo'
+import { openImageFiles, openImageFolder, openYmkFile } from '@/lib/io/openFiles'
+import { exportCurrentProjectAs, importYmkFile, importPages } from '@/lib/io/pagesIo'
 import { saveBlob } from '@/lib/io/saveBlob'
 
 const asMock = <T extends (...args: never) => unknown>(fn: T) =>
@@ -122,9 +122,9 @@ describe('importPages', () => {
   })
 })
 
-describe('importKhrFile', () => {
+describe('importYmkFile', () => {
   it('no-ops when the user cancels', async () => {
-    asMock(openKhrFile).mockResolvedValue(null)
+    asMock(openYmkFile).mockResolvedValue(null)
     let importCalls = 0
     server.use(
       http.post('/api/v1/projects/import', () => {
@@ -132,16 +132,16 @@ describe('importKhrFile', () => {
         return HttpResponse.json({ id: '', name: '', path: '', updatedAtMs: 0 })
       }),
     )
-    await importKhrFile()
+    await importYmkFile()
     expect(importCalls).toBe(0)
     expect(isInvalidated(getGetSceneJsonQueryKey())).toBe(false)
   })
 
   it('uploads the archive and invalidates scene', async () => {
-    const khr = new File([new Uint8Array([1, 2, 3])], 'x.khr', {
+    const ymk = new File([new Uint8Array([1, 2, 3])], 'x.ymk', {
       type: 'application/zip',
     })
-    asMock(openKhrFile).mockResolvedValue(khr)
+    asMock(openYmkFile).mockResolvedValue(ymk)
     let importCalls = 0
     server.use(
       http.post('/api/v1/projects/import', () => {
@@ -154,7 +154,7 @@ describe('importKhrFile', () => {
         })
       }),
     )
-    await importKhrFile()
+    await importYmkFile()
     expect(importCalls).toBe(1)
     expect(isInvalidated(getGetSceneJsonQueryKey())).toBe(true)
   })
@@ -176,18 +176,18 @@ describe('exportCurrentProjectAs', () => {
     expect(seen).toEqual([{ format: 'rendered', pages: ['p1', 'p2'] }])
     expect(saveBlob).toHaveBeenCalledTimes(1)
     const [, filename] = asMock(saveBlob).mock.calls[0]
-    expect(filename).toBe('koharu-export.zip')
+    expect(filename).toBe('yomika-export.zip')
   })
 
-  it('uses .khr extension for khr format', async () => {
+  it('uses .ymk extension for ymk format', async () => {
     server.use(
       http.post('/api/v1/projects/current/export', () =>
         HttpResponse.arrayBuffer(new Uint8Array([0]).buffer),
       ),
     )
-    await exportCurrentProjectAs('khr')
+    await exportCurrentProjectAs('ymk')
     const [, filename] = asMock(saveBlob).mock.calls[0]
-    expect(filename).toBe('koharu-export.khr')
+    expect(filename).toBe('yomika-export.ymk')
   })
 
   it('uses the server-provided filename for single-file exports', async () => {

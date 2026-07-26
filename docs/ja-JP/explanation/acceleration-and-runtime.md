@@ -4,20 +4,20 @@ title: アクセラレーションとランタイム
 
 # アクセラレーションとランタイム
 
-Koharu は複数のランタイム経路を備えており、幅広いハードウェアで実用的に動くようになっています。
+Yomika は複数のランタイム経路を備えており、幅広いハードウェアで実用的に動くようになっています。
 
 ## NVIDIA GPU 上の CUDA
 
 CUDA は、対応する NVIDIA ハードウェアを持つ環境での主な GPU アクセラレーション経路です。
 
-- Koharu は compute capability 8.0 以上の NVIDIA GPU をサポートします
-- Koharu は CUDA Toolkit 13.0 を同梱しています
+- Yomika は compute capability 8.0 以上の NVIDIA GPU をサポートします
+- Yomika は CUDA Toolkit 13.0 を同梱しています
 
 初回実行時には、必要な動的ライブラリがアプリケーションデータディレクトリへ展開されます。
 
 !!! note
 
-    CUDA アクセラレーションには新しい NVIDIA ドライバが必要です。ドライバが CUDA 13.0 以降 (Windows のローカル LLM CUDA 経路では CUDA 13.1+) をサポートしていない場合、Koharu は CPU にフォールバックします。
+    CUDA アクセラレーションには新しい NVIDIA ドライバが必要です。ドライバが CUDA 13.0 以降 (Windows のローカル LLM CUDA 経路では CUDA 13.1+) をサポートしていない場合、Yomika は CPU にフォールバックします。
 
 ## Apple Silicon 上の Metal
 
@@ -31,19 +31,19 @@ AMD や Intel の GPU でも Vulkan による高速化は使えますが、detec
 
 ## CPU フォールバック
 
-GPU アクセラレーションが利用できない場合や、明示的に CPU モードを強制した場合でも、Koharu は常に CPU で動作できます。
+GPU アクセラレーションが利用できない場合や、明示的に CPU モードを強制した場合でも、Yomika は常に CPU で動作できます。
 
 ```bash
 # macOS / Linux
-koharu --cpu
+yomika --cpu
 
 # Windows
-koharu.exe --cpu
+yomika.exe --cpu
 ```
 
 ## フォールバックが重要な理由
 
-フォールバック動作があることで、Koharu はより多くのマシンで動きますが、体験は変わります。
+フォールバック動作があることで、Yomika はより多くのマシンで動きますが、体験は変わります。
 
 - 対応していれば GPU 推論のほうがずっと速い
 - CPU モードのほうが互換性は高いが、かなり遅くなることがある
