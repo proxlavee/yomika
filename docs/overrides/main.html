@@ -2,6 +2,7 @@
 
 {% block extrahead %}
   {{ super() }}
+  {% include "partials/home-styles.html" %}
   {% set favicon_href = config.theme.favicon | d("assets/images/favicon.png") | url %}
   {% if page.meta and page.meta.social_title %}
     {% set social_title = page.meta.social_title %}
