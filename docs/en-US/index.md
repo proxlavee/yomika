@@ -160,11 +160,11 @@ hide:
     <section class="ym-install" aria-labelledby="ym-install-title">
       <div class="ym-install__grid">
         <div class="ym-install__copy">
-          <div class="ym-kicker">Source build</div>
+          <div class="ym-kicker">Install Yomika</div>
           <h2 id="ym-install-title">Ready to turn the first page?</h2>
           <p>
-            No prebuilt release is published yet. Build with the repository's
-            Bun wrapper so the correct Tauri and platform feature path is used.
+            Download the latest desktop package, or use the repository's Bun
+            wrapper when you need a custom source build.
           </p>
         </div>
         <div>
@@ -173,6 +173,7 @@ cd yomika
 bun install --frozen-lockfile
 bun run build</code></pre>
           <div class="ym-install__links">
+            <a class="ym-text-link" href="https://github.com/proxlavee/yomika/releases/latest">Download the latest release</a>
             <a class="ym-text-link" href="how-to/build-from-source.md">Read prerequisites and platform notes</a>
             <a class="ym-text-link" href="how-to/runtime-and-model-downloads.md">Understand first-run downloads</a>
             <a class="ym-text-link" href="https://github.com/proxlavee/yomika">View the source on GitHub</a>

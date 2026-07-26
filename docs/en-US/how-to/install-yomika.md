@@ -4,9 +4,12 @@ title: Install Yomika
 
 # Install Yomika
 
-## Build the application
+## Download a release
 
-No prebuilt release is currently assumed. Follow [Build From Source](build-from-source.md) to produce the desktop binary for Windows, macOS, or Linux. Future published artifacts will appear on the [Yomika releases page](https://github.com/proxlavee/yomika/releases).
+Download the latest desktop package for your platform from the
+[Yomika Releases page](https://github.com/proxlavee/yomika/releases/latest).
+For a development or custom build, follow
+[Build From Source](build-from-source.md).
 
 ## What gets installed locally
 

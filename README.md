@@ -52,7 +52,12 @@ interface is built with [Next.js](https://nextjs.org/).
 
 ## Installation
 
-### Requirements
+### Download
+
+Download the latest desktop package for your platform from
+[GitHub Releases](https://github.com/proxlavee/yomika/releases/latest).
+
+### Source Build Requirements
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.95 or later
 - [Bun](https://bun.sh/) 1.0 or later
@@ -61,7 +66,7 @@ interface is built with [Next.js](https://nextjs.org/).
 - CUDA Toolkit 13.0 for the default Windows and Linux CUDA build, or Apple
   Silicon for the macOS Metal build
 
-### Build
+### Build From Source
 
 ```bash
 git clone https://github.com/proxlavee/yomika.git
@@ -76,8 +81,7 @@ downloads the default vision/OCR models; optional local translation models are
 downloaded when selected.
 
 See [Build From Source](docs/en-US/how-to/build-from-source.md) for Windows,
-Linux, macOS, and WSL notes. Turkish readers can use the
-[Türkçe kurulum rehberi](docs/tr-TR/README.md).
+Linux, macOS, and WSL notes.
 
 Official packages built with repository-owned updater signing can check,
 download, install, and relaunch into a newer release. Development and unsigned

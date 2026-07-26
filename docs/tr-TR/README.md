@@ -6,12 +6,8 @@ birleştirir.
 
 [Ana README](../../README.md) ·
 [İngilizce belgeler](https://proxlavee.github.io/yomika/) ·
+[Sürümleri indir](https://github.com/proxlavee/yomika/releases/latest) ·
 [Sorun bildir](https://github.com/proxlavee/yomika/issues)
-
-> [!IMPORTANT]
-> Şu anda yayımlanmış hazır bir Yomika paketi yoktur. GitHub
-> [Releases](https://github.com/proxlavee/yomika/releases) sayfasında bir paket
-> görünene kadar uygulamayı kaynak koddan derleyin.
 
 ## Desteklenen Derleme Yolları
 
