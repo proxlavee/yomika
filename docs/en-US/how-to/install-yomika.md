@@ -6,7 +6,7 @@ title: Install Yomika
 
 ## Download a release
 
-Download the latest desktop package for your platform from the
+Download the latest Windows desktop package from the
 [Yomika Releases page](https://github.com/proxlavee/yomika/releases/latest).
 For a development or custom build, follow
 [Build From Source](build-from-source.md).

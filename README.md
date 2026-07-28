@@ -54,7 +54,7 @@ interface is built with [Next.js](https://nextjs.org/).
 
 ### Download
 
-Download the latest desktop package for your platform from
+Download the latest Windows desktop package from
 [GitHub Releases](https://github.com/proxlavee/yomika/releases/latest).
 
 ### Source Build Requirements
