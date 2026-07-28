@@ -38,6 +38,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
       - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: tauri
       - uses: Jimver/cuda-toolkit@v0.2.35
         if: startsWith(matrix.os, 'ubuntu')
         with:
@@ -56,6 +58,7 @@ jobs:
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
       - run: bun install --frozen-lockfile
       - uses: actions/cache@v6
         with:
