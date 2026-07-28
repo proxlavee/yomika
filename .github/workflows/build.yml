@@ -39,7 +39,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: tauri
+          shared-key: build
       - uses: Jimver/cuda-toolkit@v0.2.35
         if: startsWith(matrix.os, 'ubuntu')
         with:

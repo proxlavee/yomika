@@ -5,14 +5,13 @@ on:
     tags:
       - '*'
 
-permissions:
-  contents: write
-
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   release:
+    permissions:
+      contents: write
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v7
@@ -25,7 +24,7 @@ jobs:
       - name: Restore shared Rust cache
         uses: Swatinem/rust-cache@v2
         with:
-          shared-key: tauri
+          shared-key: build
 
       - name: Install CUDA Toolkit
         uses: Jimver/cuda-toolkit@v0.2.35
@@ -84,7 +83,8 @@ jobs:
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build and publish Windows installers
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YOMIKA_UPDATER_PUBKEY: ${{ vars.YOMIKA_UPDATER_PUBKEY }}
@@ -105,3 +105,14 @@ jobs:
           prerelease: false
           args: ${{ steps.updater.outputs.args }}
           includeUpdaterJson: ${{ steps.updater.outputs.enabled }}
+
+      - name: Preserve installers when publication fails
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: yomika-${{ github.ref_name }}-windows
+          path: |
+            target/release/bundle/msi/*.msi
+            target/release/bundle/nsis/*-setup.exe
+          if-no-files-found: ignore
+          retention-days: 3
