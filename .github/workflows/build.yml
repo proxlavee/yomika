@@ -67,10 +67,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lock') }}-
       - run: bun tauri build --no-bundle
-      - name: Upload Artifact
+      - name: Upload Windows validation artifact
+        if: startsWith(matrix.os, 'windows')
         uses: actions/upload-artifact@v7
         with:
-          name: yomika-${{ matrix.os }}
-          path: |
-            target/release/yomika*
+          name: yomika-windows-2022
+          path: target/release/yomika.exe
           retention-days: 3
