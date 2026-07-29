@@ -226,4 +226,40 @@ expression: paths
             "get",
         ],
     ),
+    (
+        "/storage",
+        [
+            "get",
+        ],
+    ),
+    (
+        "/storage/cache",
+        [
+            "delete",
+        ],
+    ),
+    (
+        "/storage/models",
+        [
+            "delete",
+        ],
+    ),
+    (
+        "/storage/models/location",
+        [
+            "put",
+        ],
+    ),
+    (
+        "/storage/models/{model_id}",
+        [
+            "delete",
+        ],
+    ),
+    (
+        "/storage/models/{model_id}/redownload",
+        [
+            "post",
+        ],
+    ),
 ]
