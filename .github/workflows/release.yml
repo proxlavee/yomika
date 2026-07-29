@@ -68,6 +68,8 @@ jobs:
 
       - name: Generate release notes
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun git-cliff --current --strip all --output "$env:RUNNER_TEMP/release-notes.md"
 
       - name: Build portable Windows executable
