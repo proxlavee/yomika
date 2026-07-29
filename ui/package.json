@@ -60,7 +60,7 @@
     "react-dom": "^19.2.7",
     "react-error-boundary": "^6.1.2",
     "react-hotkeys-hook": "^5.3.3",
-    "react-i18next": "17.0.10",
+    "react-i18next": "17.0.11",
     "react-resizable-panels": "^4.11.2",
     "tailwind-merge": "^3.6.0",
     "xstate": "^5.32.2",
