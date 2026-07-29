@@ -5,7 +5,23 @@
 import type { LlmTarget } from './llmTarget'
 
 export interface LlmCatalogModel {
+  /**
+   * Stable id used by the download/cancellation endpoints.
+   * @nullable
+   */
+  downloadId?: string | null
+  /**
+   * Present only for local models.
+   * @nullable
+   */
+  downloaded?: boolean | null
   languages: string[]
   name: string
+  /**
+   * Cached model-file size when downloaded.
+   * @minimum 0
+   * @nullable
+   */
+  sizeBytes?: number | null
   target: LlmTarget
 }

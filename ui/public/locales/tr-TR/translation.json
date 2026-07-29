@@ -133,6 +133,10 @@
     "languageLabel": "Hedef dil",
     "languagePlaceholder": "Dil seç",
     "load": "Yükle",
+    "download": "İndir",
+    "downloaded": "İndirildi ({{size}})",
+    "downloading": "Model indiriliyor. İşlem panelinden iptal edebilirsiniz.",
+    "downloadRequired": "Bu modeli yüklemeden önce indirin.",
     "unload": "Kaldır",
     "loadTooltip": "Seçili modeli yükle",
     "unloadTooltip": "Modeli kaldır",
@@ -242,7 +246,12 @@
     "readingOrder": "Okuma Sırası",
     "readingOrderRtl": "Sağdan Sola (RTL)",
     "readingOrderLtr": "Soldan Sağa (LTR)",
-    "readingOrderCustom": "Özel"
+    "readingOrderCustom": "Özel",
+    "marqueeHint": "Birden fazla bloğu seçmek için boş alanı sürükleyin.",
+    "selectAll": "Tüm blokları seç",
+    "clearSelection": "Blok seçimini temizle",
+    "selectedCount_one": "{{count}} seçili",
+    "selectedCount_other": "{{count}} seçili"
   },
   "workspace": {
     "importPrompt": "Düzenlemeye başlamak için bir sayfa içe aktarın.",
@@ -259,6 +268,7 @@
     "brushColor": "Fırça rengi"
   },
   "toolRail": {
+    "hand": "El",
     "select": "Seç",
     "block": "Blok",
     "brush": "Fırça",
@@ -266,7 +276,13 @@
     "eraser": "Silgi"
   },
   "download": {
-    "title": "İndiriliyor"
+    "title": "İndiriliyor",
+    "completedTitle": "İndirme tamamlandı",
+    "completedDescription": "{{filename}} hazır.",
+    "cancelledTitle": "İndirme iptal edildi",
+    "cancelledDescription": "{{filename}} indirmesi durduruldu.",
+    "failedTitle": "İndirme başarısız",
+    "failedDescription": "{{filename}} indirilemedi: {{reason}}"
   },
   "errors": {
     "title": "Hata",
@@ -309,7 +325,7 @@
     "httpProxyDescription": "Runtime ve model indirmeleri için kullanılır. Değişiklikler otomatik kaydedilir.",
     "title": "Ayarlar",
     "appearance": "Görünüm",
-    "appearanceDescription": "Yomika'nun cihazınızda nasıl görüneceğini özelleştirin.",
+    "appearanceDescription": "Yomika'nın cihazınızda nasıl görüneceğini özelleştirin.",
     "theme": "Tema",
     "themeDescription": "Tercih ettiğiniz renk şemasını seçin.",
     "themeLight": "Açık",
@@ -323,6 +339,8 @@
     "aboutVersion": "Sürüm",
     "aboutLatest": "En son",
     "aboutUpdate": "Güncelleme mevcut ({{version}})",
+    "aboutUpdateCheckFailed": "Güncellemeler denetlenemedi",
+    "aboutCheckUpdates": "Güncellemeleri denetle",
     "aboutAuthor": "Yazar",
     "aboutRepository": "Depo",
     "device": "Cihaz",
@@ -371,7 +389,7 @@
     "apiKeySave": "Kaydet",
     "apiKeySaved": "Kaydedildi!",
     "dataPath": "Veri Yolu",
-    "dataPathDescription": "Yomika modelleri, çalışma zamanı paketlerini, sayfa bildirimlerini ve görsel verilerini bu dizinde saklar. Yolu değiştirmek uygulamanın yeniden başlatılmasını gerektirir.",
+    "dataPathDescription": "Yomika çalışma zamanı paketlerini, sayfa bildirimlerini ve görsel verilerini burada saklar. Modeller aşağıdaki ayrı konumu kullanabilir. Bu yolu değiştirmek uygulamanın yeniden başlatılmasını gerektirir.",
     "dataPathApply": "Uygula ve Yeniden Başlat",
     "dataPathApplying": "Uygulanıyor...",
     "dataPathDesktopOnly": "Çalışma zamanı ayarları yalnızca masaüstü uygulamasında kullanılabilir.",
@@ -385,6 +403,51 @@
     "restartApply": "Uygula ve Yeniden Başlat",
     "restartApplying": "Uygulanıyor...",
     "restartRequiredDescription": "Bu ayarlar başlangıçta yüklenir. Uygulamak yapılandırmayı kaydedip uygulamayı yeniden başlatır.",
+    "restartManually": "Ayarlar kaydedildi. Uygulamak için Yomika'yı elle yeniden başlatın.",
+    "modelStorage": "Model depolama",
+    "modelStorageDescription": "Yerel modellerin konumunu seçin ve proje dosyalarına dokunmadan disk alanını boşaltın.",
+    "modelStorageLoadFailed": "Model depolama bilgileri yüklenemedi.",
+    "modelsPath": "Model kitaplığı",
+    "modelsPathPlaceholder": "Mutlak bir klasör seçin",
+    "modelsPathDescription": "Mevcut bir kitaplığı olduğu gibi kullanın veya Yomika'nın geçerli modellerini boş bir hedefe güvenle taşıyın.",
+    "modelsPathBrowse": "Model klasörüne göz at",
+    "modelsPathChoose": "Model kitaplığı klasörünü seçin",
+    "modelsPathRequired": "Bir model kitaplığı klasörü seçin.",
+    "modelsPathUse": "Mevcut olanı kullan",
+    "modelsPathMove": "Geçerli modelleri taşı",
+    "modelsPathConfirmTitle": "Model kitaplığı değiştirilsin mi?",
+    "modelsPathUseConfirm": "Yomika yeniden başlatıldıktan sonra bu klasörü kullanacak. Mevcut modeller kopyalanmaz.",
+    "modelsPathMoveConfirm": "Yomika yönettiği model önbelleğini kopyalayıp doğrulayacak, yeni konumu kaydedecek, eski yönetilen önbelleği kaldıracak ve yeniden başlayacak.",
+    "modelsPathChanged": "Model kitaplığı değiştirildi",
+    "modelsPathChangedDescription": "{{size}} taşındı. Yomika yeniden başladıktan sonra yeni klasörü kullanacak.",
+    "modelsPathChangedSourceKept": "{{size}} kopyalandı ancak eski önbellek kaldırılamadı. Yeni klasör kaydedildi; yeniden başlattıktan sonra eski önbelleği elle kaldırabilirsiniz.",
+    "downloadedModels": "İndirilen modeller",
+    "modelSpace": "Model alanı",
+    "modelSpaceDescription": "Model alanı ve Tümünü sil seçeneği görsel, OCR ve yerel çeviri modellerini kapsar.",
+    "temporarySpace": "Geçici dosyalar",
+    "temporaryCache": "Geçici indirme önbelleği",
+    "temporaryCacheDescription": "Yarım kalan indirmeleri ve paket indirme artıklarını kaldırır.",
+    "clearCache": "Önbelleği temizle",
+    "clearCacheConfirmTitle": "Geçici önbellek temizlensin mi?",
+    "clearCacheConfirmDescription": "Geçici indirme dosyaları kaldırılır. İndirilen modeller ve projeler korunur.",
+    "cacheCleared": "Geçici önbellek temizlendi",
+    "deleteAllModels": "Tümünü sil",
+    "deleteAllModelsConfirmTitle": "İndirilen tüm modeller silinsin mi?",
+    "deleteAllModelsConfirmDescription": "Yerel modeller yüklenmeden önce yeniden indirilmelidir. Projeler etkilenmez.",
+    "modelsCleared": "İndirilen modeller silindi",
+    "noDownloadedModels": "İndirilmiş yerel model yok.",
+    "deleteModel": "{{name}} modelini sil",
+    "deleteModelConfirmTitle": "İndirilen model silinsin mi?",
+    "deleteModelConfirmDescription": "{{name}} bu cihazdan silinsin mi? Daha sonra yeniden indirebilirsiniz.",
+    "modelDeleted": "Model silindi",
+    "redownload": "Yeniden indir",
+    "redownloadModel": "{{name}} modelini yeniden indir",
+    "redownloadModelConfirmTitle": "Model yeniden indirilsin mi?",
+    "redownloadModelConfirmDescription": "{{name}} modelinin geçerli kopyası silinip yeni bir indirme başlatılsın mı?",
+    "modelRedownloadStarted": "Model indirmesi yeniden başlatıldı",
+    "modelRedownloadStartedDescription": "{{name}} modelinin yeni bir kopyası indiriliyor.",
+    "spaceFreed": "{{size}} alan boşaltıldı.",
+    "storageWorking": "Model depolama güncelleniyor…",
     "engines": "Motorlar",
     "enginesDescription": "Her işlem hattı aşaması için kullanılacak ML motorunu seçin.",
     "detector": "Algılayıcı",
@@ -405,23 +468,11 @@
     "shortcutConflict": "Tuş kombinasyonu zaten kullanılıyor",
     "shortcutInvalid": "Bu tuş kısayol olarak kullanılamaz"
   },
-  "updater": {
+  "updates": {
     "available": {
       "title": "Güncelleme mevcut",
-      "description": "Yomika <strong>{{version}}</strong> yüklenmeye hazır"
+      "description": "Yomika {{version}} GitHub'da yayımlandı."
     },
-    "noNotes": "Sürüm notu sağlanmadı.",
-    "later": "Daha sonra",
-    "update": "Güncelle",
-    "downloading": {
-      "title": "Güncelleme indiriliyor…",
-      "subtitle": "Yomika {{version}}"
-    },
-    "error": {
-      "title": "Güncelleme başarısız",
-      "description": "Güncelleme sırasında bir hata oluştu"
-    },
-    "close": "Kapat",
-    "retry": "Tekrar dene"
+    "openRelease": "İndirme sayfasını aç"
   }
 }

@@ -10,7 +10,7 @@ pub mod sys;
 use std::path::PathBuf;
 
 use strum::{EnumProperty, IntoEnumIterator};
-use yomika_runtime::RuntimeManager;
+use yomika_runtime::{RuntimeManager, hf_hub::Cache};
 
 pub use language::{Language, language_from_tag, supported_locales};
 pub use model::{GenerateOptions, Llm};
@@ -310,16 +310,54 @@ pub enum ModelId {
     Qwen3_6_35bA3bUncensored,
 }
 
+#[derive(Debug, thiserror::Error)]
+#[error("local model `{model_id}` has not been downloaded")]
+pub struct ModelNotDownloaded {
+    pub model_id: String,
+}
+
 impl ModelId {
     fn property(&self, name: &str) -> &'static str {
         self.get_str(name).expect("missing model property")
     }
 
-    pub async fn get(&self, runtime: &RuntimeManager) -> anyhow::Result<PathBuf> {
+    pub fn repository(&self) -> &'static str {
+        self.property("repo")
+    }
+
+    pub fn filename(&self) -> &'static str {
+        self.property("filename")
+    }
+
+    pub fn download_id(&self) -> String {
+        format!("llm:{self}")
+    }
+
+    pub fn cached_path(&self, runtime: &RuntimeManager) -> Option<PathBuf> {
+        Cache::new(runtime.models_root().join("huggingface"))
+            .model(self.repository().to_string())
+            .get(self.filename())
+    }
+
+    pub fn cached_size(&self, runtime: &RuntimeManager) -> Option<u64> {
+        self.cached_path(runtime)
+            .and_then(|path| std::fs::metadata(path).ok())
+            .map(|metadata| metadata.len())
+    }
+
+    pub async fn download(&self, runtime: &RuntimeManager) -> anyhow::Result<PathBuf> {
         runtime
             .downloads()
-            .huggingface_model(self.property("repo"), self.property("filename"))
+            .huggingface_model_with_id(&self.download_id(), self.repository(), self.filename())
             .await
+    }
+
+    pub fn require_cached(&self, runtime: &RuntimeManager) -> anyhow::Result<PathBuf> {
+        self.cached_path(runtime)
+            .ok_or_else(|| ModelNotDownloaded {
+                model_id: self.to_string(),
+            })
+            .map_err(Into::into)
     }
 
     pub fn default_generate_options(&self) -> GenerateOptions {
@@ -409,7 +447,7 @@ pub async fn prefetch(runtime: &RuntimeManager) -> anyhow::Result<()> {
     stream::iter(ModelId::iter())
         .map(|model| {
             let runtime = runtime.clone();
-            async move { model.get(&runtime).await }
+            async move { model.download(&runtime).await }
         })
         .buffer_unordered(num_cpus::get())
         .try_collect::<Vec<_>>()

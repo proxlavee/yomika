@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangleIcon, CircleXIcon } from 'lucide-react'
+import { AlertTriangleIcon, CheckCircleIcon, CircleXIcon, InfoIcon, XIcon } from 'lucide-react'
 import { type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -12,9 +12,15 @@ import type {
   JobWarningEvent,
   PipelineProgress,
 } from '@/lib/api/schemas'
+import { openExternalUrl } from '@/lib/backend'
 import { useDownloadsStore } from '@/lib/stores/downloadsStore'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { type JobEntry, useJobsStore } from '@/lib/stores/jobsStore'
+import {
+  type AppNotification,
+  type NotificationTone,
+  useNotificationsStore,
+} from '@/lib/stores/notificationsStore'
 
 type TranslateFunc = ReturnType<typeof useTranslation>['t']
 
@@ -54,12 +60,16 @@ function ProgressBar({ percent }: { percent?: number }) {
 }
 
 function DownloadCard({
+  id,
   filename,
   percent,
+  onCancel,
   t,
 }: {
+  id: string
   filename: string
   percent?: number
+  onCancel: () => void
   t: TranslateFunc
 }) {
   return (
@@ -72,9 +82,78 @@ function DownloadCard({
             {filename}
           </div>
           <ProgressBar percent={percent} />
+          <div className='mt-3 flex justify-end'>
+            <Button
+              data-testid={`download-cancel-${id}`}
+              variant='outline'
+              size='sm'
+              onClick={onCancel}
+              className='text-xs font-semibold'
+            >
+              {t('common.cancel')}
+            </Button>
+          </div>
         </div>
       </div>
     </BubbleCard>
+  )
+}
+
+const notificationToneStyles: Record<NotificationTone, string> = {
+  info: 'border-sky-200/80 text-sky-600 dark:border-sky-900/80 dark:text-sky-400',
+  success:
+    'border-emerald-200/80 text-emerald-600 dark:border-emerald-900/80 dark:text-emerald-400',
+  warning: 'border-amber-200/80 text-amber-600 dark:border-amber-900/80 dark:text-amber-400',
+  error: 'border-red-200/80 text-red-600 dark:border-red-900/80 dark:text-red-400',
+}
+
+function NotificationIcon({ tone }: { tone: NotificationTone }) {
+  if (tone === 'success') return <CheckCircleIcon className='size-4' />
+  if (tone === 'warning' || tone === 'error') return <AlertTriangleIcon className='size-4' />
+  return <InfoIcon className='size-4' />
+}
+
+function NotificationCard({
+  notification,
+  onDismiss,
+  t,
+}: {
+  notification: AppNotification
+  onDismiss: () => void
+  t: TranslateFunc
+}) {
+  return (
+    <div
+      data-testid={`notification-${notification.id}`}
+      className={`rounded-2xl border bg-card/95 p-4 shadow-[0_15px_60px_rgba(0,0,0,0.12)] backdrop-blur ${notificationToneStyles[notification.tone]}`}
+    >
+      <div className='flex items-start gap-3'>
+        <div className='mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-current/10'>
+          <NotificationIcon tone={notification.tone} />
+        </div>
+        <div className='min-w-0 flex-1'>
+          <div className='text-sm font-semibold text-foreground'>{t(notification.titleKey)}</div>
+          {notification.messageKey && (
+            <p className='mt-1 text-xs break-words text-muted-foreground'>
+              {t(notification.messageKey, notification.values)}
+            </p>
+          )}
+          {notification.actionUrl && notification.actionLabelKey && (
+            <Button
+              variant='link'
+              size='xs'
+              className='mt-2 h-auto p-0'
+              onClick={() => void openExternalUrl(notification.actionUrl!)}
+            >
+              {t(notification.actionLabelKey)}
+            </Button>
+          )}
+        </div>
+        <Button variant='ghost' size='icon-xs' onClick={onDismiss} aria-label={t('errors.dismiss')}>
+          <XIcon className='size-3.5' />
+        </Button>
+      </div>
+    </div>
   )
 }
 
@@ -211,6 +290,8 @@ export function ActivityBubble() {
   const { t } = useTranslation()
   const jobs = useJobsStore((s) => s.jobs)
   const downloads = useDownloadsStore((s) => s.downloads)
+  const notifications = useNotificationsStore((s) => s.notifications)
+  const removeNotification = useNotificationsStore((s) => s.remove)
   const uiError = useEditorUiStore((s) => s.error)
   const clearUiError = useEditorUiStore((s) => s.clearError)
 
@@ -223,7 +304,14 @@ export function ActivityBubble() {
   })
 
   const errorMessage = uiError?.message
-  if (!errorMessage && runningJobs.length === 0 && activeDownloads.length === 0) return null
+  if (
+    !errorMessage &&
+    runningJobs.length === 0 &&
+    activeDownloads.length === 0 &&
+    notifications.length === 0
+  ) {
+    return null
+  }
 
   return (
     <div className='pointer-events-auto fixed right-6 bottom-6 z-100 flex w-80 max-w-[calc(100%-1.5rem)] flex-col gap-3'>
@@ -234,8 +322,25 @@ export function ActivityBubble() {
       {activeDownloads.map((d) => {
         const percent =
           d.total && d.total > 0 ? Math.round((d.downloaded / d.total) * 100) : undefined
-        return <DownloadCard key={d.id} filename={d.filename} percent={percent} t={t} />
+        return (
+          <DownloadCard
+            key={d.id}
+            id={d.id}
+            filename={d.filename}
+            percent={percent}
+            onCancel={() => void cancelOperation(d.id)}
+            t={t}
+          />
+        )
       })}
+      {notifications.map((notification) => (
+        <NotificationCard
+          key={notification.id}
+          notification={notification}
+          onDismiss={() => removeNotification(notification.id)}
+          t={t}
+        />
+      ))}
     </div>
   )
 }

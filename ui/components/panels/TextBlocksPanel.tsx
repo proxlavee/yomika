@@ -1,8 +1,8 @@
 'use client'
 
-import { Languages, LoaderCircleIcon, Trash2Icon } from 'lucide-react'
+import { CheckSquare2Icon, Languages, LoaderCircleIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useCurrentPage, useTextNodes, type TextNodeEntry } from '@/hooks/useCurrentPage'
+import { useMarqueeSelection } from '@/hooks/useMarqueeSelection'
 import { getConfig, startPipeline, useGetCurrentLlm } from '@/lib/api/default/default'
 import type { TextDataPatch } from '@/lib/api/schemas'
 import { applyOp, queueAutoRender, reorderPageTextNodes } from '@/lib/io/scene'
@@ -47,7 +48,10 @@ export function TextBlocksPanel() {
   }, [textNodes])
   const selectedIds = useSelectionStore((s) => s.nodeIds)
   const select = useSelectionStore((s) => s.select)
+  const selectMany = useSelectionStore((s) => s.selectMany)
   const clearSelection = useSelectionStore((s) => s.clear)
+  const viewportRef = useRef<HTMLDivElement | null>(null)
+  const [openNodeId, setOpenNodeId] = useState<string | null>(null)
   const { data: llm } = useGetCurrentLlm()
   const llmReady = llm?.status === 'ready'
   const isProcessing = useJobsStore((s) =>
@@ -55,6 +59,23 @@ export function TextBlocksPanel() {
   )
   const readingOrder = useEditorUiStore((s) => s.readingOrder)
   const setReadingOrder = useEditorUiStore((s) => s.setReadingOrder)
+
+  const selectedTextIds = useMemo(() => {
+    const textIds = new Set(textNodes.map((node) => node.id))
+    return new Set([...selectedIds].filter((id) => textIds.has(id)))
+  }, [selectedIds, textNodes])
+  const { marqueeRect, marqueeHandlers } = useMarqueeSelection({
+    viewportRef,
+    selectedIds: selectedTextIds,
+    onSelectMany: selectMany,
+    onClear: clearSelection,
+  })
+
+  useEffect(() => {
+    if (marqueeRect) return
+    if (selectedTextIds.size === 1) setOpenNodeId([...selectedTextIds][0])
+    if (selectedTextIds.size === 0) setOpenNodeId(null)
+  }, [marqueeRect, selectedTextIds])
 
   if (!page) {
     return (
@@ -64,8 +85,8 @@ export function TextBlocksPanel() {
     )
   }
 
-  const selectedIndex = textNodes.findIndex((n) => selectedIds.has(n.id))
-  const accordionValue = selectedIndex >= 0 ? selectedIndex.toString() : ''
+  const openIndex = textNodes.findIndex((node) => node.id === openNodeId)
+  const accordionValue = openIndex >= 0 ? openIndex.toString() : ''
 
   const patchText = async (nodeId: string, patch: TextDataPatch) => {
     const editEpoch = await applyOp(
@@ -169,9 +190,14 @@ export function TextBlocksPanel() {
         key={page.id}
         className='min-h-0 flex-1'
         viewportClassName='pb-1'
+        viewportRef={viewportRef}
         data-testid='textblocks-scroll'
+        {...marqueeHandlers}
       >
-        <div className='p-2'>
+        <div
+          data-testid='textblocks-marquee-surface'
+          className={cn('relative min-h-full p-2', marqueeRect && 'select-none')}
+        >
           {textNodes.length === 0 ? (
             <p className='rounded-md border border-dashed border-border p-2 text-xs text-muted-foreground'>
               {t('textBlocks.none')}
@@ -184,12 +210,15 @@ export function TextBlocksPanel() {
               value={accordionValue}
               onValueChange={(value) => {
                 if (!value) {
-                  clearSelection()
+                  setOpenNodeId(null)
                   return
                 }
                 const idx = Number(value)
                 const node = textNodes[idx]
-                if (node) select(node.id, false)
+                if (node) {
+                  setOpenNodeId(node.id)
+                  select(node.id, false)
+                }
               }}
               className='flex flex-col gap-1'
             >
@@ -209,31 +238,84 @@ export function TextBlocksPanel() {
               ))}
             </Accordion>
           )}
+          {textNodes.length > 0 && (
+            <p className='pointer-events-none mt-3 text-center text-[10px] text-muted-foreground/70'>
+              {t('textBlocks.marqueeHint')}
+            </p>
+          )}
+          {marqueeRect && (
+            <div
+              data-testid='textblocks-marquee'
+              className='pointer-events-none absolute z-50 rounded-sm border border-primary bg-primary/15'
+              style={marqueeRect}
+            />
+          )}
         </div>
       </ScrollArea>
       <div
         className={cn(
-          'flex items-center justify-between border-t border-border px-2 py-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase',
-          selectedIds.size <= 1 && 'hidden',
+          'flex items-center justify-between border-t border-border px-2 py-1.5 text-xs font-semibold tracking-wide text-muted-foreground',
+          textNodes.length === 0 && 'hidden',
         )}
       >
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              data-testid='textblocks-delete-selected'
-              aria-label={t('workspace.deleteSelected')}
-              variant='ghost'
-              size='icon-xs'
-              className='size-5 text-rose-600 hover:text-rose-600'
-              onClick={() => removeNodes([...selectedIds])}
-            >
-              <Trash2Icon className='size-4' />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side='left' sideOffset={4}>
-            {t('workspace.deleteSelected')}
-          </TooltipContent>
-        </Tooltip>
+        <span className='text-[10px] tabular-nums'>
+          {t('textBlocks.selectedCount', { count: selectedTextIds.size })}
+        </span>
+        <div className='flex items-center gap-1'>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                data-testid='textblocks-select-all'
+                aria-label={t('textBlocks.selectAll')}
+                variant='ghost'
+                size='icon-xs'
+                className='size-6'
+                onClick={() => selectMany(textNodes.map((node) => node.id))}
+              >
+                <CheckSquare2Icon className='size-3.5' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side='left' sideOffset={4}>
+              {t('textBlocks.selectAll')}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                data-testid='textblocks-clear-selection'
+                aria-label={t('textBlocks.clearSelection')}
+                variant='ghost'
+                size='icon-xs'
+                className='size-6'
+                disabled={selectedTextIds.size === 0}
+                onClick={clearSelection}
+              >
+                <XIcon className='size-3.5' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side='left' sideOffset={4}>
+              {t('textBlocks.clearSelection')}
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                data-testid='textblocks-delete-selected'
+                aria-label={t('workspace.deleteSelected')}
+                variant='ghost'
+                size='icon-xs'
+                className='size-6 text-rose-600 hover:text-rose-600'
+                disabled={selectedTextIds.size === 0 || isProcessing}
+                onClick={() => void removeNodes([...selectedTextIds])}
+              >
+                <Trash2Icon className='size-3.5' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side='left' sideOffset={4}>
+              {t('workspace.deleteSelected')}
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </div>
     </div>
   )
@@ -271,6 +353,8 @@ function BlockCard({
   return (
     <motion.div
       data-testid={`textblock-card-${index}`}
+      data-textblock-item
+      data-textblock-id={node.id}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}

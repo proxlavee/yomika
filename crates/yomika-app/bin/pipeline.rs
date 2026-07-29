@@ -138,6 +138,7 @@ async fn run() -> Result<()> {
 
     let mut cfg = cfg;
     cfg.data.path = temp_root.join("data");
+    cfg.data.models_path = None;
     std::fs::create_dir_all(cfg.data.path.as_std_path()).context("create data dir")?;
 
     let http = RuntimeHttpConfig {
@@ -150,7 +151,12 @@ async fn run() -> Result<()> {
     } else {
         ComputePolicy::PreferGpu
     };
-    let runtime = RuntimeManager::new_with_http(cfg.data.path.as_std_path(), compute, http)?;
+    let runtime = RuntimeManager::new_with_storage(
+        cfg.data.path.as_std_path(),
+        cfg.data.resolved_models_path().as_std_path(),
+        compute,
+        http,
+    )?;
     runtime
         .prepare()
         .await

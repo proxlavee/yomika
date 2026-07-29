@@ -103,6 +103,10 @@ impl Default for PipelineConfig {
 pub struct DataConfig {
     #[schema(value_type = String)]
     pub path: Utf8PathBuf,
+    /// Optional model-library override. `None` uses `{path}/models`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = Option<String>)]
+    pub models_path: Option<Utf8PathBuf>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
@@ -129,13 +133,23 @@ impl Default for DataConfig {
     fn default() -> Self {
         Self {
             path: default_app_data_root(),
+            models_path: None,
         }
+    }
+}
+
+impl DataConfig {
+    pub fn resolved_models_path(&self) -> Utf8PathBuf {
+        self.models_path
+            .clone()
+            .unwrap_or_else(|| self.path.join("models"))
     }
 }
 
 fn schema_default_data_config() -> DataConfig {
     DataConfig {
         path: Utf8PathBuf::from("<app-data>/Yomika"),
+        models_path: None,
     }
 }
 
@@ -413,6 +427,7 @@ mod tests {
         .unwrap();
 
         assert_eq!(config.data.path, "/tmp/test");
+        assert_eq!(config.data.resolved_models_path(), "/tmp/test/models");
         assert_eq!(config.http.connect_timeout, 20);
         assert_eq!(config.http.read_timeout, 300);
         assert_eq!(config.http.max_retries, 3);

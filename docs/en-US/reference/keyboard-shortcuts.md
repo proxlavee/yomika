@@ -12,8 +12,9 @@ These are gesture-based and not user-rebindable.
 
 | Shortcut | Action |
 | --- | --- |
-| `Ctrl` + mouse wheel | Zoom in or out |
-| `Ctrl` + drag | Pan the canvas |
+| Mouse wheel | Zoom in or out around the pointer |
+| Hand tool + drag | Pan the canvas (the Hand tool is selected by default) |
+| `Ctrl` + drag | Pan temporarily from any tool |
 | Pinch on trackpad | Pinch-zoom |
 
 ## Tool switching

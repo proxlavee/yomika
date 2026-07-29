@@ -13,10 +13,34 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct LlmCatalogModel {
+    /// Stable id used by the download/cancellation endpoints.
+    #[serde(
+        rename = "downloadId",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub download_id: Option<Option<String>>,
+    /// Present only for local models.
+    #[serde(
+        rename = "downloaded",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub downloaded: Option<Option<bool>>,
     #[serde(rename = "languages")]
     pub languages: Vec<String>,
     #[serde(rename = "name")]
     pub name: String,
+    /// Cached model-file size when downloaded.
+    #[serde(
+        rename = "sizeBytes",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub size_bytes: Option<Option<u64>>,
     #[serde(rename = "target")]
     pub target: Box<models::LlmTarget>,
 }
@@ -24,8 +48,11 @@ pub struct LlmCatalogModel {
 impl LlmCatalogModel {
     pub fn new(languages: Vec<String>, name: String, target: models::LlmTarget) -> LlmCatalogModel {
         LlmCatalogModel {
+            download_id: None,
+            downloaded: None,
             languages,
             name,
+            size_bytes: None,
             target: Box::new(target),
         }
     }

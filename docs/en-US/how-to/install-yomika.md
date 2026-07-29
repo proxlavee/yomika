@@ -6,14 +6,18 @@ title: Install Yomika
 
 ## Download a release
 
-Download the latest Windows desktop package from the
+Download the latest Windows portable `.exe` or `.zip` from the
 [Yomika Releases page](https://github.com/proxlavee/yomika/releases/latest).
-For a development or custom build, follow
+The ZIP contains the same executable. Extract it to a folder you control and
+run `Yomika-<version>-windows-x64.exe`; there is no installer. For a development
+or custom build, follow
 [Build From Source](build-from-source.md).
 
-## What gets installed locally
+## What Yomika stores locally
 
-Yomika is a local-first application. In practice, the desktop binary is only part of the install footprint. The first real run also creates a per-user local data directory for:
+Yomika is a local-first application. The portable desktop binary is only part
+of its disk footprint. The first real run also creates a per-user local data
+directory for:
 
 - runtime libraries used by llama.cpp and GPU backends
 - downloaded vision and OCR models
@@ -27,11 +31,21 @@ On first run, Yomika may:
 
 - extract or download runtime libraries required by the local inference stack
 - download the default vision and OCR models used by detection, segmentation, OCR, inpainting, and font estimation
-- wait to download local translation LLMs until you actually select them in Settings
+- wait to download optional local translation LLMs until you choose **Download** in the model picker
 
 This is normal and can take a while depending on your connection and hardware.
+Model downloads show progress, can be cancelled, and report completion in the
+notification area. Use **Settings > Runtime** to change the model-library
+folder, delete downloaded models, or download a model again.
 
 If you want to prefetch those runtime dependencies ahead of time, run Yomika once with `--download`. That path initializes the runtime packages and default vision stack, then exits without opening the GUI.
+
+## Application updates
+
+Yomika checks the latest GitHub release when it starts. You can also run the
+check from **Settings > About**. When a newer version exists, Yomika shows a
+notification that opens the Releases page; it never downloads or installs an
+application update automatically.
 
 ## GPU acceleration notes
 

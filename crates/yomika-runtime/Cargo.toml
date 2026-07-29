@@ -27,10 +27,12 @@ reqwest-retry = { workspace = true }
 serde = { workspace = true }
 zip = { workspace = true }
 tokio = { workspace = true }
+tokio-util = { workspace = true }
 tracing = { workspace = true }
 libloading = { workspace = true }
 flate2 = { workspace = true }
 num_cpus = { workspace = true }
+dashmap = { workspace = true }
 tar = "0.4"
 
 [target.'cfg(target_os = "windows")'.dependencies]

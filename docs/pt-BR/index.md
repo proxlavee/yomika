@@ -21,13 +21,13 @@ hide:
             somente quando o projeto precisar.
           </p>
           <div class="ym-actions">
-            <a class="ym-button ym-button--primary" href="how-to/build-from-source.md">Compilar o Yomika</a>
+            <a class="ym-button ym-button--primary" href="https://github.com/proxlavee/yomika/releases/latest">Baixar para Windows</a>
             <a class="ym-button ym-button--secondary" href="tutorials/translate-your-first-page.md">Traduzir a primeira página</a>
           </div>
           <ul class="ym-facts" aria-label="Resumo do Yomika">
-            <li>Windows, Linux e Apple Silicon</li>
+            <li>Versão portátil para Windows</li>
+            <li>Builds a partir do código-fonte para Linux e macOS</li>
             <li>GPL-3.0</li>
-            <li>Desktop, headless e MCP</li>
           </ul>
         </div>
 
@@ -160,11 +160,11 @@ hide:
     <section class="ym-install" aria-labelledby="ym-install-title">
       <div class="ym-install__grid">
         <div class="ym-install__copy">
-          <div class="ym-kicker">Build a partir do código-fonte</div>
+          <div class="ym-kicker">Obtenha o Yomika</div>
           <h2 id="ym-install-title">Vamos começar a primeira página?</h2>
           <p>
-            Ainda não há uma versão pré-compilada publicada. Use o wrapper Bun
-            do repositório para selecionar o caminho correto do Tauri e da plataforma.
+            Escolha o EXE ou ZIP portátil para Windows, sem instalador. Use o
+            wrapper Bun do repositório no Linux, macOS ou para uma build personalizada.
           </p>
         </div>
         <div>
@@ -173,6 +173,7 @@ cd yomika
 bun install --frozen-lockfile
 bun run build</code></pre>
           <div class="ym-install__links">
+            <a class="ym-text-link" href="https://github.com/proxlavee/yomika/releases/latest">Baixar o EXE ou ZIP para Windows</a>
             <a class="ym-text-link" href="how-to/build-from-source.md">Ver pré-requisitos e notas da plataforma</a>
             <a class="ym-text-link" href="how-to/runtime-and-model-downloads.md">Entender os downloads da primeira execução</a>
             <a class="ym-text-link" href="https://github.com/proxlavee/yomika">Ver o código no GitHub</a>

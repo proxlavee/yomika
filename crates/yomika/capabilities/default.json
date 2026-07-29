@@ -25,7 +25,6 @@
     "core:window:allow-set-focus",
     "opener:default",
     "process:default",
-    "updater:default",
     "dialog:default",
     "dialog:allow-open",
     "dialog:allow-save",

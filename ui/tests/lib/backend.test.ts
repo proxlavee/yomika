@@ -13,7 +13,7 @@ import { restoreAppWindowInteraction } from '@/lib/backend'
 
 describe('restoreAppWindowInteraction', () => {
   afterEach(() => {
-    delete (window as Record<string, unknown>).__TAURI_INTERNALS__
+    Reflect.deleteProperty(window, '__TAURI_INTERNALS__')
     setEnabled.mockReset()
     setEnabled.mockResolvedValue(undefined)
     setFocus.mockReset()
@@ -21,7 +21,7 @@ describe('restoreAppWindowInteraction', () => {
   })
 
   it('re-enables and focuses the Tauri window', async () => {
-    ;(window as Record<string, unknown>).__TAURI_INTERNALS__ = {}
+    Object.assign(window, { __TAURI_INTERNALS__: {} })
 
     await restoreAppWindowInteraction()
 
@@ -30,7 +30,7 @@ describe('restoreAppWindowInteraction', () => {
   })
 
   it('still tries to focus when enabling fails', async () => {
-    ;(window as Record<string, unknown>).__TAURI_INTERNALS__ = {}
+    Object.assign(window, { __TAURI_INTERNALS__: {} })
     setEnabled.mockRejectedValueOnce(new Error('permission denied'))
 
     await restoreAppWindowInteraction()

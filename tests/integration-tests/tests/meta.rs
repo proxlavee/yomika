@@ -46,6 +46,19 @@ async fn config_get_returns_defaults() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
+async fn storage_summary_reports_default_model_library() -> anyhow::Result<()> {
+    let app = TestApp::spawn().await?;
+    let storage = api::get_storage(&app.client_config).await?;
+
+    assert!(!storage.custom_models_path);
+    assert_eq!(
+        std::path::Path::new(&storage.models_path),
+        std::path::Path::new(&storage.data_path).join("models")
+    );
+    Ok(())
+}
+
+#[tokio::test]
 async fn config_patch_merges_and_persists() -> anyhow::Result<()> {
     let app = TestApp::spawn().await?;
 

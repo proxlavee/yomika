@@ -18,6 +18,7 @@ pub enum DownloadStatus {
     DownloadStatusOneOf1(Box<models::DownloadStatusOneOf1>),
     DownloadStatusOneOf2(Box<models::DownloadStatusOneOf2>),
     DownloadStatusOneOf3(Box<models::DownloadStatusOneOf3>),
+    DownloadStatusOneOf4(Box<models::DownloadStatusOneOf4>),
 }
 
 impl Default for DownloadStatus {

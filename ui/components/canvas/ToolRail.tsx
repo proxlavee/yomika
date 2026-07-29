@@ -1,6 +1,6 @@
 'use client'
 
-import { MousePointer, VectorSquare, Brush, Bandage, Eraser, PanelLeft } from 'lucide-react'
+import { Hand, MousePointer, VectorSquare, Brush, Bandage, Eraser, PanelLeft } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -18,6 +18,12 @@ type ModeDefinition = {
 }
 
 const MODES: ModeDefinition[] = [
+  {
+    labelKey: 'toolRail.hand',
+    value: 'hand',
+    icon: Hand,
+    testId: 'tool-hand',
+  },
   {
     labelKey: 'toolRail.select',
     value: 'select',

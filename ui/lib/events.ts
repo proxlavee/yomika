@@ -2,13 +2,19 @@
 
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
 
-import { getGetCurrentLlmQueryKey, getGetSceneJsonQueryKey } from '@/lib/api/default/default'
+import {
+  getGetCatalogQueryKey,
+  getGetCurrentLlmQueryKey,
+  getGetSceneJsonQueryKey,
+  getGetStorageQueryKey,
+} from '@/lib/api/default/default'
 import type { AppEvent } from '@/lib/api/schemas'
 import { queryClient } from '@/lib/queryClient'
 import { useDownloadsStore } from '@/lib/stores/downloadsStore'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { useEventsStore } from '@/lib/stores/eventsStore'
 import { useJobsStore } from '@/lib/stores/jobsStore'
+import { useNotificationsStore } from '@/lib/stores/notificationsStore'
 
 /**
  * Scoped, resilient SSE client.
@@ -169,6 +175,39 @@ function dispatch(event: AppEvent): void {
 
     case 'downloadProgress':
       useDownloadsStore.getState().progress(event)
+      if (event.status.status === 'completed') {
+        useNotificationsStore.getState().upsert({
+          id: `download:${event.id}:completed`,
+          tone: 'success',
+          titleKey: 'download.completedTitle',
+          messageKey: 'download.completedDescription',
+          values: { filename: event.filename },
+        })
+      } else if (event.status.status === 'cancelled') {
+        useNotificationsStore.getState().upsert({
+          id: `download:${event.id}:cancelled`,
+          tone: 'info',
+          titleKey: 'download.cancelledTitle',
+          messageKey: 'download.cancelledDescription',
+          values: { filename: event.filename },
+        })
+      } else if (event.status.status === 'failed') {
+        useNotificationsStore.getState().upsert({
+          id: `download:${event.id}:failed`,
+          tone: 'error',
+          titleKey: 'download.failedTitle',
+          messageKey: 'download.failedDescription',
+          values: { filename: event.filename, reason: event.status.reason },
+        })
+      }
+      if (
+        event.status.status === 'completed' ||
+        event.status.status === 'cancelled' ||
+        event.status.status === 'failed'
+      ) {
+        void queryClient.invalidateQueries({ queryKey: getGetCatalogQueryKey() })
+        void queryClient.invalidateQueries({ queryKey: getGetStorageQueryKey() })
+      }
       return
 
     case 'llmLoading':

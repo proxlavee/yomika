@@ -16,8 +16,8 @@ use serde::{Deserialize, Serialize};
 pub enum PipelineStatus {
     PipelineStatusOneOf(Box<models::PipelineStatusOneOf>),
     DownloadStatusOneOf2(Box<models::DownloadStatusOneOf2>),
-    PipelineStatusOneOf1(Box<models::PipelineStatusOneOf1>),
     DownloadStatusOneOf3(Box<models::DownloadStatusOneOf3>),
+    DownloadStatusOneOf4(Box<models::DownloadStatusOneOf4>),
 }
 
 impl Default for PipelineStatus {

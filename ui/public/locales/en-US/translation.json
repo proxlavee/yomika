@@ -151,6 +151,10 @@
     "languageLabel": "Target language",
     "languagePlaceholder": "Select language",
     "load": "Load",
+    "download": "Download",
+    "downloaded": "Downloaded ({{size}})",
+    "downloading": "Downloading model. You can cancel from the activity panel.",
+    "downloadRequired": "Download this model before loading it.",
     "unload": "Unload",
     "loadTooltip": "Load selected model",
     "unloadTooltip": "Unload model",
@@ -276,7 +280,12 @@
     "readingOrder": "Reading Order",
     "readingOrderRtl": "Right-to-Left (RTL)",
     "readingOrderLtr": "Left-to-Right (LTR)",
-    "readingOrderCustom": "Custom"
+    "readingOrderCustom": "Custom",
+    "marqueeHint": "Drag empty space to select multiple blocks.",
+    "selectAll": "Select all blocks",
+    "clearSelection": "Clear block selection",
+    "selectedCount_one": "{{count}} selected",
+    "selectedCount_other": "{{count}} selected"
   },
   "workspace": {
     "importPrompt": "Import a page to begin editing.",
@@ -294,6 +303,7 @@
     "brushColor": "Brush color"
   },
   "toolRail": {
+    "hand": "Hand",
     "select": "Select",
     "block": "Block",
     "brush": "Brush",
@@ -301,7 +311,13 @@
     "eraser": "Eraser"
   },
   "download": {
-    "title": "Downloading"
+    "title": "Downloading",
+    "completedTitle": "Download complete",
+    "completedDescription": "{{filename}} is ready.",
+    "cancelledTitle": "Download cancelled",
+    "cancelledDescription": "Stopped downloading {{filename}}.",
+    "failedTitle": "Download failed",
+    "failedDescription": "{{filename}} could not be downloaded: {{reason}}"
   },
   "errors": {
     "title": "Error",
@@ -358,6 +374,8 @@
     "aboutVersion": "Version",
     "aboutLatest": "Latest",
     "aboutUpdate": "Update available ({{version}})",
+    "aboutUpdateCheckFailed": "Could not check for updates",
+    "aboutCheckUpdates": "Check for updates",
     "aboutAuthor": "Author",
     "aboutRepository": "Repository",
     "device": "Device",
@@ -410,7 +428,7 @@
     "apiKeySave": "Save",
     "apiKeySaved": "Saved!",
     "dataPath": "Data Path",
-    "dataPathDescription": "Yomika stores models, runtime packages, page manifests, and image blobs under this directory. Changing the path requires an app restart.",
+    "dataPathDescription": "Yomika stores runtime packages, page manifests, and image blobs here. Models can use the separate location below. Changing this path requires an app restart.",
     "dataPathApply": "Apply and restart",
     "dataPathApplying": "Applying...",
     "dataPathDesktopOnly": "Runtime settings are only available in the desktop app.",
@@ -424,6 +442,51 @@
     "restartApply": "Apply and restart",
     "restartApplying": "Applying...",
     "restartRequiredDescription": "These settings are loaded at startup. Applying them will save the config and restart the app.",
+    "restartManually": "Settings were saved. Restart Yomika manually to apply them.",
+    "modelStorage": "Model storage",
+    "modelStorageDescription": "Choose where local models are stored and reclaim disk space without touching project files.",
+    "modelStorageLoadFailed": "Model storage could not be loaded.",
+    "modelsPath": "Model library",
+    "modelsPathPlaceholder": "Choose an absolute folder",
+    "modelsPathDescription": "Use an existing library as-is, or safely move Yomika's current models into an empty destination.",
+    "modelsPathBrowse": "Browse for model folder",
+    "modelsPathChoose": "Choose model library folder",
+    "modelsPathRequired": "Choose a model library folder.",
+    "modelsPathUse": "Use existing",
+    "modelsPathMove": "Move current models",
+    "modelsPathConfirmTitle": "Change model library?",
+    "modelsPathUseConfirm": "Yomika will use this folder after restarting. Existing models are not copied.",
+    "modelsPathMoveConfirm": "Yomika will copy and verify its managed model cache, save the new location, remove the old managed cache, and restart.",
+    "modelsPathChanged": "Model library changed",
+    "modelsPathChangedDescription": "Moved {{size}}. Yomika will use the new folder after restart.",
+    "modelsPathChangedSourceKept": "Copied {{size}}, but the old cache could not be removed. The new folder is saved; you can remove the old cache manually after restart.",
+    "downloadedModels": "Downloaded models",
+    "modelSpace": "Model space",
+    "modelSpaceDescription": "Model space and Delete all include vision, OCR, and local translation models.",
+    "temporarySpace": "Temporary files",
+    "temporaryCache": "Temporary download cache",
+    "temporaryCacheDescription": "Removes interrupted downloads and package download leftovers.",
+    "clearCache": "Clear cache",
+    "clearCacheConfirmTitle": "Clear temporary cache?",
+    "clearCacheConfirmDescription": "This removes temporary download files. Downloaded models and projects are kept.",
+    "cacheCleared": "Temporary cache cleared",
+    "deleteAllModels": "Delete all",
+    "deleteAllModelsConfirmTitle": "Delete all downloaded models?",
+    "deleteAllModelsConfirmDescription": "All local models must be downloaded again before they can be loaded. Projects are not affected.",
+    "modelsCleared": "Downloaded models deleted",
+    "noDownloadedModels": "No local models are downloaded.",
+    "deleteModel": "Delete {{name}}",
+    "deleteModelConfirmTitle": "Delete downloaded model?",
+    "deleteModelConfirmDescription": "Delete {{name}} from this device? You can download it again later.",
+    "modelDeleted": "Model deleted",
+    "redownload": "Redownload",
+    "redownloadModel": "Redownload {{name}}",
+    "redownloadModelConfirmTitle": "Redownload model?",
+    "redownloadModelConfirmDescription": "Delete the current copy of {{name}} and start a fresh download?",
+    "modelRedownloadStarted": "Model download restarted",
+    "modelRedownloadStartedDescription": "Downloading a fresh copy of {{name}}.",
+    "spaceFreed": "Freed {{size}}.",
+    "storageWorking": "Updating model storage…",
     "engines": "Engines",
     "enginesDescription": "Select which ML engine to use for each pipeline stage.",
     "detector": "Detector",
@@ -444,23 +507,11 @@
     "shortcutConflict": "Key combination already in use",
     "shortcutInvalid": "This key cannot be used as a shortcut"
   },
-  "updater": {
+  "updates": {
     "available": {
       "title": "Update available",
-      "description": "Yomika <strong>{{version}}</strong> is ready to install."
+      "description": "Yomika {{version}} is available on GitHub."
     },
-    "noNotes": "No release notes provided.",
-    "later": "Later",
-    "update": "Update",
-    "downloading": {
-      "title": "Downloading update…",
-      "subtitle": "Yomika {{version}}"
-    },
-    "error": {
-      "title": "Update failed",
-      "description": "Something went wrong while updating."
-    },
-    "close": "Close",
-    "retry": "Retry"
+    "openRelease": "Open download page"
   }
 }

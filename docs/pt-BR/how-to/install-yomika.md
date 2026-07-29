@@ -4,13 +4,13 @@ title: Instalar o Yomika
 
 # Instalar o Yomika
 
-## Compile a aplicação
+## Baixe a versão para Windows
 
-No momento, não se presume a existência de uma release pré-compilada. Siga [Build a Partir do Código-Fonte](build-from-source.md) para gerar o binário desktop no Windows, macOS ou Linux. Artefatos publicados futuramente aparecerão na [página de releases do Yomika](https://github.com/proxlavee/yomika/releases).
+Baixe o `.exe` ou `.zip` portátil mais recente para Windows na [página de releases do Yomika](https://github.com/proxlavee/yomika/releases/latest). O ZIP contém o mesmo executável. Extraia-o para uma pasta sob seu controle e execute `Yomika-<version>-windows-x64.exe`; não há instalador. Para desenvolvimento ou uma build personalizada, consulte [Build a Partir do Código-Fonte](build-from-source.md).
 
-## O que é instalado localmente
+## O que o Yomika armazena localmente
 
-O Yomika é uma aplicação local-first. Na prática, o binário desktop é apenas parte do footprint de instalação. A primeira execução real também cria um diretório local de dados por usuário para:
+O Yomika é uma aplicação local-first. Além do executável portátil, a primeira execução cria um diretório local de dados por usuário para:
 
 - bibliotecas de runtime usadas pelo llama.cpp e pelos backends de GPU
 - modelos de visão e OCR baixados
@@ -24,11 +24,16 @@ Na primeira execução, o Yomika pode:
 
 - extrair ou baixar bibliotecas de runtime exigidas pela stack de inferência local
 - baixar os modelos padrão de visão e OCR usados por detection, segmentação, OCR, inpainting e estimativa de fonte
-- adiar o download de LLMs locais de tradução até que você realmente as selecione em Settings
+- aguardar até que você escolha **Download** no seletor de modelos para baixar uma LLM local de tradução
 
 Isso é normal e pode levar algum tempo dependendo da sua conexão e hardware.
+O progresso de cada modelo fica visível, o download pode ser cancelado e uma notificação confirma a conclusão. Use **Settings > Runtime** para mudar a pasta da biblioteca de modelos, excluir modelos baixados ou baixá-los novamente.
 
 Se você quiser pré-baixar essas dependências de runtime, execute o Yomika uma vez com `--download`. Esse caminho inicializa os pacotes de runtime e a stack de visão padrão, e então encerra sem abrir a GUI.
+
+## Atualizações da aplicação
+
+O Yomika verifica a release mais recente do GitHub ao iniciar. Você também pode verificar manualmente em **Settings > About**. Quando houver uma versão nova, uma notificação abre a página de Releases; o Yomika nunca baixa nem instala uma atualização da aplicação automaticamente.
 
 ## Notas sobre aceleração por GPU
 

@@ -99,15 +99,17 @@ describe('ColorPicker', () => {
 
   describe('EyeDropper', () => {
     afterEach(() => {
-      delete (window as Record<string, unknown>).EyeDropper
+      Reflect.deleteProperty(window, 'EyeDropper')
     })
 
     it('applies the picked color and settles cleanly', async () => {
-      ;(window as Record<string, unknown>).EyeDropper = class {
-        async open() {
-          return { sRGBHex: '#abcdef' }
-        }
-      }
+      Object.assign(window, {
+        EyeDropper: class {
+          async open() {
+            return { sRGBHex: '#abcdef' }
+          }
+        },
+      })
       const onChange = vi.fn()
       render(
         <ColorPicker
@@ -126,11 +128,13 @@ describe('ColorPicker', () => {
     })
 
     it('aborting the EyeDropper neither throws nor changes the color', async () => {
-      ;(window as Record<string, unknown>).EyeDropper = class {
-        async open(): Promise<{ sRGBHex: string }> {
-          throw new DOMException('cancelled', 'AbortError')
-        }
-      }
+      Object.assign(window, {
+        EyeDropper: class {
+          async open(): Promise<{ sRGBHex: string }> {
+            throw new DOMException('cancelled', 'AbortError')
+          }
+        },
+      })
       const onChange = vi.fn()
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
       render(

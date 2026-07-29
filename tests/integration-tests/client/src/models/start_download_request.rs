@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct StartDownloadRequest {
-    /// Package id, as declared via `declare_hf_model_package!` (e.g. `\"model:comic-text-detector:yolo-v5\"`).
+    /// Package id declared by `declare_hf_model_package!`, or a local LLM operation id from `GET /llm/catalog` (for example `\"llm:qwen3.5-2b\"`).
     #[serde(rename = "modelId")]
     pub model_id: String,
 }

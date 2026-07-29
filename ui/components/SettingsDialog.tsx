@@ -27,6 +27,7 @@ import { useTheme } from 'next-themes'
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { ModelStorageManager } from '@/components/ModelStorageManager'
 import {
   Accordion,
   AccordionItem,
@@ -54,13 +55,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useUpdater, type UpdaterStatus } from '@/components/Updater'
+import { useUpdateChecker, type UpdateStatus } from '@/components/UpdateChecker'
 import {
   getCatalog as getLlmCatalog,
   getConfig,
   getEngineCatalog,
   getGetCatalogQueryKey as getGetLlmCatalogQueryKey,
-  getMeta,
   patchConfig,
   deleteCodexSession,
   getGetCodexAuthStatusQueryKey,
@@ -177,8 +177,7 @@ export function SettingsDialog({
   const [storageSettingsError, setStorageSettingsError] = useState<string | null>(null)
   const [isSavingStorageSettings, setIsSavingStorageSettings] = useState(false)
   const [engineCatalog, setEngineCatalog] = useState<GetEngineCatalog200 | null>(null)
-  const [appVersion, setAppVersion] = useState<string>()
-  const updater = useUpdater()
+  const updateChecker = useUpdateChecker()
 
   useEffect(() => {
     if (!open) return
@@ -194,29 +193,6 @@ export function SettingsDialog({
         setEngineCatalog(engines)
       } catch {}
     })()
-  }, [open])
-
-  const checkForUpdates = updater.checkForUpdates
-  useEffect(() => {
-    if (!open || !isTauri()) return
-    void checkForUpdates()
-  }, [open, checkForUpdates])
-
-  useEffect(() => {
-    if (!open) return
-    let cancelled = false
-    void (async () => {
-      try {
-        const meta = await getMeta()
-        if (cancelled) return
-        setAppVersion(meta.version)
-      } catch {
-        return
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
   }, [open])
 
   useEffect(() => {
@@ -293,14 +269,14 @@ export function SettingsDialog({
       return
     }
     if (!isTauri()) {
-      setStorageSettingsError('Restart manually')
+      setStorageSettingsError(t('settings.restartManually'))
       return
     }
     try {
       const { relaunch } = await import('@tauri-apps/plugin-process')
       await relaunch()
     } catch {
-      setStorageSettingsError('Restart manually')
+      setStorageSettingsError(t('settings.restartManually'))
     }
   }
 
@@ -429,11 +405,11 @@ export function SettingsDialog({
               {tab === 'keybinds' && <KeybindsPane />}
               {tab === 'about' && (
                 <AboutPane
-                  version={appVersion}
-                  latestVersion={updater.latestVersion}
-                  status={updater.status}
-                  isInstallingUpdate={updater.isInstalling}
-                  onInstallUpdate={() => void updater.installUpdate()}
+                  version={updateChecker.currentVersion}
+                  latestVersion={updateChecker.latestVersion}
+                  status={updateChecker.status}
+                  onCheck={() => void updateChecker.checkForUpdates()}
+                  onOpenRelease={() => void updateChecker.openLatestRelease()}
                 />
               )}
             </div>
@@ -1172,7 +1148,7 @@ function StoragePane({
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <>
+    <div className='space-y-6'>
       <Section title={t('settings.runtime')} description={t('settings.runtimeDescription')}>
         <div className='space-y-1.5'>
           <Label className='text-xs'>{t('settings.dataPath')}</Label>
@@ -1240,6 +1216,8 @@ function StoragePane({
         </div>
       </Section>
 
+      <ModelStorageManager />
+
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogTitle>{t('settings.restartApply')}</AlertDialogTitle>
@@ -1259,7 +1237,7 @@ function StoragePane({
           </div>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   )
 }
 
@@ -1269,14 +1247,14 @@ function AboutPane({
   version,
   latestVersion,
   status,
-  isInstallingUpdate,
-  onInstallUpdate,
+  onCheck,
+  onOpenRelease,
 }: {
-  version?: string
+  version: string
   latestVersion?: string
-  status: UpdaterStatus
-  isInstallingUpdate: boolean
-  onInstallUpdate: () => void
+  status: UpdateStatus
+  onCheck: () => void
+  onOpenRelease: () => void
 }) {
   const { t } = useTranslation()
 
@@ -1292,36 +1270,42 @@ function AboutPane({
         <div className='space-y-3 text-sm'>
           <InfoRow label={t('settings.aboutVersion')}>
             <div className='flex flex-col items-end gap-0.5'>
-              <span className='font-mono text-xs font-medium'>{version || '...'}</span>
-              {status === 'loading' && (
+              <span className='font-mono text-xs font-medium'>{version}</span>
+              {status === 'checking' && (
                 <LoaderIcon className='size-3.5 animate-spin text-muted-foreground' />
               )}
-              {status === 'latest' && (
+              {status === 'current' && (
                 <span className='flex items-center gap-1 text-xs text-green-500'>
                   <CheckCircleIcon className='size-3.5' />
                   {t('settings.aboutLatest')}
                 </span>
               )}
-              {status === 'outdated' && (
+              {status === 'available' && (
                 <Button
                   variant='link'
                   size='xs'
-                  onClick={onInstallUpdate}
-                  disabled={isInstallingUpdate}
+                  onClick={onOpenRelease}
                   className='h-auto gap-1 p-0 text-amber-500'
                 >
-                  {isInstallingUpdate ? (
-                    <LoaderIcon className='size-3.5 animate-spin' />
-                  ) : (
-                    <AlertCircleIcon className='size-3.5' />
-                  )}
+                  <AlertCircleIcon className='size-3.5' />
                   {t('settings.aboutUpdate', { version: latestVersion })}
                 </Button>
+              )}
+              {status === 'error' && (
+                <span className='text-xs text-muted-foreground'>
+                  {t('settings.aboutUpdateCheckFailed')}
+                </span>
               )}
             </div>
           </InfoRow>
           <InfoRow label={t('settings.aboutAuthor')}>
-            <span className='text-xs font-medium'>Yomika contributors</span>
+            <Button
+              variant='link'
+              size='xs'
+              onClick={() => void openExternalUrl('https://github.com/proxlavee')}
+            >
+              proxlavee
+            </Button>
           </InfoRow>
           <InfoRow label={t('settings.aboutRepository')}>
             <Button
@@ -1333,6 +1317,16 @@ function AboutPane({
             </Button>
           </InfoRow>
         </div>
+        <Button
+          variant='outline'
+          size='sm'
+          className='mt-4 w-full'
+          onClick={onCheck}
+          disabled={status === 'checking'}
+        >
+          {status === 'checking' && <LoaderIcon className='size-3.5 animate-spin' />}
+          {t('settings.aboutCheckUpdates')}
+        </Button>
       </div>
     </div>
   )

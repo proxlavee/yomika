@@ -13,12 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DataConfig {
+    /// Optional model-library override. `None` uses `{path}/models`.
+    #[serde(
+        rename = "models_path",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub models_path: Option<Option<String>>,
     #[serde(rename = "path")]
     pub path: String,
 }
 
 impl DataConfig {
     pub fn new(path: String) -> DataConfig {
-        DataConfig { path }
+        DataConfig {
+            models_path: None,
+            path,
+        }
     }
 }

@@ -21,3 +21,8 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# These support files are maintained for the Yomika Cargo workspace. Generated
+# APIs, models, and documentation remain fully reproducible from ui/openapi.json.
+Cargo.toml
+src/lib.rs

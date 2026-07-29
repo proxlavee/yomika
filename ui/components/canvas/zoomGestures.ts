@@ -22,3 +22,10 @@ export function resolvePinchNextScaleRatio(memoScaleRatio: number, movementScale
   }
   return clampScaleRatio(baseScaleRatio * movementScale)
 }
+
+export function resolveWheelNextScale(currentScale: number, deltaY: number): number {
+  const current = clampScaleRatio(currentScale / 100) * 100
+  if (!Number.isFinite(deltaY) || deltaY === 0) return Math.round(current)
+  const step = Math.max(1, Math.min(10, Math.abs(deltaY) * 0.05))
+  return Math.round(clampScaleRatio((current - Math.sign(deltaY) * step) / 100) * 100)
+}

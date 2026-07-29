@@ -57,6 +57,23 @@ fn local_target(id: ModelId) -> LlmTarget {
     }
 }
 
+pub fn local_model_download_id(model_id: &str) -> Result<String> {
+    let model = parse_local_model(model_id)?;
+    Ok(model.download_id())
+}
+
+pub async fn download_local_model(runtime: &RuntimeManager, model_id: &str) -> Result<()> {
+    let model = parse_local_model(model_id)?;
+    model.download(runtime).await?;
+    Ok(())
+}
+
+fn parse_local_model(model_id: &str) -> Result<ModelId> {
+    let model_id = model_id.strip_prefix("llm:").unwrap_or(model_id);
+    std::str::FromStr::from_str(model_id)
+        .map_err(|_| anyhow::anyhow!("unknown local model id: {model_id}"))
+}
+
 fn state_target(state: &State) -> Option<LlmTarget> {
     match state {
         State::Empty => None,
@@ -140,7 +157,8 @@ impl Model {
     }
 
     /// Kick off a local llama.cpp load in the background.
-    pub async fn load_local(&self, id: ModelId) {
+    pub async fn load_local(&self, id: ModelId) -> Result<()> {
+        id.require_cached(&self.runtime)?;
         let target = local_target(id);
         *self.state.write().await = State::Loading {
             target: target.clone(),
@@ -167,6 +185,7 @@ impl Model {
             let snapshot = snapshot_from_state(&guard);
             let _ = state_tx.send(snapshot);
         });
+        Ok(())
     }
 
     pub async fn offload(&self) {
@@ -265,8 +284,7 @@ impl Model {
                     std::str::FromStr::from_str(&request.target.model_id).map_err(|_| {
                         anyhow::anyhow!("unknown local model id: {}", request.target.model_id)
                     })?;
-                self.load_local(id).await;
-                Ok(())
+                self.load_local(id).await
             }
             LlmTargetKind::Provider => {
                 let provider_id = request
@@ -294,7 +312,7 @@ impl Model {
 /// configuration; Static providers always return the baked-in list.
 pub async fn catalog(config: &crate::config::AppConfig, runtime: &RuntimeManager) -> LlmCatalog {
     LlmCatalog {
-        local_models: local_catalog_models(),
+        local_models: local_catalog_models(runtime),
         providers: provider_catalog(config, runtime).await,
     }
 }
@@ -307,12 +325,18 @@ fn provider_target(provider_id: &str, model_id: &str) -> LlmTarget {
     }
 }
 
-fn local_catalog_models() -> Vec<LlmCatalogModel> {
+fn local_catalog_models(runtime: &RuntimeManager) -> Vec<LlmCatalogModel> {
     ModelId::iter()
-        .map(|model| LlmCatalogModel {
-            target: local_target(model),
-            name: model.to_string(),
-            languages: language_tags(&model.languages()),
+        .map(|model| {
+            let size_bytes = model.cached_size(runtime);
+            LlmCatalogModel {
+                target: local_target(model),
+                name: model.to_string(),
+                languages: language_tags(&model.languages()),
+                downloaded: Some(size_bytes.is_some()),
+                size_bytes,
+                download_id: Some(model.download_id()),
+            }
         })
         .collect()
 }
@@ -365,6 +389,9 @@ async fn provider_catalog(
                                         target: provider_target(descriptor.id, &m.id),
                                         name: m.name,
                                         languages: descriptor.supported_languages.tags(),
+                                        downloaded: None,
+                                        size_bytes: None,
+                                        download_id: None,
                                     })
                                     .collect(),
                             ),
@@ -407,6 +434,9 @@ fn static_provider_models(descriptor: &ProviderDescriptor) -> Vec<LlmCatalogMode
                 target: provider_target(descriptor.id, m.id),
                 name: m.name.to_string(),
                 languages: descriptor.supported_languages.tags(),
+                downloaded: None,
+                size_bytes: None,
+                download_id: None,
             })
             .collect(),
         ProviderCatalogModels::Dynamic(_) => Vec::new(),

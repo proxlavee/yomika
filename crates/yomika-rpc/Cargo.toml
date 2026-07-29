@@ -16,6 +16,7 @@ yomika-app = { workspace = true }
 yomika-core = { workspace = true }
 yomika-psd = { workspace = true }
 yomika-runtime = { workspace = true }
+yomika-llm = { workspace = true }
 anyhow = { workspace = true }
 async-stream = { workspace = true }
 axum = { workspace = true }

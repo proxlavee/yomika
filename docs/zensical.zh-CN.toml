@@ -2,7 +2,7 @@
 site_name = "Yomika"
 site_url = "https://proxlavee.github.io/yomika/zh-CN/"
 site_description = "本地优先的漫画翻译工具，支持 OCR、图像修复、本地与远程 LLM 以及 MCP 自动化。"
-site_author = "Yomika contributors"
+site_author = "proxlavee"
 repo_url = "https://github.com/proxlavee/yomika"
 repo_name = "proxlavee/yomika"
 edit_uri = "edit/main/docs/zh-CN/"

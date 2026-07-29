@@ -20,13 +20,13 @@ hide:
             必要なプロジェクトだけリモートプロバイダーを選べます。
           </p>
           <div class="ym-actions">
-            <a class="ym-button ym-button--primary" href="how-to/build-from-source.md">Yomika をビルド</a>
+            <a class="ym-button ym-button--primary" href="https://github.com/proxlavee/yomika/releases/latest">Windows 版をダウンロード</a>
             <a class="ym-button ym-button--secondary" href="tutorials/translate-your-first-page.md">最初のページを翻訳</a>
           </div>
           <ul class="ym-facts" aria-label="Yomika の概要">
-            <li>Windows・Linux・Apple Silicon</li>
+            <li>Windows 向けポータブル版</li>
+            <li>Linux・macOS はソースビルド</li>
             <li>GPL-3.0</li>
-            <li>デスクトップ・Headless・MCP</li>
           </ul>
         </div>
 
@@ -157,11 +157,11 @@ hide:
     <section class="ym-install" aria-labelledby="ym-install-title">
       <div class="ym-install__grid">
         <div class="ym-install__copy">
-          <div class="ym-kicker">ソースビルド</div>
+          <div class="ym-kicker">Yomika を入手</div>
           <h2 id="ym-install-title">最初のページを始めますか？</h2>
           <p>
-            現在、ビルド済みリリースは公開されていません。正しい Tauri とプラットフォーム機能を使うため、
-            リポジトリの Bun ラッパーでビルドしてください。
+            Windows 向けのポータブル EXE または ZIP を選択できます。インストーラーは不要です。
+            Linux、macOS、または独自ビルドにはリポジトリの Bun ラッパーを使用してください。
           </p>
         </div>
         <div>
@@ -170,6 +170,7 @@ cd yomika
 bun install --frozen-lockfile
 bun run build</code></pre>
           <div class="ym-install__links">
+            <a class="ym-text-link" href="https://github.com/proxlavee/yomika/releases/latest">Windows EXE または ZIP をダウンロード</a>
             <a class="ym-text-link" href="how-to/build-from-source.md">必要条件とプラットフォーム別注意点</a>
             <a class="ym-text-link" href="how-to/runtime-and-model-downloads.md">初回ダウンロードについて</a>
             <a class="ym-text-link" href="https://github.com/proxlavee/yomika">GitHub でソースを見る</a>

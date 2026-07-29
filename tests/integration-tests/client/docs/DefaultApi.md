@@ -7,13 +7,16 @@ Method | HTTP request | Description
 [**add_image_layer**](DefaultApi.md#add_image_layer) | **POST** /pages/{id}/image-layers |
 [**apply_command**](DefaultApi.md#apply_command) | **POST** /history/apply |
 [**cancel_operation**](DefaultApi.md#cancel_operation) | **DELETE** /operations/{id} |
+[**clear_models**](DefaultApi.md#clear_models) | **DELETE** /storage/models |
 [**clear_provider_secret**](DefaultApi.md#clear_provider_secret) | **DELETE** /config/providers/{id}/secret | Clear a provider's keyring secret. The provider entry itself is kept.
+[**clear_temporary_cache**](DefaultApi.md#clear_temporary_cache) | **DELETE** /storage/cache |
 [**create_pages**](DefaultApi.md#create_pages) | **POST** /pages |
 [**create_pages_from_paths**](DefaultApi.md#create_pages_from_paths) | **POST** /pages/from-paths | Create pages by reading image files from absolute paths on the server's filesystem. This is the Tauri desktop import path — the webview picker returns paths, and the backend reads + decodes + hashes them in parallel without a round-trip through JS memory or a multipart upload body.
 [**create_project**](DefaultApi.md#create_project) | **POST** /projects |
 [**delete_codex_session**](DefaultApi.md#delete_codex_session) | **DELETE** /ai/codex/auth/session |
 [**delete_current_llm**](DefaultApi.md#delete_current_llm) | **DELETE** /llm/current |
 [**delete_current_project**](DefaultApi.md#delete_current_project) | **DELETE** /projects/current |
+[**delete_local_model**](DefaultApi.md#delete_local_model) | **DELETE** /storage/models/{model_id} |
 [**delete_project**](DefaultApi.md#delete_project) | **DELETE** /projects/{id} |
 [**events**](DefaultApi.md#events) | **GET** /events |
 [**export_current_project**](DefaultApi.md#export_current_project) | **POST** /projects/current/export |
@@ -30,6 +33,7 @@ Method | HTTP request | Description
 [**get_page_thumbnail**](DefaultApi.md#get_page_thumbnail) | **GET** /pages/{id}/thumbnail |
 [**get_scene_bin**](DefaultApi.md#get_scene_bin) | **GET** /scene.bin |
 [**get_scene_json**](DefaultApi.md#get_scene_json) | **GET** /scene.json |
+[**get_storage**](DefaultApi.md#get_storage) | **GET** /storage |
 [**import_project**](DefaultApi.md#import_project) | **POST** /projects/import |
 [**list_downloads**](DefaultApi.md#list_downloads) | **GET** /downloads |
 [**list_fonts**](DefaultApi.md#list_fonts) | **GET** /fonts |
@@ -40,7 +44,9 @@ Method | HTTP request | Description
 [**put_current_project**](DefaultApi.md#put_current_project) | **PUT** /projects/current |
 [**put_mask**](DefaultApi.md#put_mask) | **PUT** /pages/{id}/masks/{role} | Upsert the `Mask { role }` node on a page with the raw image bytes in the body. Emits `Op::UpdateNode` if a mask of that role exists, else `Op::AddNode`. Used by the repair-brush / segment-edit flow; the follow-up localized inpaint is a separate `POST /pipelines` call.
 [**redo**](DefaultApi.md#redo) | **POST** /history/redo |
+[**redownload_local_model**](DefaultApi.md#redownload_local_model) | **POST** /storage/models/{model_id}/redownload |
 [**reorder_text_nodes**](DefaultApi.md#reorder_text_nodes) | **POST** /pages/{page_id}/reorder-text-nodes |
+[**set_model_location**](DefaultApi.md#set_model_location) | **PUT** /storage/models/location |
 [**set_provider_secret**](DefaultApi.md#set_provider_secret) | **PUT** /config/providers/{id}/secret | Save (or overwrite) the keyring secret for a provider. Creates the provider entry in `config.providers` if it didn't exist. `PUT` because setting the secret is idempotent for the same body.
 [**start_codex_device_login**](DefaultApi.md#start_codex_device_login) | **POST** /ai/codex/auth/device-code |
 [**start_codex_image_generation**](DefaultApi.md#start_codex_image_generation) | **POST** /ai/codex/images |
@@ -135,6 +141,31 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
+## clear_models
+
+> models::StorageCleanupResponse clear_models()
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**models::StorageCleanupResponse**](StorageCleanupResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
 ## clear_provider_secret
 
 > clear_provider_secret(id)
@@ -159,6 +190,31 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## clear_temporary_cache
+
+> models::StorageCleanupResponse clear_temporary_cache()
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**models::StorageCleanupResponse**](StorageCleanupResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -321,6 +377,34 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## delete_local_model
+
+> models::StorageCleanupResponse delete_local_model(model_id)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**model_id** | **String** | Local model id | [required] |
+
+### Return type
+
+[**models::StorageCleanupResponse**](StorageCleanupResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -744,6 +828,31 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
+## get_storage
+
+> models::StorageSummary get_storage()
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**models::StorageSummary**](StorageSummary.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
 ## import_project
 
 > models::ProjectSummary import_project(body)
@@ -1016,6 +1125,34 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
+## redownload_local_model
+
+> models::RedownloadModelResponse redownload_local_model(model_id)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**model_id** | **String** | Local model id | [required] |
+
+### Return type
+
+[**models::RedownloadModelResponse**](RedownloadModelResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
 ## reorder_text_nodes
 
 > reorder_text_nodes(page_id, body)
@@ -1041,6 +1178,34 @@ No authorization required
 
 - **Content-Type**: application/json
 - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## set_model_location
+
+> models::SetModelLocationResponse set_model_location(set_model_location_request)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**set_model_location_request** | [**SetModelLocationRequest**](SetModelLocationRequest.md) |  | [required] |
+
+### Return type
+
+[**models::SetModelLocationResponse**](SetModelLocationResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

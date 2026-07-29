@@ -4,11 +4,12 @@ title: Referência de configurações
 
 # Referência de configurações
 
-A tela de configurações do Yomika atualmente expõe seis áreas principais:
+A tela de configurações do Yomika atualmente expõe sete áreas principais:
 
 - `Appearance`
 - `Engines`
 - `API Keys`
+- `AI`
 - `Keybinds`
 - `Runtime`
 - `About`
@@ -74,6 +75,10 @@ O response da API intencionalmente redacta as chaves salvas em vez de retornar o
 
 O armazenamento local de credenciais no Linux depende das permissões do filesystem em vez de criptografia em nível de sistema operacional.
 
+## AI
+
+A aba `AI` gerencia a conexão opcional com o Codex usada pelo fluxo de geração de imagens. Ela mostra o estado atual da conta e oferece entrada por código de dispositivo e saída. Essa conexão é separada das chaves configuradas em `API Keys`.
+
 ## Keybinds
 
 A aba `Keybinds` permite remapear os atalhos de troca de ferramenta e de tamanho de pincel, além dos atalhos de desfazer e refazer.
@@ -83,7 +88,7 @@ Comportamento atual:
 - os padrões são `V`/`M`/`B`/`E`/`R` para as ferramentas Selecionar / Bloco / Pincel / Borracha / Pincel de Reparo
 - os padrões são `[` e `]` para o passo do tamanho do pincel
 - os padrões são `Ctrl + Z` e `Ctrl + Shift + Z` (`Cmd + Z` e `Cmd + Shift + Z` no macOS) para desfazer e refazer
-- o zoom do canvas (`Ctrl` + roda), o pan (`Ctrl` + arrastar), o select-all (`Ctrl + A`) e o fallback legado de refazer com `Ctrl + Y` não são remapeáveis
+- o zoom pela roda do mouse, o pan pela ferramenta Mão ou por `Ctrl` + arrastar, o select-all (`Ctrl + A`) e o fallback legado de refazer com `Ctrl + Y` não são remapeáveis
 - conflitos são destacados no editor; você pode redefinir tudo para os padrões na mesma tela
 
 As preferências de atalhos ficam armazenadas na camada de preferências do frontend, não em `config.toml`.
@@ -92,16 +97,21 @@ Para a lista completa de padrões, veja [Atalhos de teclado](keyboard-shortcuts.
 
 ## Runtime
 
-A aba `Runtime` agrupa configurações que exigem reinicialização e afetam o runtime local compartilhado:
+A aba `Runtime` agrupa a configuração do runtime compartilhado e a manutenção do armazenamento de modelos:
 
 - `Data Path`
+- `Model Library`
 - `HTTP Connect Timeout`
 - `HTTP Read Timeout`
 - `HTTP Max Retries`
 
 Comportamento atual:
 
-- `Data Path` controla onde o Yomika armazena pacotes de runtime, modelos baixados, manifests de página e blobs de imagem
+- `Data Path` controla onde o Yomika armazena pacotes de runtime, manifests de página e blobs de imagem
+- `Model Library` usa `<Data Path>/models` por padrão ou outra pasta absoluta
+- **Use existing** adota o cache na pasta escolhida; **Move current models** valida e move o cache gerenciado pelo Yomika
+- o painel mostra o uso de disco, limpa arquivos temporários e exclui ou baixa novamente modelos locais
+- mudar a biblioteca exige reiniciar; descarregue modelos locais e conclua ou cancele trabalhos ativos primeiro
 - `HTTP Connect Timeout` define quanto tempo o Yomika aguarda ao estabelecer conexões HTTP
 - `HTTP Read Timeout` define quanto tempo o Yomika aguarda ao ler responses HTTP
 - `HTTP Max Retries` controla as retentativas automáticas para falhas transitórias de HTTP
@@ -114,16 +124,16 @@ A aba `About` atualmente mostra:
 
 - a versão atual do app
 - se existe um release mais novo no GitHub
-- o link do autor
+- o link do autor `proxlavee`
 - o link do repositório
 
-No modo de app empacotado, a verificação de versão compara a versão local do app com o último release no GitHub em `proxlavee/yomika`.
+A verificação compara a versão local com o release mais recente de `proxlavee/yomika` ao iniciar e manualmente na aba About. Quando há uma versão nova, abre a página de Releases; o Yomika não baixa nem instala atualizações do aplicativo.
 
 ## Modelo de persistência
 
 O comportamento atual das configurações é dividido em camadas de armazenamento:
 
-- `config.toml` armazena a config compartilhada do app, como `data`, `http`, `pipeline` e `baseUrl` dos provedores
+- `config.toml` armazena caminhos de dados e modelos, `http`, `pipeline` e `baseUrl` dos provedores
 - as chaves de API dos provedores são armazenadas separadamente de `config.toml` pelo armazenamento de credenciais da plataforma descrito acima
 - as preferências de tema, idioma e fonte de renderização são armazenadas na camada de preferências do frontend
 

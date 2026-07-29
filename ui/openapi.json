@@ -1054,6 +1054,140 @@
           }
         }
       }
+    },
+    "/storage": {
+      "get": {
+        "operationId": "get_storage",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/cache": {
+      "delete": {
+        "operationId": "clear_temporary_cache",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageCleanupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/models": {
+      "delete": {
+        "operationId": "clear_models",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageCleanupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/models/location": {
+      "put": {
+        "operationId": "set_model_location",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetModelLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetModelLocationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/models/{model_id}": {
+      "delete": {
+        "operationId": "delete_local_model",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "description": "Local model id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageCleanupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/storage/models/{model_id}/redownload": {
+      "post": {
+        "operationId": "redownload_local_model",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "description": "Local model id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedownloadModelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1475,6 +1609,10 @@
         "type": "object",
         "required": ["path"],
         "properties": {
+          "models_path": {
+            "type": ["string", "null"],
+            "description": "Optional model-library override. `None` uses `{path}/models`."
+          },
           "path": {
             "type": "string"
           }
@@ -1542,6 +1680,16 @@
               "status": {
                 "type": "string",
                 "enum": ["completed"]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["status"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["cancelled"]
               }
             }
           },
@@ -2047,6 +2195,14 @@
         "type": "object",
         "required": ["target", "name", "languages"],
         "properties": {
+          "downloadId": {
+            "type": ["string", "null"],
+            "description": "Stable id used by the download/cancellation endpoints."
+          },
+          "downloaded": {
+            "type": ["boolean", "null"],
+            "description": "Present only for local models."
+          },
           "languages": {
             "type": "array",
             "items": {
@@ -2055,6 +2211,12 @@
           },
           "name": {
             "type": "string"
+          },
+          "sizeBytes": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Cached model-file size when downloaded.",
+            "minimum": 0
           },
           "target": {
             "$ref": "#/components/schemas/LlmTarget"
@@ -2232,6 +2394,10 @@
             "type": "string"
           }
         }
+      },
+      "ModelLocationMode": {
+        "type": "string",
+        "enum": ["use_existing", "move_existing"]
       },
       "NamedFontPrediction": {
         "type": "object",
@@ -2959,6 +3125,20 @@
         "type": "string",
         "enum": ["rtl", "ltr", "custom"]
       },
+      "RedownloadModelResponse": {
+        "type": "object",
+        "required": ["operationId", "removedBytes"],
+        "properties": {
+          "operationId": {
+            "type": "string"
+          },
+          "removedBytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "Region": {
         "type": "object",
         "required": ["x", "y", "width", "height"],
@@ -3020,6 +3200,38 @@
           }
         }
       },
+      "SetModelLocationRequest": {
+        "type": "object",
+        "required": ["path", "mode"],
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ModelLocationMode"
+          },
+          "path": {
+            "type": "string"
+          }
+        }
+      },
+      "SetModelLocationResponse": {
+        "type": "object",
+        "required": ["modelsPath", "copiedBytes", "sourceRemoved", "restartRequired"],
+        "properties": {
+          "copiedBytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "modelsPath": {
+            "type": "string"
+          },
+          "restartRequired": {
+            "type": "boolean"
+          },
+          "sourceRemoved": {
+            "type": "boolean"
+          }
+        }
+      },
       "SnapshotEvent": {
         "type": "object",
         "required": ["jobs", "downloads"],
@@ -3044,7 +3256,7 @@
         "properties": {
           "modelId": {
             "type": "string",
-            "description": "Package id, as declared via `declare_hf_model_package!`\n(e.g. `\"model:comic-text-detector:yolo-v5\"`)."
+            "description": "Package id declared by `declare_hf_model_package!`, or a local LLM\noperation id from `GET /llm/catalog` (for example `\"llm:qwen3.5-2b\"`)."
           }
         }
       },
@@ -3127,6 +3339,53 @@
         "properties": {
           "operationId": {
             "type": "string"
+          }
+        }
+      },
+      "StorageCleanupResponse": {
+        "type": "object",
+        "required": ["removedBytes"],
+        "properties": {
+          "removedBytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "StorageSummary": {
+        "type": "object",
+        "required": [
+          "dataPath",
+          "modelsPath",
+          "customModelsPath",
+          "modelsBytes",
+          "temporaryBytes",
+          "downloadedLocalModels"
+        ],
+        "properties": {
+          "customModelsPath": {
+            "type": "boolean"
+          },
+          "dataPath": {
+            "type": "string"
+          },
+          "downloadedLocalModels": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "modelsBytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "modelsPath": {
+            "type": "string"
+          },
+          "temporaryBytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         }
       },

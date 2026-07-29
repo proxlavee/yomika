@@ -6,8 +6,8 @@
 //!   cadence on the UI side.
 //! - `DELETE /operations/{id}` — unified cancel. Pipeline cancellation
 //!   flips the cancel flag registered at start time; download cancellation
-//!   is best-effort (HF hub transfers don't expose mid-stream cancel) and
-//!   just evicts the row so the UI clears it.
+//!   aborts the owned transfer and lets it publish a terminal status after
+//!   cleaning up its partial file.
 
 use axum::Json;
 use axum::extract::{Path, State};
@@ -75,7 +75,6 @@ async fn cancel_operation(
     if let Some(flag) = cancels().get(&id) {
         flag.store(true, Ordering::Relaxed);
     }
-    // Best-effort download cancel: drop the registry row.
-    app.downloads().remove(&id);
+    app.runtime().downloads().cancel(&id);
     Ok(StatusCode::NO_CONTENT)
 }

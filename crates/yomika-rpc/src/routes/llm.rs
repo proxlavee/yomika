@@ -49,7 +49,16 @@ async fn put_current_llm(
     app.llm
         .load_from_request(req, provider_config)
         .await
-        .map_err(ApiError::internal)?;
+        .map_err(|error| {
+            if error
+                .downcast_ref::<yomika_llm::ModelNotDownloaded>()
+                .is_some()
+            {
+                ApiError::conflict(error.to_string())
+            } else {
+                ApiError::internal(error)
+            }
+        })?;
     Ok(axum::http::StatusCode::NO_CONTENT)
 }
 

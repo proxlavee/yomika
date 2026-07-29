@@ -371,7 +371,7 @@
     "apiKeySave": "保存",
     "apiKeySaved": "保存しました！",
     "dataPath": "データパス",
-    "dataPathDescription": "Yomika はモデル、ランタイムパッケージ、ページマニフェスト、画像 Blob をこのディレクトリに保存します。パスを変更するとアプリの再起動が必要です。",
+    "dataPathDescription": "Yomika はランタイムパッケージ、ページマニフェスト、画像 Blob をここに保存します。モデルには下の別の保存先を指定できます。このパスを変更するとアプリの再起動が必要です。",
     "dataPathApply": "適用して再起動",
     "dataPathApplying": "適用中...",
     "dataPathDesktopOnly": "ランタイム設定はデスクトップアプリでのみ利用可能です。",
@@ -405,23 +405,11 @@
     "shortcutConflict": "そのキーの組み合わせは既に使用されています",
     "shortcutInvalid": "このキーはショートカットとして使用できません"
   },
-  "updater": {
+  "updates": {
     "available": {
       "title": "アップデートが利用可能",
-      "description": "Yomika <strong>{{version}}</strong> をインストールできます"
+      "description": "Yomika {{version}} が GitHub で公開されています。"
     },
-    "noNotes": "リリースノートはありません。",
-    "later": "後で",
-    "update": "更新",
-    "downloading": {
-      "title": "アップデートをダウンロード中…",
-      "subtitle": "Yomika {{version}}"
-    },
-    "error": {
-      "title": "アップデートに失敗しました",
-      "description": "アップデート中に問題が発生しました"
-    },
-    "close": "閉じる",
-    "retry": "再試行"
+    "openRelease": "ダウンロードページを開く"
   }
 }

@@ -7,6 +7,7 @@ import { ActivityBubble } from '@/components/ActivityBubble'
 import { useDownloadsStore } from '@/lib/stores/downloadsStore'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { useJobsStore } from '@/lib/stores/jobsStore'
+import { useNotificationsStore } from '@/lib/stores/notificationsStore'
 
 import { renderWithQuery } from '../helpers'
 import { server } from '../msw/server'
@@ -15,6 +16,7 @@ beforeEach(() => {
   useJobsStore.getState().clear()
   useDownloadsStore.getState().clear()
   useEditorUiStore.getState().clearError()
+  useNotificationsStore.getState().clear()
 })
 
 describe('ActivityBubble', () => {
@@ -67,6 +69,42 @@ describe('ActivityBubble', () => {
     renderWithQuery(<ActivityBubble />)
     expect(screen.getByText('llama.cpp.zip')).toBeInTheDocument()
     expect(screen.getByText(/50%/)).toBeInTheDocument()
+  })
+
+  it('cancels an active download through the operation endpoint', async () => {
+    useDownloadsStore.getState().progress({
+      id: 'llm:model-a',
+      filename: 'model-a.gguf',
+      downloaded: 25,
+      total: 100,
+      status: { status: 'downloading' },
+    })
+    const deletes: string[] = []
+    server.use(
+      http.delete('/api/v1/operations/:id', ({ params }) => {
+        deletes.push(String(params.id))
+        return new HttpResponse(null, { status: 204 })
+      }),
+    )
+
+    renderWithQuery(<ActivityBubble />)
+    await userEvent.click(screen.getByTestId('download-cancel-llm:model-a'))
+    expect(deletes).toEqual(['llm:model-a'])
+  })
+
+  it('renders and dismisses shared notifications', async () => {
+    useNotificationsStore.getState().upsert({
+      id: 'model-ready',
+      tone: 'success',
+      titleKey: 'download.completedTitle',
+      messageKey: 'download.completedDescription',
+      values: { filename: 'model.gguf' },
+    })
+
+    renderWithQuery(<ActivityBubble />)
+    expect(screen.getByTestId('notification-model-ready')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'errors.dismiss' }))
+    expect(screen.queryByTestId('notification-model-ready')).not.toBeInTheDocument()
   })
 
   it('renders an error card that can be dismissed', async () => {

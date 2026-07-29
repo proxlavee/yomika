@@ -13,26 +13,24 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DownloadStatusOneOf3 {
-    #[serde(rename = "reason")]
-    pub reason: String,
     #[serde(rename = "status")]
     pub status: Status,
 }
 
 impl DownloadStatusOneOf3 {
-    pub fn new(reason: String, status: Status) -> DownloadStatusOneOf3 {
-        DownloadStatusOneOf3 { reason, status }
+    pub fn new(status: Status) -> DownloadStatusOneOf3 {
+        DownloadStatusOneOf3 { status }
     }
 }
 ///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum Status {
-    #[serde(rename = "failed")]
-    Failed,
+    #[serde(rename = "cancelled")]
+    Cancelled,
 }
 
 impl Default for Status {
     fn default() -> Status {
-        Self::Failed
+        Self::Cancelled
     }
 }

@@ -23,7 +23,7 @@ Yomika 下载的内容大致分成三类：
 
 ## 文件保存在哪里
 
-Yomika 会把运行时包和模型缓存存到当前配置的 `Data Path` 下。默认情况下，这个路径是各平台本地 app-data 目录下的 `Yomika`。
+Yomika 会把运行时包存到当前配置的 `Data Path` 下。模型库默认使用 `<Data Path>/models`，也可以在 **Settings > Runtime** 中改为其他绝对路径。
 
 常见示例：
 
@@ -41,7 +41,7 @@ Yomika 会把运行时包和模型缓存存到当前配置的 `Data Path` 下。
     cuda/
     llama.cpp/
     zluda/
-  models/
+  models/                    # 默认模型库位置
     huggingface/
 ```
 
@@ -49,9 +49,11 @@ Yomika 会把运行时包和模型缓存存到当前配置的 `Data Path` 下。
 
 - `runtime/.downloads` 是原生运行时下载归档的通用缓存目录
 - `runtime/*` 存的是 Yomika 真正会加载的已解压库文件
-- `models/huggingface` 是 vision 模型和本地 GGUF 模型文件使用的 Hugging Face 缓存
+- `<Model Library>/huggingface` 是 vision 模型和本地 GGUF 模型文件使用的 Hugging Face 缓存
 
 并不是所有平台都会出现全部目录。比如 `zluda/` 只在 Windows 上有意义，而且只针对受支持的 AMD 场景。
+
+更改模型库时，可以选择 **Use existing** 直接采用目标文件夹中的文件，也可以选择 **Move current models** 复制并验证 Yomika 管理的缓存，再移除旧缓存。更改成功后应用会重启，确保所有运行时组件使用同一个位置。
 
 关于当前配置路径和 HTTP 设置，可参考 [设置参考](../reference/settings.md)。
 
@@ -77,7 +79,7 @@ Yomika 会把运行时包和模型缓存存到当前配置的 `Data Path` 下。
 
 ## 模型下载是怎么工作的
 
-大多数模型下载都使用 `models/huggingface` 下的共享 Hugging Face 缓存。
+大多数模型下载都使用 `<Model Library>/huggingface` 下的共享 Hugging Face 缓存。
 
 大致流程如下：
 
@@ -88,6 +90,20 @@ Yomika 会把运行时包和模型缓存存到当前配置的 `Data Path` 下。
 5. 后续加载会直接复用缓存文件，而不是重新下载。
 
 这既适用于默认视觉模型栈，也适用于之后按需下载的本地 GGUF 翻译模型。
+
+## 管理下载和磁盘空间
+
+本地翻译模型使用彼此独立的 **Download** 和 **Load** 操作。模型缺失时，**Load** 不会自动开始下载。下载期间可以在模型选择器或通知区域选择 **Cancel**；Yomika 会清理不完整文件并报告最终状态。
+
+在 **Settings > Runtime** 中可以：
+
+- 查看模型库和临时下载占用的空间
+- 清理已完成的运行时归档和不完整模型文件
+- 删除某个已下载的本地翻译模型
+- 删除包括默认视觉模型栈在内的全部模型文件
+- 删除某个本地翻译模型并立即重新下载
+
+更改模型文件前，请先卸载本地模型，并等待当前任务结束或取消正在进行的下载。已删除的默认模型会在相应流水线阶段下次需要时重新下载。
 
 ## Hugging Face 是什么
 

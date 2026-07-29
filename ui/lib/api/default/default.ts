@@ -55,11 +55,16 @@ import type {
   PutMaskParams,
   PutMaskResponse,
   ReadingOrder,
+  RedownloadModelResponse,
   SceneSnapshot,
+  SetModelLocationRequest,
+  SetModelLocationResponse,
   StartDownloadRequest,
   StartDownloadResponse,
   StartPipelineRequest,
   StartPipelineResponse,
+  StorageCleanupResponse,
+  StorageSummary,
 } from '../schemas'
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
@@ -3669,4 +3674,423 @@ export function useGetSceneJson<TData = Awaited<ReturnType<typeof getSceneJson>>
   }
 
   return withQueryKey(query, queryOptions.queryKey)
+}
+
+export const getGetStorageUrl = () => {
+  return `/api/v1/storage`
+}
+
+export const getStorage = async (options?: RequestInit): Promise<StorageSummary> => {
+  return fetchApi<StorageSummary>(getGetStorageUrl(), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetStorageQueryKey = () => {
+  return [`/api/v1/storage`] as const
+}
+
+export const useGetStorageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStorage>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getStorage>>, TError, TData>>
+  request?: SecondParameter<typeof fetchApi>
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getGetStorageQueryKey()
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getStorage>>> = ({ signal }) =>
+    getStorage({ signal, ...requestOptions })
+
+  const customOptions = withQueryDefaults({ queryKey, queryFn, ...queryOptions })
+
+  return customOptions as UseQueryOptions<Awaited<ReturnType<typeof getStorage>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+}
+
+export type GetStorageQueryResult = NonNullable<Awaited<ReturnType<typeof getStorage>>>
+export type GetStorageQueryError = unknown
+
+export function useGetStorage<TData = Awaited<ReturnType<typeof getStorage>>, TError = unknown>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getStorage>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStorage>>,
+          TError,
+          Awaited<ReturnType<typeof getStorage>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStorage<TData = Awaited<ReturnType<typeof getStorage>>, TError = unknown>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getStorage>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStorage>>,
+          TError,
+          Awaited<ReturnType<typeof getStorage>>
+        >,
+        'initialData'
+      >
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStorage<TData = Awaited<ReturnType<typeof getStorage>>, TError = unknown>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getStorage>>, TError, TData>>
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetStorage<TData = Awaited<ReturnType<typeof getStorage>>, TError = unknown>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getStorage>>, TError, TData>>
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = useGetStorageQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>
+  }
+
+  return withQueryKey(query, queryOptions.queryKey)
+}
+
+export const getClearTemporaryCacheUrl = () => {
+  return `/api/v1/storage/cache`
+}
+
+export const clearTemporaryCache = async (
+  options?: RequestInit,
+): Promise<StorageCleanupResponse> => {
+  return fetchApi<StorageCleanupResponse>(getClearTemporaryCacheUrl(), {
+    ...options,
+    method: 'DELETE',
+  })
+}
+
+export const getClearTemporaryCacheMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof clearTemporaryCache>>,
+    TError,
+    void,
+    TContext
+  >
+  request?: SecondParameter<typeof fetchApi>
+}): UseMutationOptions<Awaited<ReturnType<typeof clearTemporaryCache>>, TError, void, TContext> => {
+  const mutationKey = ['clearTemporaryCache']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof clearTemporaryCache>>,
+    void
+  > = () => {
+    return clearTemporaryCache(requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type ClearTemporaryCacheMutationResult = NonNullable<
+  Awaited<ReturnType<typeof clearTemporaryCache>>
+>
+
+export type ClearTemporaryCacheMutationError = unknown
+
+export const useClearTemporaryCache = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof clearTemporaryCache>>,
+      TError,
+      void,
+      TContext
+    >
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof clearTemporaryCache>>, TError, void, TContext> => {
+  return useMutation(getClearTemporaryCacheMutationOptions(options), queryClient)
+}
+export const getClearModelsUrl = () => {
+  return `/api/v1/storage/models`
+}
+
+export const clearModels = async (options?: RequestInit): Promise<StorageCleanupResponse> => {
+  return fetchApi<StorageCleanupResponse>(getClearModelsUrl(), {
+    ...options,
+    method: 'DELETE',
+  })
+}
+
+export const getClearModelsMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof clearModels>>, TError, void, TContext>
+  request?: SecondParameter<typeof fetchApi>
+}): UseMutationOptions<Awaited<ReturnType<typeof clearModels>>, TError, void, TContext> => {
+  const mutationKey = ['clearModels']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof clearModels>>, void> = () => {
+    return clearModels(requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type ClearModelsMutationResult = NonNullable<Awaited<ReturnType<typeof clearModels>>>
+
+export type ClearModelsMutationError = unknown
+
+export const useClearModels = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof clearModels>>, TError, void, TContext>
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof clearModels>>, TError, void, TContext> => {
+  return useMutation(getClearModelsMutationOptions(options), queryClient)
+}
+export const getSetModelLocationUrl = () => {
+  return `/api/v1/storage/models/location`
+}
+
+export const setModelLocation = async (
+  setModelLocationRequest: SetModelLocationRequest,
+  options?: RequestInit,
+): Promise<SetModelLocationResponse> => {
+  return fetchApi<SetModelLocationResponse>(getSetModelLocationUrl(), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(setModelLocationRequest),
+  })
+}
+
+export const getSetModelLocationMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setModelLocation>>,
+    TError,
+    { data: SetModelLocationRequest },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchApi>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setModelLocation>>,
+  TError,
+  { data: SetModelLocationRequest },
+  TContext
+> => {
+  const mutationKey = ['setModelLocation']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setModelLocation>>,
+    { data: SetModelLocationRequest }
+  > = (props) => {
+    const { data } = props ?? {}
+
+    return setModelLocation(data, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type SetModelLocationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setModelLocation>>
+>
+export type SetModelLocationMutationBody = SetModelLocationRequest
+export type SetModelLocationMutationError = unknown
+
+export const useSetModelLocation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setModelLocation>>,
+      TError,
+      { data: SetModelLocationRequest },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setModelLocation>>,
+  TError,
+  { data: SetModelLocationRequest },
+  TContext
+> => {
+  return useMutation(getSetModelLocationMutationOptions(options), queryClient)
+}
+export const getDeleteLocalModelUrl = (modelId: string) => {
+  return `/api/v1/storage/models/${modelId}`
+}
+
+export const deleteLocalModel = async (
+  modelId: string,
+  options?: RequestInit,
+): Promise<StorageCleanupResponse> => {
+  return fetchApi<StorageCleanupResponse>(getDeleteLocalModelUrl(modelId), {
+    ...options,
+    method: 'DELETE',
+  })
+}
+
+export const getDeleteLocalModelMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteLocalModel>>,
+    TError,
+    { modelId: string },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchApi>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteLocalModel>>,
+  TError,
+  { modelId: string },
+  TContext
+> => {
+  const mutationKey = ['deleteLocalModel']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteLocalModel>>,
+    { modelId: string }
+  > = (props) => {
+    const { modelId } = props ?? {}
+
+    return deleteLocalModel(modelId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type DeleteLocalModelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteLocalModel>>
+>
+
+export type DeleteLocalModelMutationError = unknown
+
+export const useDeleteLocalModel = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteLocalModel>>,
+      TError,
+      { modelId: string },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteLocalModel>>,
+  TError,
+  { modelId: string },
+  TContext
+> => {
+  return useMutation(getDeleteLocalModelMutationOptions(options), queryClient)
+}
+export const getRedownloadLocalModelUrl = (modelId: string) => {
+  return `/api/v1/storage/models/${modelId}/redownload`
+}
+
+export const redownloadLocalModel = async (
+  modelId: string,
+  options?: RequestInit,
+): Promise<RedownloadModelResponse> => {
+  return fetchApi<RedownloadModelResponse>(getRedownloadLocalModelUrl(modelId), {
+    ...options,
+    method: 'POST',
+  })
+}
+
+export const getRedownloadLocalModelMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof redownloadLocalModel>>,
+    TError,
+    { modelId: string },
+    TContext
+  >
+  request?: SecondParameter<typeof fetchApi>
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof redownloadLocalModel>>,
+  TError,
+  { modelId: string },
+  TContext
+> => {
+  const mutationKey = ['redownloadLocalModel']
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined }
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof redownloadLocalModel>>,
+    { modelId: string }
+  > = (props) => {
+    const { modelId } = props ?? {}
+
+    return redownloadLocalModel(modelId, requestOptions)
+  }
+
+  return { mutationFn, ...mutationOptions }
+}
+
+export type RedownloadLocalModelMutationResult = NonNullable<
+  Awaited<ReturnType<typeof redownloadLocalModel>>
+>
+
+export type RedownloadLocalModelMutationError = unknown
+
+export const useRedownloadLocalModel = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof redownloadLocalModel>>,
+      TError,
+      { modelId: string },
+      TContext
+    >
+    request?: SecondParameter<typeof fetchApi>
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof redownloadLocalModel>>,
+  TError,
+  { modelId: string },
+  TContext
+> => {
+  return useMutation(getRedownloadLocalModelMutationOptions(options), queryClient)
 }

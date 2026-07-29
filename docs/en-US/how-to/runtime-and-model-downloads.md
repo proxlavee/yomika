@@ -23,7 +23,9 @@ The important behavior detail is:
 
 ## Where the files go
 
-Yomika stores runtime packages and model caches under the configured `Data Path`. By default, that path is the platform local app-data directory plus `Yomika`.
+Yomika stores runtime packages under the configured `Data Path`. The model
+library defaults to `<Data Path>/models`, but **Settings > Runtime** can point
+it to another absolute folder.
 
 Typical examples:
 
@@ -41,7 +43,7 @@ In the current implementation, the important subdirectories are:
     cuda/
     llama.cpp/
     zluda/
-  models/
+  models/                    # default model-library location
     huggingface/
 ```
 
@@ -49,11 +51,16 @@ Practical meaning:
 
 - `runtime/.downloads` is the generic archive cache for native runtime downloads
 - `runtime/*` contains the extracted libraries Yomika actually loads
-- `models/huggingface` is the Hugging Face cache used for vision models and local GGUF model files
+- `<Model Library>/huggingface` is the Hugging Face cache used for vision models and local GGUF model files
 
 Not every directory exists on every platform. For example, `zluda/` is Windows-only and only matters on supported AMD setups.
 
-For the configured path and HTTP settings, see [Settings Reference](../reference/settings.md).
+When changing the model library, choose **Use existing** to adopt files already
+in the selected folder or **Move current models** to copy Yomika's managed
+cache there and remove the old copy after validation. The app restarts after a
+successful change so every runtime component uses the same location.
+
+For the configured paths and HTTP settings, see [Settings Reference](../reference/settings.md).
 
 ## How runtime downloading works
 
@@ -77,7 +84,8 @@ So a runtime download failure is not always a Hugging Face problem.
 
 ## How model downloading works
 
-Most model downloads use the shared Hugging Face cache under `models/huggingface`.
+Most model downloads use the shared Hugging Face cache under
+`<Model Library>/huggingface`.
 
 At a high level:
 
@@ -88,6 +96,25 @@ At a high level:
 5. Later loads reuse the cached file instead of redownloading it.
 
 This is true for the default vision stack and for local GGUF translation models that Yomika downloads on demand.
+
+## Manage downloads and disk space
+
+Local translation models have separate **Download** and **Load** actions. A
+missing model is never downloaded by **Load**. While a download is active, use
+**Cancel** in the model picker or notification area; Yomika removes partial
+model files and reports the final state.
+
+Use **Settings > Runtime** to:
+
+- view model-library and temporary-download usage
+- clear completed runtime archives and partial model files
+- delete one downloaded local translation model
+- delete all downloaded model files, including the default vision stack
+- delete and immediately download a local translation model again
+
+Unload a local translation model and finish or cancel active jobs/downloads
+before changing its files. Deleted default models are downloaded again the
+next time their pipeline stage needs them.
 
 ## What Hugging Face is
 

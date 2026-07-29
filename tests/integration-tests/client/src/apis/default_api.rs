@@ -36,10 +36,24 @@ pub enum CancelOperationError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`clear_models`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ClearModelsError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`clear_provider_secret`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ClearProviderSecretError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`clear_temporary_cache`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ClearTemporaryCacheError {
     UnknownValue(serde_json::Value),
 }
 
@@ -82,6 +96,13 @@ pub enum DeleteCurrentLlmError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum DeleteCurrentProjectError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`delete_local_model`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteLocalModelError {
     UnknownValue(serde_json::Value),
 }
 
@@ -200,6 +221,13 @@ pub enum GetSceneJsonError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`get_storage`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetStorageError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`import_project`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -270,10 +298,24 @@ pub enum RedoError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`redownload_local_model`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum RedownloadLocalModelError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`reorder_text_nodes`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ReorderTextNodesError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`set_model_location`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum SetModelLocationError {
     UnknownValue(serde_json::Value),
 }
 
@@ -481,6 +523,55 @@ pub async fn cancel_operation(
     }
 }
 
+pub async fn clear_models(
+    configuration: &configuration::Configuration,
+) -> Result<models::StorageCleanupResponse, Error<ClearModelsError>> {
+    let uri_str = format!("{}/storage/models", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::StorageCleanupResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::StorageCleanupResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ClearModelsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 pub async fn clear_provider_secret(
     configuration: &configuration::Configuration,
     id: &str,
@@ -511,6 +602,55 @@ pub async fn clear_provider_secret(
     } else {
         let content = resp.text().await?;
         let entity: Option<ClearProviderSecretError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn clear_temporary_cache(
+    configuration: &configuration::Configuration,
+) -> Result<models::StorageCleanupResponse, Error<ClearTemporaryCacheError>> {
+    let uri_str = format!("{}/storage/cache", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::StorageCleanupResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::StorageCleanupResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ClearTemporaryCacheError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -781,6 +921,63 @@ pub async fn delete_current_project(
     } else {
         let content = resp.text().await?;
         let entity: Option<DeleteCurrentProjectError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn delete_local_model(
+    configuration: &configuration::Configuration,
+    model_id: &str,
+) -> Result<models::StorageCleanupResponse, Error<DeleteLocalModelError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_model_id = model_id;
+
+    let uri_str = format!(
+        "{}/storage/models/{model_id}",
+        configuration.base_path,
+        model_id = crate::apis::urlencode(p_path_model_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::DELETE, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::StorageCleanupResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::StorageCleanupResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteLocalModelError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -1462,6 +1659,53 @@ pub async fn get_scene_json(
     }
 }
 
+pub async fn get_storage(
+    configuration: &configuration::Configuration,
+) -> Result<models::StorageSummary, Error<GetStorageError>> {
+    let uri_str = format!("{}/storage", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::StorageSummary`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::StorageSummary`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetStorageError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 pub async fn import_project(
     configuration: &configuration::Configuration,
     body: std::path::PathBuf,
@@ -1982,6 +2226,63 @@ pub async fn redo(
     }
 }
 
+pub async fn redownload_local_model(
+    configuration: &configuration::Configuration,
+    model_id: &str,
+) -> Result<models::RedownloadModelResponse, Error<RedownloadLocalModelError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_model_id = model_id;
+
+    let uri_str = format!(
+        "{}/storage/models/{model_id}/redownload",
+        configuration.base_path,
+        model_id = crate::apis::urlencode(p_path_model_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::RedownloadModelResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::RedownloadModelResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<RedownloadLocalModelError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 pub async fn reorder_text_nodes(
     configuration: &configuration::Configuration,
     page_id: &str,
@@ -2015,6 +2316,58 @@ pub async fn reorder_text_nodes(
     } else {
         let content = resp.text().await?;
         let entity: Option<ReorderTextNodesError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn set_model_location(
+    configuration: &configuration::Configuration,
+    set_model_location_request: models::SetModelLocationRequest,
+) -> Result<models::SetModelLocationResponse, Error<SetModelLocationError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_body_set_model_location_request = set_model_location_request;
+
+    let uri_str = format!("{}/storage/models/location", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    req_builder = req_builder.json(&p_body_set_model_location_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => {
+                return Err(Error::from(serde_json::Error::custom(
+                    "Received `text/plain` content type response that cannot be converted to `models::SetModelLocationResponse`",
+                )));
+            }
+            ContentType::Unsupported(unknown_type) => {
+                return Err(Error::from(serde_json::Error::custom(format!(
+                    "Received `{unknown_type}` content type response that cannot be converted to `models::SetModelLocationResponse`"
+                ))));
+            }
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<SetModelLocationError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

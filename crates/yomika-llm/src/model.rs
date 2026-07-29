@@ -69,7 +69,7 @@ impl Llm {
     ) -> Result<Self> {
         crate::sys::initialize(runtime)
             .context("failed to initialize llama.cpp runtime bindings")?;
-        let model_path = id.get(runtime).await?;
+        let model_path = id.require_cached(runtime)?;
 
         tokio::task::spawn_blocking(move || Self::load_from_path(id, cpu, model_path, backend))
             .await

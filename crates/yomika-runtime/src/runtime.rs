@@ -12,8 +12,34 @@ use crate::downloads::Downloads;
 use crate::packages::PackageCatalog;
 
 const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+pub const MODEL_LIBRARY_MARKER: &str = ".yomika-model-library";
 
 pub type RuntimeHttpClient = Arc<ClientWithMiddleware>;
+
+/// Create the ownership marker for a model-library root, or validate the
+/// existing marker without following links outside the managed directory.
+pub fn ensure_model_library_marker(root: &Path) -> Result<()> {
+    let marker = root.join(MODEL_LIBRARY_MARKER);
+    match std::fs::symlink_metadata(&marker) {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            anyhow::bail!(
+                "refusing symlinked model-library marker `{}`",
+                marker.display()
+            )
+        }
+        Ok(metadata) if !metadata.is_file() => {
+            anyhow::bail!("model-library marker is not a file: `{}`", marker.display())
+        }
+        Ok(_) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            std::fs::write(&marker, b"Yomika managed model library\n")
+                .with_context(|| format!("failed to create `{}`", marker.display()))
+        }
+        Err(error) => {
+            Err(error).with_context(|| format!("failed to inspect `{}`", marker.display()))
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComputePolicy {
@@ -87,6 +113,7 @@ pub struct Runtime {
 
 struct RuntimeInner {
     root: PathBuf,
+    models_root: PathBuf,
     compute: ComputePolicy,
     downloads: Downloads,
     packages: PackageCatalog,
@@ -103,15 +130,31 @@ impl Runtime {
         http: RuntimeHttpConfig,
     ) -> Result<Self> {
         let root = root.into();
+        let models_root = root.join("models");
+        Self::new_with_storage(root, models_root, compute, http)
+    }
+
+    /// Build a runtime with a separate managed model-library directory.
+    /// Existing callers keep the conventional `{root}/models` layout through
+    /// [`Runtime::new_with_http`].
+    pub fn new_with_storage(
+        root: impl Into<PathBuf>,
+        models_root: impl Into<PathBuf>,
+        compute: ComputePolicy,
+        http: RuntimeHttpConfig,
+    ) -> Result<Self> {
+        let root = root.into();
+        let models_root = models_root.into();
         let downloads = Downloads::new(
             root.join("runtime").join(".downloads"),
-            root.join("models").join("huggingface"),
+            models_root.join("huggingface"),
             &http,
         )?;
 
         Ok(Self {
             inner: Arc::new(RuntimeInner {
                 root,
+                models_root,
                 compute,
                 downloads,
                 packages: PackageCatalog::discover(),
@@ -121,6 +164,10 @@ impl Runtime {
 
     pub fn root(&self) -> &Path {
         &self.inner.root
+    }
+
+    pub fn models_root(&self) -> &Path {
+        &self.inner.models_root
     }
 
     pub fn wants_gpu(&self) -> bool {
@@ -143,13 +190,14 @@ impl Runtime {
         let dirs = [
             self.root().join("runtime"),
             self.root().join("runtime").join(".downloads"),
-            self.root().join("models"),
-            self.root().join("models").join("huggingface"),
+            self.models_root().to_path_buf(),
+            self.models_root().join("huggingface"),
         ];
         for dir in dirs {
             std::fs::create_dir_all(&dir)
                 .with_context(|| format!("failed to create `{}`", dir.display()))?;
         }
+        ensure_model_library_marker(self.models_root())?;
         self.inner.packages.prepare_bootstrap(self).await
     }
 
@@ -167,6 +215,24 @@ mod tests {
     use anyhow::Result;
 
     use super::*;
+
+    #[cfg(target_family = "unix")]
+    #[test]
+    fn model_library_marker_never_follows_a_symlink() -> Result<()> {
+        use std::os::unix::fs::symlink;
+
+        let root = tempfile::tempdir()?;
+        let external = root.path().join("external.txt");
+        let models = root.path().join("models");
+        fs::create_dir_all(&models)?;
+        fs::write(&external, b"keep")?;
+        symlink(&external, models.join(MODEL_LIBRARY_MARKER))?;
+
+        let error = ensure_model_library_marker(&models).unwrap_err();
+        assert!(error.to_string().contains("symlinked"));
+        assert_eq!(fs::read(&external)?, b"keep");
+        Ok(())
+    }
 
     #[tokio::test]
     #[ignore]

@@ -9,6 +9,14 @@ birleştirir.
 [Sürümleri indir](https://github.com/proxlavee/yomika/releases/latest) ·
 [Sorun bildir](https://github.com/proxlavee/yomika/issues)
 
+## Windows Taşınabilir Sürüm
+
+[GitHub Releases](https://github.com/proxlavee/yomika/releases/latest)
+sayfasından en güncel taşınabilir `.exe` veya `.zip` dosyasını indirin. ZIP
+dosyası aynı çalıştırılabilir dosyayı içerir; istediğiniz yazılabilir klasöre
+çıkarıp `Yomika-<sürüm>-windows-x64.exe` dosyasını çalıştırın. Yomika kurulum
+sihirbazı kullanmaz.
+
 ## Desteklenen Derleme Yolları
 
 | Platform | Varsayılan hızlandırma |
@@ -95,7 +103,14 @@ komuttur. Doğrudan `cargo build` çağırmak bu Tauri akışını atlar.
 
 - yerel çıkarım için gereken çalışma zamanı kitaplıklarını hazırlar;
 - varsayılan tespit, OCR ve görüntü modellerini indirir;
-- yerel çeviri modellerini siz seçtiğinizde ayrıca indirir.
+- isteğe bağlı yerel çeviri modellerini siz **İndir** seçeneğini kullandığınızda
+  indirir.
+
+Model indirmeleri ilerlemeyi gösterir, iptal edilebilir ve tamamlandığında bir
+bildirim oluşturur. **Ayarlar > Çalışma Zamanı** bölümünden model klasörünü
+değiştirebilir, geçici indirme önbelleğini temizleyebilir ve indirilen modelleri
+silebilir veya yeniden indirebilirsiniz. İndirilen bir model daha sonra ayrı
+bir **Yükle** işlemiyle belleğe alınır.
 
 Arayüzü açmadan gerekli başlangıç dosyalarını indirmek için:
 
@@ -126,9 +141,10 @@ Headless modda Web UI `http://127.0.0.1:4000/`, HTTP API
 
 ## Güncellemeler
 
-Resmî paketler yayımlandığında, depo anahtarıyla imzalanmış sürümler uygulama
-içinden güncelleme denetimi, indirme, kurulum ve yeniden başlatma yapabilir.
-Geliştirme ve imzasız kaynak derlemelerinde otomatik güncelleyici kapalıdır.
+Yomika açılışta en güncel GitHub sürümünü denetler. Denetimi **Ayarlar >
+Hakkında** bölümünden elle de başlatabilirsiniz. Yeni sürüm bulunduğunda sağdaki
+bildirim GitHub Releases sayfasını açar; Yomika uygulama güncellemelerini
+otomatik olarak indirmez veya kurmaz.
 
 ## Sorun Giderme
 

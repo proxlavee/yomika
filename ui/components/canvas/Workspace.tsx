@@ -18,6 +18,7 @@ import { ToolRail } from '@/components/canvas/ToolRail'
 import {
   resolvePinchMemoScaleRatio,
   resolvePinchNextScaleRatio,
+  resolveWheelNextScale,
 } from '@/components/canvas/zoomGestures'
 import { Image } from '@/components/Image'
 import {
@@ -209,7 +210,7 @@ export function Workspace() {
     {
       onDrag: ({ first, movement: [mx, my], memo, cancel, ctrlKey }) => {
         if (!page) return memo
-        if (!ctrlKey) {
+        if (mode !== 'hand' && !ctrlKey) {
           if (first && cancel) cancel()
           return memo
         }
@@ -223,12 +224,36 @@ export function Workspace() {
         viewport.scrollTop = memo.scrollTop - my
         return memo
       },
-      onWheel: ({ ctrlKey, delta: [, dy], event }) => {
-        if (!page || !ctrlKey) return
+      onWheel: ({ delta: [, dy], event }) => {
+        if (!page) return
         if (event.cancelable) event.preventDefault()
-        const direction = Math.sign(dy)
-        if (!direction) return
-        applyScale(useEditorUiStore.getState().scale - direction)
+        const currentScale = useEditorUiStore.getState().scale
+        const nextScale = resolveWheelNextScale(currentScale, dy)
+        if (nextScale === currentScale) return
+        const viewport = viewportRef.current
+        const canvas = canvasRef.current
+        const wheelEvent = event as WheelEvent
+        if (!viewport || !canvas) {
+          applyScale(nextScale)
+          return
+        }
+        const canvasRect = canvas.getBoundingClientRect()
+        const documentX = Math.max(
+          0,
+          Math.min(page.width, (wheelEvent.clientX - canvasRect.left) / (currentScale / 100)),
+        )
+        const documentY = Math.max(
+          0,
+          Math.min(page.height, (wheelEvent.clientY - canvasRect.top) / (currentScale / 100)),
+        )
+        applyScale(nextScale)
+        requestAnimationFrame(() => {
+          const nextCanvasRect = canvas.getBoundingClientRect()
+          const nextScaleRatio = nextScale / 100
+          viewport.scrollLeft +=
+            nextCanvasRect.left + documentX * nextScaleRatio - wheelEvent.clientX
+          viewport.scrollTop += nextCanvasRect.top + documentY * nextScaleRatio - wheelEvent.clientY
+        })
       },
       onPinch: ({ canceled, movement: [movementScale], memo }) => {
         if (!page || canceled) return memo
@@ -258,7 +283,7 @@ export function Workspace() {
   )
 
   const handleCanvasPointerDownCapture = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (mode !== 'block' && event.target === event.currentTarget) {
+    if (mode === 'select' && event.target === event.currentTarget) {
       clearSelection()
     }
   }
@@ -267,7 +292,8 @@ export function Workspace() {
   }
 
   const canvasCursor = useMemo(
-    () => (isBrushMode ? BRUSH_CURSOR : mode === 'block' ? 'cell' : 'default'),
+    () =>
+      isBrushMode ? BRUSH_CURSOR : mode === 'block' ? 'cell' : mode === 'hand' ? 'grab' : 'default',
     [isBrushMode, mode],
   )
 

@@ -21,13 +21,13 @@ hide:
             when your project needs one.
           </p>
           <div class="ym-actions">
-            <a class="ym-button ym-button--primary" href="how-to/build-from-source.md">Build Yomika</a>
+            <a class="ym-button ym-button--primary" href="https://github.com/proxlavee/yomika/releases/latest">Download for Windows</a>
             <a class="ym-button ym-button--secondary" href="tutorials/translate-your-first-page.md">Translate your first page</a>
           </div>
           <ul class="ym-facts" aria-label="Yomika facts">
-            <li>Windows, Linux, Apple Silicon</li>
+            <li>Portable Windows release</li>
+            <li>Source builds for Linux and macOS</li>
             <li>GPL-3.0</li>
-            <li>Desktop, headless, MCP</li>
           </ul>
         </div>
 
@@ -163,8 +163,8 @@ hide:
           <div class="ym-kicker">Install Yomika</div>
           <h2 id="ym-install-title">Ready to turn the first page?</h2>
           <p>
-            Download the latest desktop package, or use the repository's Bun
-            wrapper when you need a custom source build.
+            Choose the portable Windows EXE or ZIP—no installer required. Use
+            the repository's Bun wrapper for Linux, macOS, or a custom build.
           </p>
         </div>
         <div>
@@ -173,7 +173,7 @@ cd yomika
 bun install --frozen-lockfile
 bun run build</code></pre>
           <div class="ym-install__links">
-            <a class="ym-text-link" href="https://github.com/proxlavee/yomika/releases/latest">Download the latest release</a>
+            <a class="ym-text-link" href="https://github.com/proxlavee/yomika/releases/latest">Download the Windows EXE or ZIP</a>
             <a class="ym-text-link" href="how-to/build-from-source.md">Read prerequisites and platform notes</a>
             <a class="ym-text-link" href="how-to/runtime-and-model-downloads.md">Understand first-run downloads</a>
             <a class="ym-text-link" href="https://github.com/proxlavee/yomika">View the source on GitHub</a>

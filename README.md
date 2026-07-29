@@ -45,17 +45,19 @@ workflows.
 - Uses Google Fonts plus installed OpenType, TrueType, and variable fonts
 - Exports rendered images, editable layered PSD files, and Yomika project archives
 - Exposes the same runtime through the desktop UI, headless Web UI, HTTP API, and MCP
-- Supports signed in-app updates for official packaged releases
+- Separates model downloads from loading, with cancellation and storage controls
 
 The desktop shell uses [Tauri](https://tauri.app/) and Rust; its embedded
 interface is built with [Next.js](https://nextjs.org/).
 
 ## Installation
 
-### Download
+### Windows portable release
 
-Download the latest Windows desktop package from
-[GitHub Releases](https://github.com/proxlavee/yomika/releases/latest).
+Download either the portable `.exe` or `.zip` from
+[GitHub Releases](https://github.com/proxlavee/yomika/releases/latest). The ZIP
+contains the same executable; extract it anywhere you can write files, then run
+`Yomika-<version>-windows-x64.exe`. Yomika does not use an installer.
 
 ### Source Build Requirements
 
@@ -77,15 +79,15 @@ bun run build
 
 The binary is written to `target/release/yomika` or
 `target/release/yomika.exe`. First launch initializes runtime libraries and
-downloads the default vision/OCR models; optional local translation models are
-downloaded when selected.
+downloads the default vision/OCR models. Optional local translation models use
+an explicit **Download** action and can be cancelled before you choose **Load**.
 
 See [Build From Source](docs/en-US/how-to/build-from-source.md) for Windows,
 Linux, macOS, and WSL notes.
 
-Official packages built with repository-owned updater signing can check,
-download, install, and relaunch into a newer release. Development and unsigned
-source builds leave the updater disabled.
+Yomika checks GitHub for a newer release at startup and from **Settings →
+About**. An available-update notice opens the Releases page; the app never
+downloads or installs application updates automatically.
 
 ## First Page
 
@@ -103,7 +105,8 @@ for the complete walkthrough.
 
 Canvas:
 
-- <kbd>Ctrl</kbd> + Mouse Wheel: Zoom in/out
+- Mouse Wheel: Zoom in/out around the pointer
+- Hand tool + Drag: Pan the canvas
 - <kbd>Ctrl</kbd> + Drag: Pan the canvas
 
 Tools:
@@ -143,7 +146,10 @@ Open `http://127.0.0.1:4000/` for the Web UI, use
 ## Models, Providers, and Acceleration
 
 Yomika downloads required detection, OCR, inpainting, and font-analysis models
-on demand. Translation can use a local GGUF model or a configured OpenAI,
+on demand. Active downloads can be cancelled, and completed model files can be
+deleted or downloaded again from **Settings → Runtime**. The model library can
+use its default app-data location or a folder you choose. Translation can use
+a local GGUF model or a configured OpenAI,
 Gemini, Claude, DeepSeek, DeepL, Google Cloud Translation, Caiyun, LM Studio,
 OpenRouter, or other compatible endpoint. API keys are stored through the
 platform credential store.

@@ -43,9 +43,13 @@ import type {
   PipelineConfig,
   ProjectSummary,
   PutMaskResponse,
+  RedownloadModelResponse,
   SceneSnapshot,
+  SetModelLocationResponse,
   StartDownloadResponse,
   StartPipelineResponse,
+  StorageCleanupResponse,
+  StorageSummary,
   TextShaderEffect,
   TextStrokeStyle,
   TextStyle,
@@ -112,7 +116,13 @@ export const getGetBlobResponseMock = (): ArrayBuffer =>
 export const getGetConfigResponseDataConfigMock = (
   overrideResponse: Partial<DataConfig> = {},
 ): DataConfig => ({
-  ...{ path: faker.string.alpha({ length: { min: 10, max: 20 } }) },
+  ...{
+    models_path: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+      undefined,
+    ]),
+    path: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
   ...overrideResponse,
 })
 
@@ -168,7 +178,13 @@ export const getGetConfigResponseMock = (
 export const getPatchConfigResponseDataConfigMock = (
   overrideResponse: Partial<DataConfig> = {},
 ): DataConfig => ({
-  ...{ path: faker.string.alpha({ length: { min: 10, max: 20 } }) },
+  ...{
+    models_path: faker.helpers.arrayElement([
+      faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+      undefined,
+    ]),
+    path: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  },
   ...overrideResponse,
 })
 
@@ -233,6 +249,7 @@ export const getListDownloadsResponseMock = (
         { status: faker.helpers.arrayElement(['started'] as const) },
         { status: faker.helpers.arrayElement(['downloading'] as const) },
         { status: faker.helpers.arrayElement(['completed'] as const) },
+        { status: faker.helpers.arrayElement(['cancelled'] as const) },
         {
           reason: faker.string.alpha({ length: { min: 10, max: 20 } }),
           status: faker.helpers.arrayElement(['failed'] as const),
@@ -409,6 +426,7 @@ export const getEventsResponseMock = (): AppEvent =>
           { status: faker.helpers.arrayElement(['started'] as const) },
           { status: faker.helpers.arrayElement(['downloading'] as const) },
           { status: faker.helpers.arrayElement(['completed'] as const) },
+          { status: faker.helpers.arrayElement(['cancelled'] as const) },
           {
             reason: faker.string.alpha({ length: { min: 10, max: 20 } }),
             status: faker.helpers.arrayElement(['failed'] as const),
@@ -464,6 +482,7 @@ export const getEventsResponseMock = (): AppEvent =>
             { status: faker.helpers.arrayElement(['started'] as const) },
             { status: faker.helpers.arrayElement(['downloading'] as const) },
             { status: faker.helpers.arrayElement(['completed'] as const) },
+            { status: faker.helpers.arrayElement(['cancelled'] as const) },
             {
               reason: faker.string.alpha({ length: { min: 10, max: 20 } }),
               status: faker.helpers.arrayElement(['failed'] as const),
@@ -563,10 +582,19 @@ export const getGetCatalogResponseMock = (
 ): LlmCatalog => ({
   localModels: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
     () => ({
+      downloadId: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+      ]),
+      downloaded: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
       languages: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => faker.string.alpha({ length: { min: 10, max: 20 } }),
       ),
       name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      sizeBytes: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: 0 }), null]),
+        undefined,
+      ]),
       target: {
         kind: faker.helpers.arrayElement(Object.values(LlmTargetKind)),
         modelId: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -591,11 +619,23 @@ export const getGetCatalogResponseMock = (
       id: faker.string.alpha({ length: { min: 10, max: 20 } }),
       models: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
+          downloadId: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+              faker.string.alpha({ length: { min: 10, max: 20 } }),
+              null,
+            ]),
+            undefined,
+          ]),
+          downloaded: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
           languages: Array.from(
             { length: faker.number.int({ min: 1, max: 10 }) },
             (_, i) => i + 1,
           ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
           name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+          sizeBytes: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.number.int({ min: 0 }), null]),
+            undefined,
+          ]),
           target: {
             kind: faker.helpers.arrayElement(Object.values(LlmTargetKind)),
             modelId: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -1050,6 +1090,48 @@ export const getGetSceneJsonResponseMock = (
       updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z',
     },
   },
+  ...overrideResponse,
+})
+
+export const getGetStorageResponseMock = (
+  overrideResponse: Partial<Extract<StorageSummary, object>> = {},
+): StorageSummary => ({
+  customModelsPath: faker.datatype.boolean(),
+  dataPath: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  downloadedLocalModels: faker.number.int({ min: 0 }),
+  modelsBytes: faker.number.int({ min: 0 }),
+  modelsPath: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  temporaryBytes: faker.number.int({ min: 0 }),
+  ...overrideResponse,
+})
+
+export const getClearTemporaryCacheResponseMock = (
+  overrideResponse: Partial<Extract<StorageCleanupResponse, object>> = {},
+): StorageCleanupResponse => ({ removedBytes: faker.number.int({ min: 0 }), ...overrideResponse })
+
+export const getClearModelsResponseMock = (
+  overrideResponse: Partial<Extract<StorageCleanupResponse, object>> = {},
+): StorageCleanupResponse => ({ removedBytes: faker.number.int({ min: 0 }), ...overrideResponse })
+
+export const getSetModelLocationResponseMock = (
+  overrideResponse: Partial<Extract<SetModelLocationResponse, object>> = {},
+): SetModelLocationResponse => ({
+  copiedBytes: faker.number.int({ min: 0 }),
+  modelsPath: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  restartRequired: faker.datatype.boolean(),
+  sourceRemoved: faker.datatype.boolean(),
+  ...overrideResponse,
+})
+
+export const getDeleteLocalModelResponseMock = (
+  overrideResponse: Partial<Extract<StorageCleanupResponse, object>> = {},
+): StorageCleanupResponse => ({ removedBytes: faker.number.int({ min: 0 }), ...overrideResponse })
+
+export const getRedownloadLocalModelResponseMock = (
+  overrideResponse: Partial<Extract<RedownloadModelResponse, object>> = {},
+): RedownloadModelResponse => ({
+  operationId: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  removedBytes: faker.number.int({ min: 0 }),
   ...overrideResponse,
 })
 
@@ -2024,6 +2106,150 @@ export const getGetSceneJsonMockHandler = (
     options,
   )
 }
+
+export const getGetStorageMockHandler = (
+  overrideResponse?:
+    | StorageSummary
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<StorageSummary> | StorageSummary),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    '*/storage',
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetStorageResponseMock(),
+        { status: 200 },
+      )
+    },
+    options,
+  )
+}
+
+export const getClearTemporaryCacheMockHandler = (
+  overrideResponse?:
+    | StorageCleanupResponse
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<StorageCleanupResponse> | StorageCleanupResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    '*/storage/cache',
+    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getClearTemporaryCacheResponseMock(),
+        { status: 200 },
+      )
+    },
+    options,
+  )
+}
+
+export const getClearModelsMockHandler = (
+  overrideResponse?:
+    | StorageCleanupResponse
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<StorageCleanupResponse> | StorageCleanupResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    '*/storage/models',
+    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getClearModelsResponseMock(),
+        { status: 200 },
+      )
+    },
+    options,
+  )
+}
+
+export const getSetModelLocationMockHandler = (
+  overrideResponse?:
+    | SetModelLocationResponse
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<SetModelLocationResponse> | SetModelLocationResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    '*/storage/models/location',
+    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getSetModelLocationResponseMock(),
+        { status: 200 },
+      )
+    },
+    options,
+  )
+}
+
+export const getDeleteLocalModelMockHandler = (
+  overrideResponse?:
+    | StorageCleanupResponse
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<StorageCleanupResponse> | StorageCleanupResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    '*/storage/models/:modelId',
+    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getDeleteLocalModelResponseMock(),
+        { status: 200 },
+      )
+    },
+    options,
+  )
+}
+
+export const getRedownloadLocalModelMockHandler = (
+  overrideResponse?:
+    | RedownloadModelResponse
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<RedownloadModelResponse> | RedownloadModelResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    '*/storage/models/:modelId/redownload',
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === 'function'
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getRedownloadLocalModelResponseMock(),
+        { status: 202 },
+      )
+    },
+    options,
+  )
+}
 export const getDefaultMock = () => [
   getStartCodexDeviceLoginMockHandler(),
   getDeleteCodexSessionMockHandler(),
@@ -2068,4 +2294,10 @@ export const getDefaultMock = () => [
   getDeleteProjectMockHandler(),
   getGetSceneBinMockHandler(),
   getGetSceneJsonMockHandler(),
+  getGetStorageMockHandler(),
+  getClearTemporaryCacheMockHandler(),
+  getClearModelsMockHandler(),
+  getSetModelLocationMockHandler(),
+  getDeleteLocalModelMockHandler(),
+  getRedownloadLocalModelMockHandler(),
 ]

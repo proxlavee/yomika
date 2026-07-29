@@ -14,6 +14,9 @@ export type DownloadStatus =
       status: 'completed'
     }
   | {
+      status: 'cancelled'
+    }
+  | {
       reason: string
       status: 'failed'
     }

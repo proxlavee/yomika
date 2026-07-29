@@ -29,13 +29,16 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**add_image_layer**](docs/DefaultApi.md#add_image_layer) | **POST** /pages/{id}/image-layers |
 *DefaultApi* | [**apply_command**](docs/DefaultApi.md#apply_command) | **POST** /history/apply |
 *DefaultApi* | [**cancel_operation**](docs/DefaultApi.md#cancel_operation) | **DELETE** /operations/{id} |
+*DefaultApi* | [**clear_models**](docs/DefaultApi.md#clear_models) | **DELETE** /storage/models |
 *DefaultApi* | [**clear_provider_secret**](docs/DefaultApi.md#clear_provider_secret) | **DELETE** /config/providers/{id}/secret | Clear a provider's keyring secret. The provider entry itself is kept.
+*DefaultApi* | [**clear_temporary_cache**](docs/DefaultApi.md#clear_temporary_cache) | **DELETE** /storage/cache |
 *DefaultApi* | [**create_pages**](docs/DefaultApi.md#create_pages) | **POST** /pages |
 *DefaultApi* | [**create_pages_from_paths**](docs/DefaultApi.md#create_pages_from_paths) | **POST** /pages/from-paths | Create pages by reading image files from absolute paths on the server's filesystem. This is the Tauri desktop import path — the webview picker returns paths, and the backend reads + decodes + hashes them in parallel without a round-trip through JS memory or a multipart upload body.
 *DefaultApi* | [**create_project**](docs/DefaultApi.md#create_project) | **POST** /projects |
 *DefaultApi* | [**delete_codex_session**](docs/DefaultApi.md#delete_codex_session) | **DELETE** /ai/codex/auth/session |
 *DefaultApi* | [**delete_current_llm**](docs/DefaultApi.md#delete_current_llm) | **DELETE** /llm/current |
 *DefaultApi* | [**delete_current_project**](docs/DefaultApi.md#delete_current_project) | **DELETE** /projects/current |
+*DefaultApi* | [**delete_local_model**](docs/DefaultApi.md#delete_local_model) | **DELETE** /storage/models/{model_id} |
 *DefaultApi* | [**delete_project**](docs/DefaultApi.md#delete_project) | **DELETE** /projects/{id} |
 *DefaultApi* | [**events**](docs/DefaultApi.md#events) | **GET** /events |
 *DefaultApi* | [**export_current_project**](docs/DefaultApi.md#export_current_project) | **POST** /projects/current/export |
@@ -52,6 +55,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**get_page_thumbnail**](docs/DefaultApi.md#get_page_thumbnail) | **GET** /pages/{id}/thumbnail |
 *DefaultApi* | [**get_scene_bin**](docs/DefaultApi.md#get_scene_bin) | **GET** /scene.bin |
 *DefaultApi* | [**get_scene_json**](docs/DefaultApi.md#get_scene_json) | **GET** /scene.json |
+*DefaultApi* | [**get_storage**](docs/DefaultApi.md#get_storage) | **GET** /storage |
 *DefaultApi* | [**import_project**](docs/DefaultApi.md#import_project) | **POST** /projects/import |
 *DefaultApi* | [**list_downloads**](docs/DefaultApi.md#list_downloads) | **GET** /downloads |
 *DefaultApi* | [**list_fonts**](docs/DefaultApi.md#list_fonts) | **GET** /fonts |
@@ -62,7 +66,9 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**put_current_project**](docs/DefaultApi.md#put_current_project) | **PUT** /projects/current |
 *DefaultApi* | [**put_mask**](docs/DefaultApi.md#put_mask) | **PUT** /pages/{id}/masks/{role} | Upsert the `Mask { role }` node on a page with the raw image bytes in the body. Emits `Op::UpdateNode` if a mask of that role exists, else `Op::AddNode`. Used by the repair-brush / segment-edit flow; the follow-up localized inpaint is a separate `POST /pipelines` call.
 *DefaultApi* | [**redo**](docs/DefaultApi.md#redo) | **POST** /history/redo |
+*DefaultApi* | [**redownload_local_model**](docs/DefaultApi.md#redownload_local_model) | **POST** /storage/models/{model_id}/redownload |
 *DefaultApi* | [**reorder_text_nodes**](docs/DefaultApi.md#reorder_text_nodes) | **POST** /pages/{page_id}/reorder-text-nodes |
+*DefaultApi* | [**set_model_location**](docs/DefaultApi.md#set_model_location) | **PUT** /storage/models/location |
 *DefaultApi* | [**set_provider_secret**](docs/DefaultApi.md#set_provider_secret) | **PUT** /config/providers/{id}/secret | Save (or overwrite) the keyring secret for a provider. Creates the provider entry in `config.providers` if it didn't exist. `PUT` because setting the secret is idempotent for the same body.
 *DefaultApi* | [**start_codex_device_login**](docs/DefaultApi.md#start_codex_device_login) | **POST** /ai/codex/auth/device-code |
 *DefaultApi* | [**start_codex_image_generation**](docs/DefaultApi.md#start_codex_image_generation) | **POST** /ai/codex/images |
@@ -104,6 +110,7 @@ Class | Method | HTTP request | Description
  - [DownloadStatusOneOf1](docs/DownloadStatusOneOf1.md)
  - [DownloadStatusOneOf2](docs/DownloadStatusOneOf2.md)
  - [DownloadStatusOneOf3](docs/DownloadStatusOneOf3.md)
+ - [DownloadStatusOneOf4](docs/DownloadStatusOneOf4.md)
  - [EngineCatalog](docs/EngineCatalog.md)
  - [EngineCatalogEntry](docs/EngineCatalogEntry.md)
  - [ExportFormat](docs/ExportFormat.md)
@@ -141,6 +148,7 @@ Class | Method | HTTP request | Description
  - [MaskDataPatch](docs/MaskDataPatch.md)
  - [MaskRole](docs/MaskRole.md)
  - [MetaInfo](docs/MetaInfo.md)
+ - [ModelLocationMode](docs/ModelLocationMode.md)
  - [NamedFontPrediction](docs/NamedFontPrediction.md)
  - [Node](docs/Node.md)
  - [NodeDataPatch](docs/NodeDataPatch.md)
@@ -181,7 +189,6 @@ Class | Method | HTTP request | Description
  - [PipelineProgress](docs/PipelineProgress.md)
  - [PipelineStatus](docs/PipelineStatus.md)
  - [PipelineStatusOneOf](docs/PipelineStatusOneOf.md)
- - [PipelineStatusOneOf1](docs/PipelineStatusOneOf1.md)
  - [PipelineStep](docs/PipelineStep.md)
  - [ProjectMeta](docs/ProjectMeta.md)
  - [ProjectMetaPatch](docs/ProjectMetaPatch.md)
@@ -192,14 +199,19 @@ Class | Method | HTTP request | Description
  - [ProviderSecretRequest](docs/ProviderSecretRequest.md)
  - [PutMaskResponse](docs/PutMaskResponse.md)
  - [ReadingOrder](docs/ReadingOrder.md)
+ - [RedownloadModelResponse](docs/RedownloadModelResponse.md)
  - [Region](docs/Region.md)
  - [Scene](docs/Scene.md)
  - [SceneSnapshot](docs/SceneSnapshot.md)
+ - [SetModelLocationRequest](docs/SetModelLocationRequest.md)
+ - [SetModelLocationResponse](docs/SetModelLocationResponse.md)
  - [SnapshotEvent](docs/SnapshotEvent.md)
  - [StartDownloadRequest](docs/StartDownloadRequest.md)
  - [StartDownloadResponse](docs/StartDownloadResponse.md)
  - [StartPipelineRequest](docs/StartPipelineRequest.md)
  - [StartPipelineResponse](docs/StartPipelineResponse.md)
+ - [StorageCleanupResponse](docs/StorageCleanupResponse.md)
+ - [StorageSummary](docs/StorageSummary.md)
  - [TextAlign](docs/TextAlign.md)
  - [TextData](docs/TextData.md)
  - [TextDataPatch](docs/TextDataPatch.md)

@@ -4,11 +4,12 @@ title: 設定リファレンス
 
 # 設定リファレンス
 
-現在の Yomika の Settings 画面は、主に次の 6 セクションで構成されています。
+現在の Yomika の Settings 画面は、主に次の 7 セクションで構成されています。
 
 - `Appearance`
 - `Engines`
 - `API Keys`
+- `AI`
 - `Keybinds`
 - `Runtime`
 - `About`
@@ -74,6 +75,10 @@ API レスポンスでは保存済みキーは生値ではなく、マスク済�
 
 Linux のファイルシステム認証情報ストアは、OS レベルの暗号化ではなくローカルファイルシステム権限に依存します。
 
+## AI
+
+`AI` タブでは、画像生成ワークフローで使うオプションの Codex 接続を管理します。現在のアカウント状態を表示し、デバイスコードによるサインインとサインアウトを実行できます。`API Keys` の provider 設定とは別の機能です。
+
 ## キーバインド
 
 `Keybinds` タブでは、ツール切り替えとブラシサイズのショートカット、および undo / redo のキー割り当てを変更できます。
@@ -83,7 +88,7 @@ Linux のファイルシステム認証情報ストアは、OS レベルの暗�
 - 既定値は Select / Block / Brush / Eraser / Repair Brush の各ツールに対して `V` / `M` / `B` / `E` / `R`
 - ブラシサイズの増減は既定で `[` と `]`
 - undo と redo は既定で `Ctrl + Z` と `Ctrl + Shift + Z` (macOS では `Cmd + Z` と `Cmd + Shift + Z`)
-- キャンバスのズーム (`Ctrl` + ホイール)、パン (`Ctrl` + ドラッグ)、全選択 (`Ctrl + A`)、レガシーの `Ctrl + Y` redo フォールバックは再割り当てできません
+- マウスホイールのズーム、Hand ツールまたは `Ctrl` + ドラッグのパン、全選択 (`Ctrl + A`)、レガシーの `Ctrl + Y` redo フォールバックは再割り当てできません
 - キーが競合する場合はエディタ上で強調表示され、同じ画面から既定値へ戻すこともできます
 
 キーバインド設定は `config.toml` ではなく、フロントエンドの preferences 層に保存されます。
@@ -92,16 +97,21 @@ Linux のファイルシステム認証情報ストアは、OS レベルの暗�
 
 ## Runtime
 
-`Runtime` タブでは、共有ローカルランタイムに影響する再起動必須の設定をまとめています。
+`Runtime` タブでは、共有ランタイム設定とモデルストレージのメンテナンスをまとめています。
 
 - `Data Path`
+- `Model Library`
 - `HTTP Connect Timeout`
 - `HTTP Read Timeout`
 - `HTTP Max Retries`
 
 現在の挙動:
 
-- `Data Path` はランタイムパッケージ、ダウンロード済みモデル、ページマニフェスト、画像 blob の保存先です
+- `Data Path` はランタイムパッケージ、ページマニフェスト、画像 blob の保存先です
+- `Model Library` は既定で `<Data Path>/models` を使い、別の絶対パスも指定できます
+- **Use existing** は選択先のキャッシュをそのまま使い、**Move current models** は Yomika 管理下のキャッシュを検証しながら移動します
+- ストレージパネルでは使用量の確認、一時ファイルの消去、ローカルモデルの削除と再ダウンロードができます
+- モデルライブラリ変更前にローカルモデルをアンロードし、実行中の処理を完了またはキャンセルしてください。パス変更後は再起動します
 - `HTTP Connect Timeout` は HTTP 接続確立の待機時間です
 - `HTTP Read Timeout` は HTTP レスポンス読み取りの待機時間です
 - `HTTP Max Retries` は一時的な HTTP 障害への自動再試行回数です
@@ -114,16 +124,16 @@ Linux のファイルシステム認証情報ストアは、OS レベルの暗�
 
 - 現在のアプリバージョン
 - より新しい GitHub リリースの有無
-- 作者リンク
+- `proxlavee` の作者リンク
 - リポジトリリンク
 
-パッケージ済みアプリでは、`proxlavee/yomika` の最新 GitHub リリースとローカル版を比較して更新状態を判定します。
+起動時と About からの手動操作で、ローカル版と `proxlavee/yomika` の最新 GitHub リリースを比較します。新しい版がある場合は Releases ページを開きます。Yomika がアプリ更新を自動的にダウンロードまたはインストールすることはありません。
 
 ## 永続化の仕組み
 
 現在の設定保存は複数の層に分かれています。
 
-- `config.toml` には `data`、`http`、`pipeline`、provider の `baseUrl` など共有設定が保存されます
+- `config.toml` には data とモデルのパス、`http`、`pipeline`、provider の `baseUrl` など共有設定が保存されます
 - provider API キーは、上記のプラットフォーム認証情報ストレージを通じて `config.toml` とは別に保存されます
 - テーマ、言語、描画フォントはフロントエンドの preferences 層に保存されます
 

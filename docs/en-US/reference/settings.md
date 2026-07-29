@@ -4,11 +4,12 @@ title: Settings Reference
 
 # Settings Reference
 
-Yomika's Settings screen currently exposes six main areas:
+Yomika's Settings screen currently exposes seven main areas:
 
 - `Appearance`
 - `Engines`
 - `API Keys`
+- `AI`
 - `Keybinds`
 - `Runtime`
 - `About`
@@ -74,6 +75,13 @@ The API response intentionally redacts saved keys rather than returning the raw 
 
 The Linux filesystem credential store relies on local filesystem permissions rather than OS-level encryption.
 
+## AI
+
+The `AI` tab manages the optional Codex connection used by the image-generation
+workflow. It shows the current account state and provides device-code sign-in
+and sign-out actions. This is separate from the provider keys configured in
+`API Keys`.
+
 ## Keybinds
 
 The `Keybinds` tab lets you rebind tool-switch and brush-size shortcuts plus the undo and redo bindings.
@@ -83,7 +91,7 @@ Current behavior:
 - defaults are `V`/`M`/`B`/`E`/`R` for the Select / Block / Brush / Eraser / Repair Brush tools
 - defaults are `[` and `]` for the brush size step
 - defaults are `Ctrl + Z` and `Ctrl + Shift + Z` (`Cmd + Z` and `Cmd + Shift + Z` on macOS) for undo and redo
-- the canvas zoom (`Ctrl` + wheel), pan (`Ctrl` + drag), select-all (`Ctrl + A`), and the legacy `Ctrl + Y` redo fallback are not rebindable
+- mouse-wheel zoom, Hand tool or `Ctrl` + drag panning, select-all (`Ctrl + A`), and the legacy `Ctrl + Y` redo fallback are not rebindable
 - conflicts are highlighted in the editor; you can reset to defaults from the same screen
 
 Keybind preferences are stored in the frontend preferences layer, not in `config.toml`.
@@ -92,16 +100,22 @@ For the full default list, see [Keyboard Shortcuts](keyboard-shortcuts.md).
 
 ## Runtime
 
-The `Runtime` tab groups restart-required settings that affect the shared local runtime:
+The `Runtime` tab groups shared runtime configuration and model-storage
+maintenance:
 
 - `Data Path`
+- `Model Library`
 - `HTTP Connect Timeout`
 - `HTTP Read Timeout`
 - `HTTP Max Retries`
 
 Current behavior:
 
-- `Data Path` controls where Yomika stores runtime packages, downloaded models, page manifests, and image blobs
+- `Data Path` controls where Yomika stores runtime packages, page manifests, and image blobs
+- `Model Library` defaults to `<Data Path>/models`, or can use another absolute folder
+- **Use existing** adopts a model cache already in the selected folder; **Move current models** validates and moves Yomika's managed cache there
+- the storage panel reports model and temporary-download usage, clears temporary files, and deletes or redownloads local models
+- changing the model-library path requires a restart; unload local models and finish or cancel active work first
 - `HTTP Connect Timeout` sets how long Yomika waits while establishing HTTP connections
 - `HTTP Read Timeout` sets how long Yomika waits while reading HTTP responses
 - `HTTP Max Retries` controls automatic retries for transient HTTP failures
@@ -114,16 +128,19 @@ The `About` tab currently shows:
 
 - the current app version
 - whether a newer GitHub release exists
-- the author link
+- the `proxlavee` author link
 - the repository link
 
-In packaged app mode, the version check compares the local app version against the latest GitHub release for `proxlavee/yomika`.
+The version check compares the local app version against the latest GitHub
+release for `proxlavee/yomika`. It runs at startup and manually from About. An
+available update opens the Releases page; Yomika does not download or install
+application updates.
 
 ## Persistence model
 
 The current settings behavior is split across storage layers:
 
-- `config.toml` stores shared app config such as `data`, `http`, `pipeline`, and provider `baseUrl`
+- `config.toml` stores shared app config such as data and model paths, `http`, `pipeline`, and provider `baseUrl`
 - provider API keys are stored separately from `config.toml` through the platform credential store described above
 - theme, language, and rendering-font preferences are stored in the frontend preferences layer
 

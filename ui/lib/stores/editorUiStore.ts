@@ -82,7 +82,7 @@ const initialState = {
   showBrushLayer: false,
   showRenderedImage: false,
   showTextBlocksOverlay: false,
-  mode: 'select' as ToolMode,
+  mode: 'hand' as ToolMode,
   renderEffect: { italic: false, bold: false } as RenderEffect,
   renderStroke: undefined as RenderStroke | undefined,
   selectedTarget: undefined as LlmTarget | undefined,

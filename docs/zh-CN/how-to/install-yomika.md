@@ -4,13 +4,13 @@ title: 安装 Yomika
 
 # 安装 Yomika
 
-## 构建应用
+## 下载 Windows 版本
 
-目前不假定已有预构建发行版。请按照 [从源码构建](build-from-source.md) 的步骤，在 Windows、macOS 或 Linux 上生成桌面二进制。今后发布的构建产物会出现在 [Yomika releases 页面](https://github.com/proxlavee/yomika/releases)。
+请从 [Yomika Releases 页面](https://github.com/proxlavee/yomika/releases/latest) 下载最新的 Windows 便携版 `.exe` 或 `.zip`。ZIP 中包含同一个可执行文件。将其解压到你可管理的文件夹，然后运行 `Yomika-<version>-windows-x64.exe`；Yomika 不使用安装程序。如需开发或自定义构建，请参阅 [从源码构建](build-from-source.md)。
 
-## 本地会安装什么
+## Yomika 会在本地保存什么
 
-Yomika 是本地优先应用。桌面二进制只是安装内容的一部分。第一次真正运行时，还会在用户本地数据目录中创建以下内容：
+Yomika 是本地优先应用。除便携版可执行文件外，首次运行时还会创建用户本地数据目录，用于保存：
 
 - `llama.cpp` 与 GPU 后端所需的运行时库
 - 下载的视觉模型与 OCR 模型
@@ -24,11 +24,16 @@ Yomika 会把自己的文件放在 `Yomika` 应用数据根目录下，并将模
 
 - 解压或下载本地推理栈所需的运行时库
 - 下载检测、分割、OCR、修复和字体估计所需的默认视觉模型
-- 仅在你真正选择某个本地翻译模型时，才下载对应的 LLM
+- 只有当你在模型选择器中选择 **Download** 时，才下载对应的本地翻译 LLM
 
 这属于正常现象，耗时取决于网络与硬件。
+模型下载会显示进度，可以取消，并在完成后显示通知。你可以在 **Settings > Runtime** 中更改模型库文件夹、删除已下载模型或重新下载模型。
 
 如果你想提前把运行时依赖拉下来，可以先用 `--download` 运行一次。这个路径会初始化运行时包与默认视觉栈，然后直接退出，不打开 GUI。
+
+## 应用更新
+
+Yomika 启动时会检查 GitHub 上的最新发行版，也可以在 **Settings > About** 中手动检查。发现新版本时，通知会打开 Releases 页面；Yomika 不会自动下载或安装应用更新。
 
 ## GPU 加速说明
 

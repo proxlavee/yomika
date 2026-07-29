@@ -4,9 +4,8 @@
 //! - `GET /downloads`  — snapshot of every in-flight + recently-finished
 //!   package download. Clients poll while any are in flight.
 //!
-//! HF hub downloads aren't cleanly cancellable mid-stream; cancellation via
-//! `DELETE /operations/{id}` evicts the registry row and the transfer
-//! completes silently.
+//! `DELETE /operations/{id}` cancels an active transfer and removes its
+//! partial file before publishing a terminal status.
 
 use axum::Json;
 use axum::extract::State;
@@ -45,8 +44,8 @@ async fn list_downloads(State(app): State<AppState>) -> ApiResult<Json<ListDownl
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct StartDownloadRequest {
-    /// Package id, as declared via `declare_hf_model_package!`
-    /// (e.g. `"model:comic-text-detector:yolo-v5"`).
+    /// Package id declared by `declare_hf_model_package!`, or a local LLM
+    /// operation id from `GET /llm/catalog` (for example `"llm:qwen3.5-2b"`).
     pub model_id: String,
 }
 
@@ -68,21 +67,45 @@ async fn start_download(
     State(app): State<AppState>,
     Json(req): Json<StartDownloadRequest>,
 ) -> ApiResult<(StatusCode, Json<StartDownloadResponse>)> {
-    let catalog = PackageCatalog::discover();
-    let pkg = catalog
-        .all()
-        .find(|p| p.id == req.model_id)
-        .ok_or_else(|| ApiError::not_found(format!("unknown package {}", req.model_id)))?;
+    let operation_id = req.model_id.clone();
     let runtime = app.runtime();
-    tokio::spawn(async move {
-        if let Err(e) = (pkg.ensure)(&runtime).await {
-            tracing::error!(package = pkg.id, "download failed: {e:#}");
+    if runtime.downloads().is_active(&operation_id) {
+        return Err(ApiError::conflict(format!(
+            "download {operation_id} is already running"
+        )));
+    }
+
+    if operation_id.starts_with("llm:") {
+        let model_id = operation_id
+            .strip_prefix("llm:")
+            .expect("prefix checked above")
+            .to_string();
+        let expected_operation_id = yomika_app::llm::local_model_download_id(&model_id)
+            .map_err(|_| ApiError::not_found(format!("unknown local model {model_id}")))?;
+        if operation_id != expected_operation_id {
+            return Err(ApiError::not_found(format!(
+                "unknown local model {model_id}"
+            )));
         }
-    });
+        tokio::spawn(async move {
+            if let Err(error) = yomika_app::llm::download_local_model(&runtime, &model_id).await {
+                tracing::error!(model = model_id, "download failed: {error:#}");
+            }
+        });
+    } else {
+        let catalog = PackageCatalog::discover();
+        let pkg = catalog
+            .all()
+            .find(|package| package.id == operation_id)
+            .ok_or_else(|| ApiError::not_found(format!("unknown package {operation_id}")))?;
+        tokio::spawn(async move {
+            if let Err(error) = (pkg.ensure)(&runtime).await {
+                tracing::error!(package = pkg.id, "download failed: {error:#}");
+            }
+        });
+    }
     Ok((
         StatusCode::ACCEPTED,
-        Json(StartDownloadResponse {
-            operation_id: req.model_id,
-        }),
+        Json(StartDownloadResponse { operation_id }),
     ))
 }

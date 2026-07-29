@@ -75,14 +75,20 @@ pub async fn run() -> Result<()> {
     };
 
     if cli.download {
-        return RuntimeManager::new_with_http(config.data.path.as_std_path(), compute, http)?
-            .prepare()
-            .await
-            .context("failed to download runtime packages");
+        return RuntimeManager::new_with_storage(
+            config.data.path.as_std_path(),
+            config.data.resolved_models_path().as_std_path(),
+            compute,
+            http,
+        )?
+        .prepare()
+        .await
+        .context("failed to download runtime packages");
     }
 
-    let state = BootstrapManager::new(Arc::new(RuntimeManager::new_with_http(
+    let state = BootstrapManager::new(Arc::new(RuntimeManager::new_with_storage(
         config.data.path.as_std_path(),
+        config.data.resolved_models_path().as_std_path(),
         compute,
         http,
     )?));
@@ -126,21 +132,11 @@ pub async fn run() -> Result<()> {
         return Ok(());
     }
 
-    let builder = tauri::Builder::default()
+    tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_process::init());
-
-    // Release builds opt into the updater with this repository's public key.
-    // Development builds deliberately leave the plugin unregistered so they
-    // cannot trust artifacts signed by another publisher.
-    let builder = match option_env!("YOMIKA_UPDATER_PUBKEY").filter(|key| !key.trim().is_empty()) {
-        Some(pubkey) => builder.plugin(tauri_plugin_updater::Builder::new().pubkey(pubkey).build()),
-        None => builder,
-    };
-
-    builder
+        .plugin(tauri_plugin_process::init())
         .setup(move |handle| {
             tauri::async_runtime::spawn(async move {
                 bootstrap_app(state, config, cli.cpu)

@@ -10,6 +10,7 @@ env:
 
 jobs:
   release:
+    name: Windows portable release
     permissions:
       contents: write
     runs-on: windows-2022
@@ -55,64 +56,67 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/bun.lock') }}-
 
-      - name: Generate release changelog
-        id: release_notes
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate release version
+        shell: pwsh
         run: |
-          {
-            echo 'release_body<<EOF'
-            bun git-cliff --current --strip all
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          $tagVersion = "$env:GITHUB_REF_NAME".TrimStart('v')
+          $metadata = cargo metadata --no-deps --format-version 1 | ConvertFrom-Json
+          $packageVersion = ($metadata.packages | Where-Object name -eq 'yomika' | Select-Object -First 1).version
+          if ($tagVersion -ne $packageVersion) {
+            throw "Tag version '$tagVersion' does not match Yomika package version '$packageVersion'."
+          }
 
-      - name: Configure repository-owned updater signing
-        id: updater
-        shell: bash
-        env:
-          YOMIKA_UPDATER_PUBKEY: ${{ vars.YOMIKA_UPDATER_PUBKEY }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          if [[ -n "$YOMIKA_UPDATER_PUBKEY" && -n "$TAURI_SIGNING_PRIVATE_KEY" ]]; then
-            bun -e 'await Bun.write(`${process.env.RUNNER_TEMP}/yomika-updater.json`, JSON.stringify({ bundle: { createUpdaterArtifacts: "v1Compatible" }, plugins: { updater: { pubkey: process.env.YOMIKA_UPDATER_PUBKEY, endpoints: ["https://github.com/proxlavee/yomika/releases/latest/download/latest.json"] } } }))'
-            echo "args=--config $RUNNER_TEMP/yomika-updater.json" >> "$GITHUB_OUTPUT"
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "args=" >> "$GITHUB_OUTPUT"
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Generate release notes
+        shell: pwsh
+        run: bun git-cliff --current --strip all --output "$env:RUNNER_TEMP/release-notes.md"
 
-      - name: Build and publish Windows installers
-        uses: tauri-apps/tauri-action@v0
+      - name: Build portable Windows executable
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          YOMIKA_UPDATER_PUBKEY: ${{ vars.YOMIKA_UPDATER_PUBKEY }}
-          NEXT_PUBLIC_YOMIKA_UPDATER_ENABLED: ${{ steps.updater.outputs.enabled }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-        with:
-          tauriScript: npx @tauri-apps/cli
-          tagName: ${{ github.ref_name }}
-          releaseName: ${{ github.ref_name }}
-          releaseBody: ${{ steps.release_notes.outputs.release_body }}
-          releaseDraft: false
-          prerelease: false
-          args: ${{ steps.updater.outputs.args }}
-          includeUpdaterJson: ${{ steps.updater.outputs.enabled }}
+        run: bun run build
 
-      - name: Preserve installers when publication fails
-        if: failure()
+      - name: Package portable artifacts
+        id: package
+        shell: pwsh
+        run: |
+          $source = 'target/release/yomika.exe'
+          if (-not (Test-Path $source)) {
+            throw "Expected executable was not produced at $source."
+          }
+          $artifactDir = 'target/release/artifacts'
+          New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
+          $baseName = "Yomika-$env:GITHUB_REF_NAME-windows-x64"
+          $portableExe = "$artifactDir/$baseName.exe"
+          $portableZip = "$artifactDir/$baseName.zip"
+          Copy-Item $source $portableExe
+          Compress-Archive -Path $portableExe -DestinationPath $portableZip -Force
+          "exe=$portableExe" >> $env:GITHUB_OUTPUT
+          "zip=$portableZip" >> $env:GITHUB_OUTPUT
+
+      - name: Create or update GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $exe = '${{ steps.package.outputs.exe }}'
+          $zip = '${{ steps.package.outputs.zip }}'
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $exe $zip --clobber
+          } else {
+            gh release create $tag $exe $zip --verify-tag --title "Yomika $tag" --notes-file "$env:RUNNER_TEMP/release-notes.md"
+          }
+
+      - name: Preserve portable artifacts
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: yomika-${{ github.ref_name }}-windows
-          path: |
-            target/release/bundle/msi/*.msi
-            target/release/bundle/nsis/*-setup.exe
+          name: yomika-${{ github.ref_name }}-windows-portable
+          path: target/release/artifacts/*
           if-no-files-found: ignore
-          retention-days: 3
+          retention-days: 7

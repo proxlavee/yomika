@@ -4,5 +4,10 @@
  */
 
 export interface DataConfig {
+  /**
+   * Optional model-library override. `None` uses `{path}/models`.
+   * @nullable
+   */
+  models_path?: string | null
   path: string
 }

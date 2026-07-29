@@ -1,9 +1,7 @@
 'area: ci':
   - changed-files:
       - any-glob-to-any-file:
-          - .github/CODEOWNERS
-          - .github/dependabot.yml
-          - .github/workflows/**
+          - .github/**
 
 'area: docs':
   - changed-files:
@@ -20,7 +18,11 @@
 'area: tests':
   - changed-files:
       - any-glob-to-any-file:
+          - crates/*/tests/**
           - tests/**
+          - ui/tests/**
+          - '**/*.test.ts'
+          - '**/*.test.tsx'
 
 'area: tauri':
   - changed-files:
@@ -70,3 +72,4 @@ dependencies:
           - Cargo.lock
           - '**/package.json'
           - bun.lock
+          - docs/requirements.txt

@@ -17,7 +17,7 @@ pub use inventory;
 pub use loader::{load_library_by_name, load_library_by_path};
 pub use packages::{PackageCatalog as Catalog, PackageFuture, PackageKind, PackageRegistration};
 pub use runtime::{
-    ComputePolicy, Runtime, RuntimeHttpClient, RuntimeHttpConfig, RuntimeManager,
-    default_app_data_root,
+    ComputePolicy, MODEL_LIBRARY_MARKER, Runtime, RuntimeHttpClient, RuntimeHttpConfig,
+    RuntimeManager, default_app_data_root, ensure_model_library_marker,
 };
 pub use zluda::zluda_active;

@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  DownloadIcon,
   LanguagesIcon,
   LoaderCircleIcon,
   ScanIcon,
@@ -25,14 +26,18 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  cancelOperation,
   deleteCurrentLlm,
   getConfig,
   putCurrentLlm,
+  startDownload,
   startPipeline,
   useGetCatalog,
   useGetCurrentLlm,
 } from '@/lib/api/default/default'
 import type { LlmCatalog, LlmCatalogModel, LlmProviderCatalog, LlmTarget } from '@/lib/api/schemas'
+import { formatBytes } from '@/lib/format'
+import { useDownloadsStore } from '@/lib/stores/downloadsStore'
 import { useEditorUiStore } from '@/lib/stores/editorUiStore'
 import { useJobsStore } from '@/lib/stores/jobsStore'
 import { usePreferencesStore } from '@/lib/stores/preferencesStore'
@@ -241,6 +246,7 @@ function LlmStatusPopover() {
   const llmLoading = llmState?.status === 'loading'
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [busy, setBusy] = useState(false)
+  const downloads = useDownloadsStore((state) => state.downloads)
   const llmModels: LlmModelOption[] = useMemo(() => flattenCatalogModels(llmCatalog), [llmCatalog])
   const selectedTarget = useEditorUiStore((s) => s.selectedTarget)
   const customSystemPrompt = usePreferencesStore((s) => s.customSystemPrompt)
@@ -254,6 +260,13 @@ function LlmStatusPopover() {
   const selectedTargetKey = selectedTarget ? llmTargetKey(selectedTarget) : undefined
   const selectedModelLanguages = selectedModel?.model.languages ?? []
   const selectedIsLoaded = llmReady && sameLlmTarget(llmState?.target, selectedTarget)
+  const selectedIsLocal = selectedModel?.model.target.kind === 'local'
+  const selectedIsDownloaded = !selectedIsLocal || selectedModel?.model.downloaded === true
+  const selectedDownloadId = selectedModel?.model.downloadId ?? undefined
+  const selectedDownload = selectedDownloadId ? downloads[selectedDownloadId] : undefined
+  const selectedDownloadActive =
+    selectedDownload?.status.status === 'started' ||
+    selectedDownload?.status.status === 'downloading'
 
   const handleSetSelectedModel = (key: string) => {
     const next = llmModels.find(({ model }) => llmTargetKey(model.target) === key)
@@ -271,12 +284,24 @@ function LlmStatusPopover() {
     useEditorUiStore.setState({ selectedLanguage: language })
   }
 
-  const handleToggleLoadUnload = async () => {
+  const handlePrimaryAction = async () => {
     const target = useEditorUiStore.getState().selectedTarget
     if (!target) return
     setBusy(true)
     try {
-      if (selectedIsLoaded) {
+      if (selectedIsLocal && selectedDownloadActive) {
+        if (!selectedDownloadId) throw new Error('Selected model download cannot be cancelled')
+        await cancelOperation(selectedDownloadId)
+      } else if (selectedIsLocal && !selectedIsDownloaded) {
+        if (!selectedDownloadId) throw new Error('Selected model cannot be downloaded')
+        const operation = await startDownload({ modelId: selectedDownloadId })
+        useDownloadsStore.getState().progress({
+          id: operation.operationId,
+          filename: selectedModel?.model.name ?? selectedDownloadId,
+          downloaded: 0,
+          status: { status: 'started' },
+        })
+      } else if (selectedIsLoaded) {
         await deleteCurrentLlm()
       } else {
         await putCurrentLlm({ target })
@@ -311,7 +336,18 @@ function LlmStatusPopover() {
     })
   }, [llmModels, llmSelectedLanguage, selectedModel?.model, selectedTarget])
 
-  const indicatorBusy = busy || llmLoading
+  const indicatorBusy = busy || llmLoading || selectedDownloadActive
+  const primaryLabel = selectedIsLocal
+    ? selectedDownloadActive
+      ? t('common.cancel')
+      : selectedIsDownloaded
+        ? selectedIsLoaded
+          ? t('llm.unload')
+          : t('llm.load')
+        : t('llm.download')
+    : selectedIsLoaded
+      ? t('llm.unload')
+      : t('llm.load')
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -367,16 +403,31 @@ function LlmStatusPopover() {
               data-testid='llm-load-toggle'
               data-llm-ready={selectedIsLoaded ? 'true' : 'false'}
               data-llm-loading={indicatorBusy ? 'true' : 'false'}
-              variant={selectedIsLoaded ? 'ghost' : 'default'}
+              variant={selectedIsLoaded || selectedDownloadActive ? 'ghost' : 'default'}
               size='sm'
-              onClick={() => void handleToggleLoadUnload()}
-              disabled={!selectedTarget || indicatorBusy}
+              onClick={() => void handlePrimaryAction()}
+              disabled={!selectedTarget || busy || llmLoading}
               className='h-6 shrink-0 gap-1 px-2 text-[11px]'
             >
-              {indicatorBusy ? <LoaderCircleIcon className='size-3 animate-spin' /> : null}
-              {selectedIsLoaded ? t('llm.unload') : t('llm.load')}
+              {busy || llmLoading ? (
+                <LoaderCircleIcon className='size-3 animate-spin' />
+              ) : selectedIsLocal && !selectedIsDownloaded && !selectedDownloadActive ? (
+                <DownloadIcon className='size-3' />
+              ) : null}
+              {primaryLabel}
             </Button>
           </div>
+          {selectedIsLocal && (
+            <p className='text-[10px] text-muted-foreground'>
+              {selectedIsDownloaded
+                ? t('llm.downloaded', {
+                    size: formatBytes(selectedModel?.model.sizeBytes),
+                  })
+                : selectedDownloadActive
+                  ? t('llm.downloading')
+                  : t('llm.downloadRequired')}
+            </p>
+          )}
         </div>
         <div className='px-3'>
           <Separator />

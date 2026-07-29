@@ -4,11 +4,12 @@ title: 设置参考
 
 # 设置参考
 
-当前 Yomika 的 Settings 页面主要包含以下 6 个区域：
+当前 Yomika 的 Settings 页面主要包含以下 7 个区域：
 
 - `Appearance`
 - `Engines`
 - `API Keys`
+- `AI`
 - `Keybinds`
 - `Runtime`
 - `About`
@@ -74,6 +75,10 @@ API 响应不会返回原始密钥，而是返回已遮罩的值。
 
 Linux 文件系统凭据存储依赖本地文件系统权限，而不是操作系统级加密。
 
+## AI
+
+`AI` 标签页管理图像生成流程所使用的可选 Codex 连接。它显示当前账户状态，并提供设备代码登录和退出操作。此连接与 `API Keys` 中配置的提供方密钥相互独立。
+
 ## Keybinds
 
 `Keybinds` 标签页可用于重新绑定工具切换、笔刷大小快捷键以及撤销/重做的按键。
@@ -83,7 +88,7 @@ Linux 文件系统凭据存储依赖本地文件系统权限，而不是操作�
 - 选择 / 块 / 笔刷 / 橡皮 / 修复笔刷工具的默认按键分别为 `V`/`M`/`B`/`E`/`R`
 - 笔刷大小步进的默认按键为 `[` 和 `]`
 - 撤销与重做的默认按键为 `Ctrl + Z` 和 `Ctrl + Shift + Z`（macOS 上为 `Cmd + Z` 和 `Cmd + Shift + Z`）
-- 画布缩放（`Ctrl` + 滚轮）、平移（`Ctrl` + 拖动）、全选（`Ctrl + A`）以及旧版 `Ctrl + Y` 重做备用方式不可重新绑定
+- 鼠标滚轮缩放、抓手工具或 `Ctrl` + 拖动平移、全选（`Ctrl + A`）以及旧版 `Ctrl + Y` 重做备用方式不可重新绑定
 - 编辑器中会高亮显示冲突；在同一界面也可以恢复默认值
 
 快捷键偏好保存在前端 preferences 层中，而不是 `config.toml` 里。
@@ -92,16 +97,21 @@ Linux 文件系统凭据存储依赖本地文件系统权限，而不是操作�
 
 ## Runtime
 
-`Runtime` 标签页集中放置会影响共享本地运行时、且需要重启后生效的设置：
+`Runtime` 标签页集中管理共享运行时配置和模型存储维护：
 
 - `Data Path`
+- `Model Library`
 - `HTTP Connect Timeout`
 - `HTTP Read Timeout`
 - `HTTP Max Retries`
 
 当前行为：
 
-- `Data Path` 控制运行时包、下载模型、页面清单和图像 blob 的存储位置
+- `Data Path` 控制运行时包、页面清单和图像 blob 的存储位置
+- `Model Library` 默认使用 `<Data Path>/models`，也可以指定其他绝对路径
+- **Use existing** 直接采用所选文件夹中的缓存；**Move current models** 会验证并移动 Yomika 管理的缓存
+- 存储面板可查看占用空间、清理临时文件，以及删除或重新下载本地模型
+- 更改模型库需要重启；请先卸载本地模型，并完成或取消当前任务
 - `HTTP Connect Timeout` 控制建立 HTTP 连接时的最长等待时间
 - `HTTP Read Timeout` 控制读取 HTTP 响应时的最长等待时间
 - `HTTP Max Retries` 控制遇到临时 HTTP 故障时的自动重试次数
@@ -114,16 +124,16 @@ Linux 文件系统凭据存储依赖本地文件系统权限，而不是操作�
 
 - 当前应用版本
 - 是否存在更新的 GitHub release
-- 作者链接
+- `proxlavee` 作者链接
 - 仓库链接
 
-在打包应用模式下，版本检查会把本地版本与 `proxlavee/yomika` 的最新 GitHub release 进行比较。
+Yomika 会在启动时以及从 About 手动检查时，将本地版本与 `proxlavee/yomika` 的最新 GitHub release 进行比较。发现新版本时会打开 Releases 页面；Yomika 不会自动下载或安装应用更新。
 
 ## 持久化模型
 
 当前设置数据分布在多个存储层中：
 
-- `config.toml` 保存 `data`、`http`、`pipeline` 以及提供方 `baseUrl` 等共享配置
+- `config.toml` 保存数据与模型路径、`http`、`pipeline` 以及提供方 `baseUrl` 等共享配置
 - 提供方 API key 通过上文所述的平台凭据存储与 `config.toml` 分开保存
 - 主题、语言和渲染字体存储在前端 preferences 层中
 

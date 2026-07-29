@@ -116,6 +116,15 @@ pub struct LlmCatalogModel {
     pub target: LlmTarget,
     pub name: String,
     pub languages: Vec<String>,
+    /// Present only for local models.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub downloaded: Option<bool>,
+    /// Cached model-file size when downloaded.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size_bytes: Option<u64>,
+    /// Stable id used by the download/cancellation endpoints.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub download_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, JsonSchema, ToSchema)]

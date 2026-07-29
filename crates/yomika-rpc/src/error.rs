@@ -32,6 +32,10 @@ impl ApiError {
         Self::new(StatusCode::NOT_FOUND, message)
     }
 
+    pub fn conflict(message: impl Into<String>) -> Self {
+        Self::new(StatusCode::CONFLICT, message)
+    }
+
     pub fn service_unavailable(err: anyhow::Error) -> Self {
         Self::new(StatusCode::SERVICE_UNAVAILABLE, format!("{err:#}"))
     }

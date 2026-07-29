@@ -48,7 +48,7 @@
     "runCustomAll": "사용자 정의 실행 (모든 페이지)"
   },
   "welcome": {
-    "title": "코하루",
+    "title": "Yomika",
     "subtitle": "만화 번역 작업 공간",
     "new": "새 프로젝트",
     "newDescription": "빈 상태로 시작하고 나중에 페이지 가져오기",
@@ -331,7 +331,7 @@
     "httpProxyDescription": "런타임 및 모델 다운로드에 사용됩니다. 변경 사항은 자동으로 저장됩니다.",
     "title": "설정",
     "appearance": "모양",
-    "appearanceDescription": "장치에서 코하루의 모양을 사용자 지정합니다.",
+    "appearanceDescription": "장치에서 Yomika의 모양을 사용자 지정합니다.",
     "theme": "테마",
     "themeDescription": "선호하는 색상 구성표를 선택합니다.",
     "themeLight": "밝게",
@@ -397,7 +397,7 @@
     "apiKeySave": "저장",
     "apiKeySaved": "저장되었습니다!",
     "dataPath": "데이터 경로",
-    "dataPathDescription": "코하루는 모델, 런타임 패키지, 페이지 매니페스트 및 이미지 데이터를 이 디렉토리에 저장합니다. 경로를 변경하면 앱을 다시 시작해야 합니다.",
+    "dataPathDescription": "Yomika는 런타임 패키지, 페이지 매니페스트 및 이미지 데이터를 여기에 저장합니다. 모델은 아래의 별도 위치를 사용할 수 있습니다. 이 경로를 변경하면 앱을 다시 시작해야 합니다.",
     "dataPathApply": "적용 후 재시작",
     "dataPathApplying": "적용 중...",
     "dataPathDesktopOnly": "런타임 설정은 데스크톱 앱에서만 사용할 수 있습니다.",
@@ -431,23 +431,11 @@
     "shortcutConflict": "이미 사용 중인 키 조합입니다",
     "shortcutInvalid": "이 키는 단축키로 사용할 수 없습니다"
   },
-  "updater": {
+  "updates": {
     "available": {
       "title": "업데이트 사용 가능",
-      "description": "코하루 <strong>{{version}}</strong>을(를) 설치할 수 있습니다"
+      "description": "Yomika {{version}}이(가) GitHub에 출시되었습니다."
     },
-    "noNotes": "릴리스 노트가 제공되지 않았습니다.",
-    "later": "나중에",
-    "update": "업데이트",
-    "downloading": {
-      "title": "업데이트 다운로드 중…",
-      "subtitle": "코하루 {{version}}"
-    },
-    "error": {
-      "title": "업데이트 실패",
-      "description": "업데이트 중 문제가 발생했습니다"
-    },
-    "close": "닫기",
-    "retry": "다시 시도"
+    "openRelease": "다운로드 페이지 열기"
   }
 }

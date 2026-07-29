@@ -371,7 +371,7 @@
     "apiKeySave": "儲存",
     "apiKeySaved": "已儲存！",
     "dataPath": "資料路徑",
-    "dataPathDescription": "Yomika 將模型、執行階段套件、頁面清單和影像資料儲存在此目錄下。變更路徑需要重新啟動應用程式。",
+    "dataPathDescription": "Yomika 在此儲存執行階段套件、頁面清單和影像資料。模型可以使用下方另外設定的位置。變更此路徑需要重新啟動應用程式。",
     "dataPathApply": "套用並重新啟動",
     "dataPathApplying": "正在套用...",
     "dataPathDesktopOnly": "執行階段設定僅在桌面應用程式中可用。",
@@ -405,23 +405,11 @@
     "shortcutConflict": "按鍵組合已被使用",
     "shortcutInvalid": "此按鍵不能用作快捷鍵"
   },
-  "updater": {
+  "updates": {
     "available": {
       "title": "有可用更新",
-      "description": "Yomika <strong>{{version}}</strong> 已準備好安裝"
+      "description": "Yomika {{version}} 已在 GitHub 上發布。"
     },
-    "noNotes": "未提供發行說明。",
-    "later": "稍後",
-    "update": "更新",
-    "downloading": {
-      "title": "正在下載更新…",
-      "subtitle": "Yomika {{version}}"
-    },
-    "error": {
-      "title": "更新失敗",
-      "description": "更新過程中發生問題"
-    },
-    "close": "關閉",
-    "retry": "重試"
+    "openRelease": "開啟下載頁面"
   }
 }

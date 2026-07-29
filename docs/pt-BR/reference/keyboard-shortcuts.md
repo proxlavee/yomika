@@ -12,8 +12,9 @@ Estes são baseados em gestos e não podem ser remapeados pelo usuário.
 
 | Atalho | Ação |
 | --- | --- |
-| `Ctrl` + roda do mouse | Aumentar ou diminuir o zoom |
-| `Ctrl` + arrastar | Deslocar a tela |
+| Roda do mouse | Aplicar zoom ao redor do ponteiro |
+| Ferramenta Mão + arrastar | Deslocar a tela (a ferramenta Mão é o padrão) |
+| `Ctrl` + arrastar | Deslocar temporariamente a partir de qualquer ferramenta |
 | Pinçar no trackpad | Zoom por pinça |
 
 ## Troca de ferramenta

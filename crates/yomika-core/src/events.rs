@@ -160,6 +160,7 @@ pub enum DownloadStatus {
     Started,
     Downloading,
     Completed,
+    Cancelled,
     Failed { reason: String },
 }
 

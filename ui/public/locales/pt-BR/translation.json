@@ -372,7 +372,7 @@
     "apiKeySave": "Salvar",
     "apiKeySaved": "Salva!",
     "dataPath": "Caminho dos Dados",
-    "dataPathDescription": "O Yomika armazena modelos, pacotes de runtime, manifestos de páginas e blobs de imagens neste diretório. Alterar o caminho requer reiniciar o aplicativo.",
+    "dataPathDescription": "O Yomika armazena aqui pacotes de runtime, manifestos de páginas e blobs de imagens. Os modelos podem usar o local separado abaixo. Alterar este caminho requer reiniciar o aplicativo.",
     "dataPathApply": "Aplicar e Reiniciar",
     "dataPathApplying": "Aplicando...",
     "dataPathDesktopOnly": "As configurações de runtime estão disponíveis apenas no aplicativo de desktop.",
@@ -406,23 +406,11 @@
     "shortcutConflict": "Combinação de teclas já em uso",
     "shortcutInvalid": "Esta tecla não pode ser usada como atalho"
   },
-  "updater": {
+  "updates": {
     "available": {
       "title": "Atualização disponível",
-      "description": "Yomika <strong>{{version}}</strong> está pronto para instalar"
+      "description": "Yomika {{version}} está disponível no GitHub."
     },
-    "noNotes": "Nenhuma nota de versão fornecida.",
-    "later": "Mais tarde",
-    "update": "Atualizar",
-    "downloading": {
-      "title": "Baixando atualização…",
-      "subtitle": "Yomika {{version}}"
-    },
-    "error": {
-      "title": "Falha na atualização",
-      "description": "Algo deu errado durante a atualização"
-    },
-    "close": "Fechar",
-    "retry": "Tentar novamente"
+    "openRelease": "Abrir página de download"
   }
 }

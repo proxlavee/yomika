@@ -19,13 +19,13 @@ hide:
             内置流水线默认在本地运行，只有项目确实需要时才接入远程服务。
           </p>
           <div class="ym-actions">
-            <a class="ym-button ym-button--primary" href="how-to/build-from-source.md">构建 Yomika</a>
+            <a class="ym-button ym-button--primary" href="https://github.com/proxlavee/yomika/releases/latest">下载 Windows 版本</a>
             <a class="ym-button ym-button--secondary" href="tutorials/translate-your-first-page.md">翻译第一页</a>
           </div>
           <ul class="ym-facts" aria-label="Yomika 概要">
-            <li>Windows、Linux、Apple Silicon</li>
+            <li>Windows 便携版</li>
+            <li>Linux 与 macOS 源码构建</li>
             <li>GPL-3.0</li>
-            <li>桌面、Headless、MCP</li>
           </ul>
         </div>
 
@@ -154,11 +154,11 @@ hide:
     <section class="ym-install" aria-labelledby="ym-install-title">
       <div class="ym-install__grid">
         <div class="ym-install__copy">
-          <div class="ym-kicker">源码构建</div>
+          <div class="ym-kicker">获取 Yomika</div>
           <h2 id="ym-install-title">准备处理第一页了吗？</h2>
           <p>
-            目前还没有发布预编译版本。请使用仓库提供的 Bun 包装命令，
-            以便启用正确的 Tauri 与平台功能路径。
+            Windows 用户可选择便携版 EXE 或 ZIP，无需安装程序。Linux、macOS
+            或自定义构建请使用仓库提供的 Bun 包装命令。
           </p>
         </div>
         <div>
@@ -167,6 +167,7 @@ cd yomika
 bun install --frozen-lockfile
 bun run build</code></pre>
           <div class="ym-install__links">
+            <a class="ym-text-link" href="https://github.com/proxlavee/yomika/releases/latest">下载 Windows EXE 或 ZIP</a>
             <a class="ym-text-link" href="how-to/build-from-source.md">查看依赖与平台说明</a>
             <a class="ym-text-link" href="how-to/runtime-and-model-downloads.md">了解首次启动下载</a>
             <a class="ym-text-link" href="https://github.com/proxlavee/yomika">在 GitHub 查看源码</a>

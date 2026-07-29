@@ -23,7 +23,7 @@ O detalhe importante de comportamento é:
 
 ## Onde os arquivos ficam
 
-O Yomika armazena os pacotes de runtime e os caches de modelos dentro do `Data Path` configurado. Por padrão, esse caminho é o diretório local de dados da aplicação na plataforma, acrescido de `Yomika`.
+O Yomika armazena os pacotes de runtime no `Data Path` configurado. A biblioteca de modelos usa `<Data Path>/models` por padrão, mas **Settings > Runtime** pode apontá-la para outra pasta absoluta.
 
 Exemplos típicos:
 
@@ -41,7 +41,7 @@ Na implementação atual, os subdiretórios importantes são:
     cuda/
     llama.cpp/
     zluda/
-  models/
+  models/                    # local padrão da biblioteca de modelos
     huggingface/
 ```
 
@@ -49,11 +49,13 @@ Significado prático:
 
 - `runtime/.downloads` é o cache genérico de arquivos para downloads de runtime nativo
 - `runtime/*` contém as bibliotecas extraídas que o Yomika realmente carrega
-- `models/huggingface` é o cache do Hugging Face usado para modelos de visão e arquivos locais de modelos GGUF
+- `<Model Library>/huggingface` é o cache do Hugging Face usado para modelos de visão e arquivos locais de modelos GGUF
 
 Nem todos os diretórios existem em todas as plataformas. Por exemplo, `zluda/` é exclusivo do Windows e só importa em configurações AMD compatíveis.
 
-Para o caminho configurado e as configurações de HTTP, veja a [Referência de Settings](../reference/settings.md).
+Ao mudar a biblioteca de modelos, escolha **Use existing** para adotar os arquivos da pasta selecionada ou **Move current models** para copiar, validar e remover o cache antigo gerenciado pelo Yomika. O app reinicia após a mudança para que todo o runtime use o mesmo local.
+
+Para os caminhos configurados e as configurações de HTTP, veja a [Referência de Settings](../reference/settings.md).
 
 ## Como o download de runtime funciona
 
@@ -77,7 +79,7 @@ Então, uma falha de download de runtime nem sempre é um problema com o Hugging
 
 ## Como o download de modelos funciona
 
-A maioria dos downloads de modelos usa o cache compartilhado do Hugging Face em `models/huggingface`.
+A maioria dos downloads de modelos usa o cache compartilhado do Hugging Face em `<Model Library>/huggingface`.
 
 Em alto nível:
 
@@ -88,6 +90,20 @@ Em alto nível:
 5. Carregamentos posteriores reutilizam o arquivo em cache em vez de baixá-lo novamente.
 
 Isso vale tanto para a stack padrão de visão quanto para os modelos locais de tradução em GGUF que o Yomika baixa sob demanda.
+
+## Gerenciar downloads e espaço em disco
+
+Modelos locais de tradução têm ações separadas de **Download** e **Load**. A ação **Load** nunca baixa um modelo ausente. Durante um download, use **Cancel** no seletor de modelos ou na área de notificações; o Yomika remove arquivos parciais e informa o estado final.
+
+Use **Settings > Runtime** para:
+
+- ver o uso da biblioteca de modelos e dos downloads temporários
+- limpar arquivos de runtime já baixados e arquivos parciais de modelos
+- excluir um modelo local de tradução baixado
+- excluir todos os modelos, incluindo a stack padrão de visão
+- excluir e iniciar novamente o download de um modelo local de tradução
+
+Descarregue o modelo local e conclua ou cancele trabalhos e downloads ativos antes de alterar seus arquivos. Modelos padrão excluídos serão baixados novamente quando a etapa correspondente do pipeline precisar deles.
 
 ## O que é o Hugging Face
 
