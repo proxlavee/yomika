@@ -79,7 +79,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "@vitest/ui": "^4.1.10",
     "babel-plugin-react-compiler": "^1.0.0",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "msw": "^2.14.6",
     "orval": "^8.19.0",
     "oxlint": "^1.71.0",
